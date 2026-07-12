@@ -6,11 +6,11 @@
 
 ## Tools & versions
 
-| Tool                             | Version | Notes                                             |
-| -------------------------------- | ------- | ------------------------------------------------- |
-| Better Auth                      | 1.6.x   | email/password + Google OAuth; runs in the Next app |
+| Tool                              | Version | Notes                                               |
+| --------------------------------- | ------- | --------------------------------------------------- |
+| Better Auth                       | 1.6.x   | email/password + Google OAuth; runs in the Next app |
 | Better Auth `organization` plugin | 1.6.x   | organization = tenant; `member` = membership + role |
-| Supabase Postgres                | 15      | stores Better Auth tables (owned by `postgres`)   |
+| Supabase Postgres                 | 15      | stores Better Auth tables (owned by `postgres`)     |
 
 ## Why we chose this
 
@@ -33,10 +33,10 @@
 
 ## Alternatives considered
 
-| Alternative      | Why not (for now)                                                                 |
-| ---------------- | --------------------------------------------------------------------------------- |
-| Supabase Auth    | Ties tenant context to a Supabase JWT claim; less control over the schema and RLS mapping. Google OAuth was already configured against a localhost callback, which fits an in-app library. |
-| Clerk / Auth0    | Hosted, less control over the RLS/JWT claim mapping; another vendor.               |
+| Alternative   | Why not (for now)                                                                                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Supabase Auth | Ties tenant context to a Supabase JWT claim; less control over the schema and RLS mapping. Google OAuth was already configured against a localhost callback, which fits an in-app library. |
+| Clerk / Auth0 | Hosted, less control over the RLS/JWT claim mapping; another vendor.                                                                                                                       |
 
 ## Open decisions
 
@@ -47,7 +47,7 @@
 
 ## Changelog
 
-| Date       | Change                                      | Reason                                                        |
-| ---------- | ------------------------------------------- | ------------------------------------------------------------- |
-| 2026-07-12 | Created sheet                               | Supabase Auth chosen (all-in)                                 |
+| Date       | Change                                        | Reason                                                        |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------- |
+| 2026-07-12 | Created sheet                                 | Supabase Auth chosen (all-in)                                 |
 | 2026-07-12 | Switched to Better Auth + organization plugin | More schema/session control; org = tenant maps cleanly to RLS |

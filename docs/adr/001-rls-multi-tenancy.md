@@ -50,8 +50,8 @@ queries:
 
 ## Alternatives
 
-| Alternative | Why not |
-| --- | --- |
-| Schema-per-tenant | Migration and connection-pool complexity grows per tenant; cross-tenant analytics get awkward; overkill for the scale we target. |
-| RLS keyed off a Supabase JWT claim | We use Better Auth, not Supabase Auth, so there is no Supabase JWT. Tenant context comes from the active organization instead. |
-| Trusting app-code `WHERE tenant_id = ?` filters | Not defense in depth: a single missed filter leaks data. RLS fails closed at the DB. |
+| Alternative                                     | Why not                                                                                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Schema-per-tenant                               | Migration and connection-pool complexity grows per tenant; cross-tenant analytics get awkward; overkill for the scale we target. |
+| RLS keyed off a Supabase JWT claim              | We use Better Auth, not Supabase Auth, so there is no Supabase JWT. Tenant context comes from the active organization instead.   |
+| Trusting app-code `WHERE tenant_id = ?` filters | Not defense in depth: a single missed filter leaks data. RLS fails closed at the DB.                                             |

@@ -1,0 +1,15 @@
+# Normalize line endings to LF in the repo and in working copies.
+# Prettier enforces `endOfLine: lf`, so without this, Windows checkouts (core.autocrlf=true)
+# produce CRLF files that fail `pnpm lint` locally while CI on Linux passes.
+* text=auto eol=lf
+
+# Binary assets: never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

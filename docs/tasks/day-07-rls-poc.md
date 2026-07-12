@@ -27,7 +27,7 @@ feature. This is the item the plan flags as make-or-break.
 
 ## Verification
 
-`pnpm --filter @selectcars/db rls:verify` — all checks PASS:
+`pnpm --filter @selectcars/db rls:verify` reports all checks PASS:
 
 - tenant A sees only its 2 rows;
 - tenant B sees only its 1 row;
