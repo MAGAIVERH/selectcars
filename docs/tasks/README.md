@@ -26,15 +26,20 @@ a day in the build plan.
 
 ### Phase 1 — Multi-tenancy + Auth
 
-| Day | Title                                                  | Status               |
-| --- | ------------------------------------------------------ | -------------------- |
-| 06  | [DB package + migrations](day-06-db-package.md)        | Done                 |
-| 07  | [RLS proof-of-concept](day-07-rls-poc.md)              | Done                 |
-| 08  | [Tenant context in requests](day-08-tenant-context.md) | Partial              |
-| 09  | [Auth with Better Auth](day-09-auth-better-auth.md)    | Done (roles partial) |
-| 10  | [Fastify API scaffold](day-10-fastify-api.md)          | Done                 |
-| 11  | Audit log                                              | Open                 |
-| 12  | Docker compose + tag                                   | Open                 |
+| Day | Title                                                     | Status                    |
+| --- | --------------------------------------------------------- | ------------------------- |
+| 06  | [DB package + migrations](day-06-db-package.md)           | Done                      |
+| 07  | [RLS proof-of-concept](day-07-rls-poc.md)                 | Done                      |
+| 08  | [Tenant context in requests](day-08-tenant-context.md)    | Done                      |
+| 09  | [Auth with Better Auth](day-09-auth-better-auth.md)       | Done (roles partial)      |
+| 10  | [Fastify API scaffold](day-10-fastify-api.md)             | Done                      |
+| 11  | [Audit log](day-11-audit-log.md)                          | Done                      |
+| 12  | [Docker compose + env template](day-12-docker-and-tag.md) | Done (build not executed) |
+
+**Phase 1 is functionally complete.** Tenant isolation, JWT/JWKS service auth, RBAC, and
+the audit trail are proven end to end by `pnpm --filter @selectcars/db verify:api`
+(13/13, against real servers). Key decisions: [ADR 001](../adr/001-rls-multi-tenancy.md)
+and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ### Phase 2 — Inventory / Vehicles
 

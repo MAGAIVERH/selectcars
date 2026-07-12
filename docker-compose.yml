@@ -1,0 +1,54 @@
+# Local development services.
+#
+# Postgres is NOT here: the database is Supabase (managed), and running a second one
+# locally would let RLS drift between environments. Redis is local because BullMQ (Phase 3)
+# needs it and Upstash is only worth paying for in production.
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: selectcars-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: selectcars-api
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 3333
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3333:3333"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # /ready also proves the container can reach Supabase, not just that it booted.
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3333/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  redis-data:
