@@ -26,11 +26,7 @@ function matchesChip(car: Car, chip: Chip): boolean {
     case "SUV Premium":
       return car.body === "SUV";
     case "Edições limitadas":
-      return (
-        car.badge === "RARO" ||
-        car.badge === "ÚLTIMA UNIDADE" ||
-        car.badge === "RESERVADO"
-      );
+      return car.badge === "RARO" || car.badge === "ÚLTIMA UNIDADE" || car.badge === "RESERVADO";
     case "Recém-chegados":
       return car.badge === "NOVO";
   }
@@ -38,10 +34,7 @@ function matchesChip(car: Car, chip: Chip): boolean {
 
 export function ShowroomGrid({ cars }: { cars: Car[] }) {
   const [chip, setChip] = useState<Chip>("Todos");
-  const filtered = useMemo(
-    () => cars.filter((c) => matchesChip(c, chip)),
-    [cars, chip],
-  );
+  const filtered = useMemo(() => cars.filter((c) => matchesChip(c, chip)), [cars, chip]);
 
   return (
     <div>
@@ -63,13 +56,11 @@ export function ShowroomGrid({ cars }: { cars: Car[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="mt-8 flex h-48 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed border-border text-center">
-          <p className="text-foreground">
-            Nenhum veículo nesta categoria no momento.
-          </p>
+        <div className="border-border mt-8 flex h-48 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed text-center">
+          <p className="text-foreground">Nenhum veículo nesta categoria no momento.</p>
           <Link
             href="/colecao"
-            className="mt-3 text-sm text-muted underline underline-offset-4 hover:text-foreground"
+            className="text-muted hover:text-foreground mt-3 text-sm underline underline-offset-4"
           >
             Ver coleção completa
           </Link>
@@ -87,22 +78,20 @@ export function ShowroomGrid({ cars }: { cars: Car[] }) {
 
 function ShowroomCard({ car }: { car: Car }) {
   return (
-    <article className="flex flex-col rounded-[var(--radius-card)] border border-border bg-surface p-6 transition-shadow hover:shadow-[0_18px_44px_-24px_rgba(0,0,0,0.35)]">
+    <article className="border-border bg-surface flex flex-col rounded-[var(--radius-card)] border p-6 transition-shadow hover:shadow-[0_18px_44px_-24px_rgba(0,0,0,0.35)]">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-xl font-semibold tracking-tight text-foreground">
-            {car.brand}
-          </h3>
-          <p className="text-sm text-muted">{car.model}</p>
+          <h3 className="text-foreground text-xl font-semibold tracking-tight">{car.brand}</h3>
+          <p className="text-muted text-sm">{car.model}</p>
         </div>
         {car.badge && (
-          <span className="shrink-0 rounded-full border border-border-strong px-2.5 py-1 font-mono text-[10px] font-medium tracking-[0.12em] text-foreground">
+          <span className="border-border-strong text-foreground shrink-0 rounded-full border px-2.5 py-1 font-mono text-[10px] font-medium tracking-[0.12em]">
             {car.badge}
           </span>
         )}
       </div>
 
-      <p className="mt-3 font-mono text-[11px] tracking-[0.1em] text-faint">
+      <p className="text-faint mt-3 font-mono text-[11px] tracking-[0.1em]">
         {car.year} · {formatKm(car.km).toUpperCase()} · {car.color.toUpperCase()}
       </p>
 
@@ -116,17 +105,13 @@ function ShowroomCard({ car }: { car: Car }) {
         />
       </div>
 
-      {car.description && (
-        <p className="text-sm leading-6 text-muted">{car.description}</p>
-      )}
+      {car.description && <p className="text-muted text-sm leading-6">{car.description}</p>}
 
-      <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-4">
-        <p className="text-base font-semibold text-foreground">
-          {formatPrice(car.price)}
-        </p>
+      <div className="border-border mt-6 flex items-center justify-between gap-3 border-t pt-4">
+        <p className="text-foreground text-base font-semibold">{formatPrice(car.price)}</p>
         <Link
           href={`/colecao/${car.id}`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background transition-opacity hover:opacity-90"
+          className="bg-foreground text-background inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition-opacity hover:opacity-90"
         >
           Ver detalhes
           <span aria-hidden="true">→</span>

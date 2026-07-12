@@ -57,21 +57,16 @@ export function FeaturedCar() {
     <div>
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
         {/* sidebar */}
-        <aside className="h-fit rounded-[var(--radius-card)] bg-surface p-6">
-          <button
-            type="button"
-            className="flex w-full items-center justify-between"
-          >
+        <aside className="bg-surface h-fit rounded-[var(--radius-card)] p-6">
+          <button type="button" className="flex w-full items-center justify-between">
             <span className="eyebrow">Modelo</span>
             <span className="text-muted" aria-hidden="true">
               ↓
             </span>
           </button>
-          <p className="mt-3 text-base font-medium text-foreground">
-            Aston Martin DB12
-          </p>
+          <p className="text-foreground mt-3 text-base font-medium">Aston Martin DB12</p>
 
-          <div className="mt-4 flex h-44 items-center justify-center rounded-lg bg-background p-3">
+          <div className="bg-background mt-4 flex h-44 items-center justify-center rounded-lg p-3">
             <div className="relative h-32 w-full">
               <Image
                 src="/Image (Aston Martin DB12).png"
@@ -86,28 +81,28 @@ export function FeaturedCar() {
             <button
               type="button"
               aria-label="Anterior"
-              className="grid size-8 place-items-center rounded-full border border-border text-muted transition-colors hover:text-foreground"
+              className="border-border text-muted hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               ‹
             </button>
             <button
               type="button"
               aria-label="Próximo"
-              className="grid size-8 place-items-center rounded-full border border-border text-muted transition-colors hover:text-foreground"
+              className="border-border text-muted hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               ›
             </button>
           </div>
 
-          <ul className="mt-5 border-t border-border">
+          <ul className="border-border mt-5 border-t">
             {CATEGORIES.map((cat) => (
               <li key={cat}>
                 <button
                   type="button"
                   onClick={() => setCategory(cat)}
-                  className={`flex w-full items-center justify-between border-b border-border py-3 text-sm transition-colors ${
+                  className={`border-border flex w-full items-center justify-between border-b py-3 text-sm transition-colors ${
                     category === cat
-                      ? "font-medium text-foreground"
+                      ? "text-foreground font-medium"
                       : "text-muted hover:text-foreground"
                   }`}
                 >
@@ -125,24 +120,19 @@ export function FeaturedCar() {
             {SPECS.map((s) => {
               const Icon = s.icon;
               return (
-                <div
-                  key={s.label}
-                  className="rounded-[var(--radius-card)] bg-surface p-4"
-                >
-                  <div className="flex items-center gap-2 text-faint">
+                <div key={s.label} className="bg-surface rounded-[var(--radius-card)] p-4">
+                  <div className="text-faint flex items-center gap-2">
                     <Icon />
                     <span className="eyebrow">{s.label}</span>
                   </div>
-                  <p className="mt-3 text-sm font-medium text-foreground">
-                    {s.value}
-                  </p>
-                  <p className="mt-1 text-xs text-faint">{s.note}</p>
+                  <p className="text-foreground mt-3 text-sm font-medium">{s.value}</p>
+                  <p className="text-faint mt-1 text-xs">{s.note}</p>
                 </div>
               );
             })}
           </div>
 
-          <div className="relative overflow-hidden rounded-[var(--radius-card)] bg-surface">
+          <div className="bg-surface relative overflow-hidden rounded-[var(--radius-card)]">
             <div className="relative aspect-[16/10] w-full">
               <Image
                 src="/Image (Aston Martin DB12).png"
@@ -157,7 +147,7 @@ export function FeaturedCar() {
             {ANNOTATIONS.map((a) => (
               <span
                 key={a.label}
-                className="absolute flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-border bg-background/90 px-3 py-1.5 text-xs text-foreground backdrop-blur"
+                className="border-border bg-background/90 text-foreground absolute flex -translate-x-1/2 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs backdrop-blur"
                 style={{ top: a.top, left: a.left }}
               >
                 <span className="text-faint">+</span>
@@ -173,42 +163,42 @@ export function FeaturedCar() {
         <div className="hidden lg:block" />
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-          <span className="rounded-full bg-foreground px-4 py-2 font-mono text-[11px] tracking-[0.14em] text-background uppercase">
-            Cores
-          </span>
-          <div className="flex items-center gap-2">
-            {COLORS.map((c, i) => (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => setColor(i)}
-                title={c.name}
-                aria-label={c.name}
-                className={`size-6 rounded-full transition-all ${
-                  color === i
-                    ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
-                    : "ring-1 ring-border-strong"
-                }`}
-                style={{ backgroundColor: c.hex }}
-              />
-            ))}
+            <span className="bg-foreground text-background rounded-full px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase">
+              Cores
+            </span>
+            <div className="flex items-center gap-2">
+              {COLORS.map((c, i) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => setColor(i)}
+                  title={c.name}
+                  aria-label={c.name}
+                  className={`size-6 rounded-full transition-all ${
+                    color === i
+                      ? "ring-foreground ring-offset-background ring-2 ring-offset-2"
+                      : "ring-border-strong ring-1"
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/colecao"
-            className="rounded-full border border-border-strong px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Ver coleção completa
-          </Link>
-          <Link
-            href="#agendar"
-            className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
-          >
-            Solicitar proposta
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/colecao"
+              className="border-border-strong text-foreground hover:bg-surface rounded-full border px-5 py-2.5 text-sm font-medium transition-colors"
+            >
+              Ver coleção completa
+            </Link>
+            <Link
+              href="#agendar"
+              className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
+            >
+              Solicitar proposta
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -231,7 +221,12 @@ function EngineIcon() {
 function SpeedIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M4 15a8 8 0 1 1 16 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path
+        d="M4 15a8 8 0 1 1 16 0"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
       <path d="m12 15 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
