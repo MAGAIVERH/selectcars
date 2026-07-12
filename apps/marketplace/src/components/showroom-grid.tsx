@@ -3,37 +3,37 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { type Car, formatKm, formatPrice } from "@/lib/cars";
+import { type Car, formatMileage, formatPrice } from "@/lib/cars";
 
 const CHIPS = [
-  "Todos",
-  "Esportivos",
-  "Clássicos",
-  "SUV Premium",
-  "Edições limitadas",
-  "Recém-chegados",
+  "All",
+  "Sports",
+  "Classics",
+  "Premium SUV",
+  "Limited editions",
+  "Just arrived",
 ] as const;
 type Chip = (typeof CHIPS)[number];
 
 function matchesChip(car: Car, chip: Chip): boolean {
   switch (chip) {
-    case "Todos":
+    case "All":
       return true;
-    case "Esportivos":
-      return car.body === "Coupé" || car.body === "GT";
-    case "Clássicos":
+    case "Sports":
+      return car.body === "Coupe" || car.body === "GT";
+    case "Classics":
       return car.year <= 2015;
-    case "SUV Premium":
+    case "Premium SUV":
       return car.body === "SUV";
-    case "Edições limitadas":
-      return car.badge === "RARO" || car.badge === "ÚLTIMA UNIDADE" || car.badge === "RESERVADO";
-    case "Recém-chegados":
-      return car.badge === "NOVO";
+    case "Limited editions":
+      return car.badge === "RARE" || car.badge === "FINAL UNIT" || car.badge === "RESERVED";
+    case "Just arrived":
+      return car.badge === "NEW";
   }
 }
 
 export function ShowroomGrid({ cars }: { cars: Car[] }) {
-  const [chip, setChip] = useState<Chip>("Todos");
+  const [chip, setChip] = useState<Chip>("All");
   const filtered = useMemo(() => cars.filter((c) => matchesChip(c, chip)), [cars, chip]);
 
   return (
@@ -57,12 +57,12 @@ export function ShowroomGrid({ cars }: { cars: Car[] }) {
 
       {filtered.length === 0 ? (
         <div className="border-border mt-8 flex h-48 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed text-center">
-          <p className="text-foreground">Nenhum veículo nesta categoria no momento.</p>
+          <p className="text-foreground">No vehicles in this category right now.</p>
           <Link
             href="/colecao"
             className="text-muted hover:text-foreground mt-3 text-sm underline underline-offset-4"
           >
-            Ver coleção completa
+            View full collection
           </Link>
         </div>
       ) : (
@@ -92,7 +92,7 @@ function ShowroomCard({ car }: { car: Car }) {
       </div>
 
       <p className="text-faint mt-3 font-mono text-[11px] tracking-[0.1em]">
-        {car.year} · {formatKm(car.km).toUpperCase()} · {car.color.toUpperCase()}
+        {car.year} · {formatMileage(car.mileage).toUpperCase()} · {car.color.toUpperCase()}
       </p>
 
       <div className="relative my-6 h-40 w-full">
@@ -113,7 +113,7 @@ function ShowroomCard({ car }: { car: Car }) {
           href={`/colecao/${car.id}`}
           className="bg-foreground text-background inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition-opacity hover:opacity-90"
         >
-          Ver detalhes
+          View details
           <span aria-hidden="true">→</span>
         </Link>
       </div>

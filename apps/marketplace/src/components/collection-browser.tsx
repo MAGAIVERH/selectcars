@@ -14,22 +14,22 @@ import {
 } from "@/lib/cars";
 import { CarCard } from "@/components/car-card";
 
-const PRICE_MAX = 3_450_000;
+const PRICE_MAX = 350_000;
 
 const CHIPS = [
-  "Todos",
-  "Esportivos",
-  "Clássicos",
-  "SUV Premium",
-  "Edições limitadas",
-  "Recém-chegados",
+  "All",
+  "Sports",
+  "Classics",
+  "Premium SUV",
+  "Limited editions",
+  "Just arrived",
 ] as const;
 type Chip = (typeof CHIPS)[number];
 
 const SORTS = {
-  recentes: "Recém-chegados",
-  "menor-preco": "Menor preço",
-  "maior-preco": "Maior preço",
+  recent: "Just arrived",
+  "price-asc": "Price: low to high",
+  "price-desc": "Price: high to low",
 } as const;
 type SortKey = keyof typeof SORTS;
 
@@ -39,18 +39,18 @@ function toggle<T>(list: T[], value: T): T[] {
 
 function matchesChip(car: Car, chip: Chip): boolean {
   switch (chip) {
-    case "Todos":
+    case "All":
       return true;
-    case "Esportivos":
-      return car.body === "Coupé" || car.body === "GT";
-    case "Clássicos":
+    case "Sports":
+      return car.body === "Coupe" || car.body === "GT";
+    case "Classics":
       return car.year <= 2015;
-    case "SUV Premium":
+    case "Premium SUV":
       return car.body === "SUV";
-    case "Edições limitadas":
-      return car.badge === "RARO" || car.badge === "ÚLTIMA UNIDADE" || car.badge === "RESERVADO";
-    case "Recém-chegados":
-      return car.badge === "NOVO";
+    case "Limited editions":
+      return car.badge === "RARE" || car.badge === "FINAL UNIT" || car.badge === "RESERVED";
+    case "Just arrived":
+      return car.badge === "NEW";
   }
 }
 
@@ -62,8 +62,8 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
   const [selBodies, setSelBodies] = useState<Body[]>([]);
   const [selTransmissions, setSelTransmissions] = useState<Transmission[]>([]);
   const [selFuels, setSelFuels] = useState<Fuel[]>([]);
-  const [chip, setChip] = useState<Chip>("Todos");
-  const [sort, setSort] = useState<SortKey>("recentes");
+  const [chip, setChip] = useState<Chip>("All");
+  const [sort, setSort] = useState<SortKey>("recent");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -83,10 +83,10 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
     });
 
     result.sort((a, b) => {
-      if (sort === "menor-preco") return (a.price ?? Infinity) - (b.price ?? Infinity);
-      if (sort === "maior-preco") return (b.price ?? -Infinity) - (a.price ?? -Infinity);
-      // recém-chegados: mais novo primeiro, depois menor km
-      return b.year - a.year || a.km - b.km;
+      if (sort === "price-asc") return (a.price ?? Infinity) - (b.price ?? Infinity);
+      if (sort === "price-desc") return (b.price ?? -Infinity) - (a.price ?? -Infinity);
+      // just arrived: newest first, then lowest mileage
+      return b.year - a.year || a.mileage - b.mileage;
     });
 
     return result;
@@ -111,7 +111,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
     setSelBodies([]);
     setSelTransmissions([]);
     setSelFuels([]);
-    setChip("Todos");
+    setChip("All");
   }
 
   return (
@@ -141,12 +141,12 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar marca, modelo ou cor"
+              placeholder="Search make, model, or color"
               className="text-foreground placeholder:text-faint w-52 bg-transparent text-sm outline-none"
             />
           </label>
           <label className="border-border bg-surface flex items-center gap-2 rounded-full border px-4 py-2 text-sm">
-            <span className="eyebrow">Ordenar</span>
+            <span className="eyebrow">Sort</span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
@@ -166,17 +166,17 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
       <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="border-border bg-surface h-fit rounded-[var(--radius-card)] border p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">Filtrar por</h2>
+            <h2 className="text-base font-semibold">Filter</h2>
             <button
               type="button"
               onClick={clearAll}
               className="text-faint hover:text-foreground text-sm transition-colors"
             >
-              Limpar
+              Clear
             </button>
           </div>
 
-          <FilterGroup label="Disponibilidade">
+          <FilterGroup label="Availability">
             <label className="text-muted flex cursor-pointer items-center gap-2.5 text-sm">
               <input
                 type="checkbox"
@@ -184,27 +184,27 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
                 onChange={(e) => setOnlyAvailable(e.target.checked)}
                 className="accent-foreground size-4"
               />
-              Apenas disponíveis para visita
+              Available for viewing only
             </label>
           </FilterGroup>
 
-          <FilterGroup label="Faixa de valor">
+          <FilterGroup label="Price range">
             <input
               type="range"
               min={0}
               max={PRICE_MAX}
-              step={50000}
+              step={5000}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="accent-foreground w-full"
             />
             <div className="text-faint mt-2 flex justify-between font-mono text-[11px]">
-              <span>R$ 0</span>
-              <span>até {formatPrice(maxPrice)}</span>
+              <span>$0</span>
+              <span>up to {formatPrice(maxPrice)}</span>
             </div>
           </FilterGroup>
 
-          <FilterGroup label="Marca">
+          <FilterGroup label="Make">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
               {brands.map((brand) => (
                 <Check
@@ -217,7 +217,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           </FilterGroup>
 
-          <FilterGroup label="Carroceria">
+          <FilterGroup label="Body">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
               {bodies.map((body) => (
                 <Check
@@ -230,7 +230,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           </FilterGroup>
 
-          <FilterGroup label="Câmbio">
+          <FilterGroup label="Transmission">
             <div className="flex flex-wrap gap-2">
               {transmissions.map((t) => (
                 <button
@@ -249,7 +249,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           </FilterGroup>
 
-          <FilterGroup label="Combustível" last>
+          <FilterGroup label="Fuel" last>
             <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
               {fuels.map((fuel) => (
                 <Check
@@ -266,13 +266,13 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
         <div>
           {filtered.length === 0 ? (
             <div className="border-border flex h-64 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed text-center">
-              <p className="text-foreground">Nenhum veículo encontrado.</p>
+              <p className="text-foreground">No vehicles found.</p>
               <button
                 type="button"
                 onClick={clearAll}
                 className="text-muted hover:text-foreground mt-3 text-sm underline underline-offset-4"
               >
-                Limpar filtros
+                Clear filters
               </button>
             </div>
           ) : (
@@ -285,7 +285,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
 
           <div className="border-border text-faint mt-10 flex items-center justify-between border-t pt-6 text-sm">
             <p>
-              Exibindo {filtered.length === 0 ? 0 : 1}–{filtered.length} de {filtered.length}
+              Showing {filtered.length === 0 ? 0 : 1}–{filtered.length} of {filtered.length}
             </p>
             <p className="font-mono tracking-[0.1em]">01 / 01</p>
           </div>

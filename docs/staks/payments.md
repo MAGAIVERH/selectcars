@@ -6,9 +6,9 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Stripe | latest | Checkout + Customer Portal + webhooks |
+| Tool   | Version | Notes                                 |
+| ------ | ------- | ------------------------------------- |
+| Stripe | latest  | Checkout + Customer Portal + webhooks |
 
 ## Plan model (draft)
 
@@ -28,6 +28,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                 |
+| ---------- | ------------- | ---------------------- |
 | 2026-07-12 | Created sheet | Stripe Free/Pro chosen |

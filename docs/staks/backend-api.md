@@ -6,13 +6,13 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Node.js | 20 LTS | |
-| Fastify | 4.x | REST + plugins (cors, helmet, pino) |
-| Zod | latest | validation; contracts shared via `packages/shared` |
-| BullMQ | latest | async jobs (AI, emails) |
-| Supabase JS | latest | server-side client with service role for privileged ops |
+| Tool        | Version | Notes                                                   |
+| ----------- | ------- | ------------------------------------------------------- |
+| Node.js     | 20 LTS  |                                                         |
+| Fastify     | 4.x     | REST + plugins (cors, helmet, pino)                     |
+| Zod         | latest  | validation; contracts shared via `packages/shared`      |
+| BullMQ      | latest  | async jobs (AI, emails)                                 |
+| Supabase JS | latest  | server-side client with service role for privileged ops |
 
 ## Why we chose this
 
@@ -22,11 +22,11 @@
 
 ## Alternatives considered
 
-| Alternative | Why not (for now) |
-|-------------|-------------------|
-| Only Next Route Handlers | Weaker microservice story; harder to run standalone workers |
-| NestJS | More boilerplate than we need for the demo scope |
-| Hono | Great, but Fastify's plugin ecosystem fits BullMQ/observability better here |
+| Alternative              | Why not (for now)                                                           |
+| ------------------------ | --------------------------------------------------------------------------- |
+| Only Next Route Handlers | Weaker microservice story; harder to run standalone workers                 |
+| NestJS                   | More boilerplate than we need for the demo scope                            |
+| Hono                     | Great, but Fastify's plugin ecosystem fits BullMQ/observability better here |
 
 ## Open decisions
 
@@ -35,6 +35,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                                     |
+| ---------- | ------------- | ------------------------------------------ |
 | 2026-07-12 | Created sheet | Initial decision: Fastify + BullMQ service |

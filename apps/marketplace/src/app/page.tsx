@@ -15,21 +15,21 @@ const showroomCars = cars.slice(0, 6);
 const testimonials = [
   {
     name: "R. M.",
-    role: "Empresário · São Paulo",
+    role: "Business owner · Austin, TX",
     quote:
-      "Procurei um Porsche específico por dois anos antes de chegar à SELECTCARS. Em três semanas eles encontraram a unidade certa, na cor certa, com o histórico certo. Atendimento de outro nível.",
+      "I searched for a specific Porsche for two years before I found SELECTCARS. In three weeks they located the right unit, in the right color, with the right history. Service on another level.",
   },
   {
     name: "C. A.",
-    role: "Investidor · Rio de Janeiro",
+    role: "Investor · New York, NY",
     quote:
-      "O que mais me impressionou foi a discrição. Comprei dois carros pela SELECTCARS e em nenhum momento me senti um número. O processo é silencioso, preciso e respeita o seu tempo.",
+      "What impressed me most was the discretion. I bought two cars through SELECTCARS and never once felt like a number. The process is quiet, precise, and respects your time.",
   },
   {
     name: "F. L.",
-    role: "Colecionador · Belo Horizonte",
+    role: "Collector · Los Angeles, CA",
     quote:
-      "Já tive experiências ruins comprando importados. Aqui foi diferente desde o primeiro contato. Eles realmente entendem o produto e tratam o carro como peça, não como estoque.",
+      "I had bad experiences buying imports before. This was different from the first contact. They truly understand the product and treat the car as a piece, not as stock.",
   },
 ];
 
@@ -79,23 +79,23 @@ export default function Home() {
                 style={{ animation: "heroReveal 0.9s ease both" }}
               >
                 <h1 className="text-foreground text-5xl leading-[0.98] font-semibold tracking-[-0.03em] sm:text-6xl xl:text-7xl">
-                  Carros que não se encontram.
+                  Cars you will not find.
                 </h1>
                 <p className="text-muted mt-3 text-3xl font-medium tracking-tight sm:text-4xl">
-                  Se reconhecem.
+                  You will recognize them.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-3">
                   <Link
                     href="/colecao"
                     className="bg-foreground text-background rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
                   >
-                    Ver a coleção
+                    View the collection
                   </Link>
                   <Link
                     href="#agendar"
                     className="border-border-strong bg-background/60 text-foreground hover:bg-surface rounded-full border px-6 py-3 text-sm font-medium backdrop-blur transition-colors"
                   >
-                    Agendar visita
+                    Book a visit
                   </Link>
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function Home() {
                 Porsche · Ferrari · Lamborghini · Aston Martin · Bentley
               </p>
               <p className="text-muted max-w-xs text-sm leading-6 lg:text-right">
-                Uma curadoria para quem entende a diferença entre possuir e pertencer.
+                A curation for those who understand the difference between owning and belonging.
               </p>
             </div>
           </div>
@@ -117,11 +117,11 @@ export default function Home() {
         <section id="sobre" className="mx-auto max-w-[1280px] px-6 py-16">
           {/* eyebrow + headline */}
           <div className="grid gap-6 lg:grid-cols-[1fr_2fr] lg:items-start">
-            <p className="eyebrow pt-3">01 / Sobre</p>
+            <p className="eyebrow pt-3">01 / About</p>
             <h2 className="text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-              Não vendemos carros.
+              We do not sell cars.
               <br />
-              Entregamos exceções.
+              We deliver exceptions.
             </h2>
           </div>
 
@@ -132,27 +132,27 @@ export default function Home() {
                 5%
               </p>
               <p className="eyebrow mt-5 max-w-[13rem] leading-relaxed">
-                Percentual de carros avaliados que chegam ao showroom
+                Share of appraised cars that reach the showroom
               </p>
             </div>
             <div className="max-w-2xl">
               <div className="text-muted space-y-5 text-base leading-7">
                 <p>
-                  A SELECTCARS nasceu da convicção de que um carro extraordinário merece um processo
-                  à altura. Cada veículo no nosso showroom passou por uma seleção criteriosa:
-                  procedência verificada, histórico documentado, condição mecânica e estética dentro
-                  de padrões que não admitem concessões.
+                  SELECTCARS was born from the conviction that an extraordinary car deserves a
+                  process to match. Every vehicle in our showroom has passed a rigorous selection:
+                  verified provenance, documented history, and mechanical and cosmetic condition
+                  held to standards that make no concessions.
                 </p>
                 <p>
-                  Trabalhamos com um número limitado de unidades por mês. Por escolha. Porque
-                  atender bem importa mais do que vender muito.
+                  We work with a limited number of units per month. By choice. Because serving well
+                  matters more than selling in volume.
                 </p>
               </div>
               <Link
                 href="#processo"
                 className="border-foreground text-foreground mt-8 inline-flex items-center gap-2 border-b pb-1 text-sm font-medium transition-opacity hover:opacity-70"
               >
-                Conheça o processo
+                See the process
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -161,8 +161,8 @@ export default function Home() {
           {/* timeline de eras */}
           <div className="border-border mt-20 border-t pt-6">
             <div className="flex items-center justify-between">
-              <p className="eyebrow">Eras representadas no acervo</p>
-              <p className="eyebrow">1960 a 2024</p>
+              <p className="eyebrow">Eras represented in the inventory</p>
+              <p className="eyebrow">1960 to 2024</p>
             </div>
             <div className="border-border mt-6 grid grid-cols-6 border-t pt-4">
               {["1960", "1970", "1980", "1990", "2000", "2010"].map((year) => (
@@ -193,20 +193,20 @@ export default function Home() {
             </div>
 
             <div>
-              <p className="eyebrow">Três princípios</p>
+              <p className="eyebrow">Three principles</p>
               <div className="border-border mt-6 border-t">
                 {[
                   {
-                    t: "Procedência",
-                    d: "Cada veículo é rastreado desde o primeiro proprietário. Documentação completa, histórico de manutenção e laudo técnico independente.",
+                    t: "Provenance",
+                    d: "Every vehicle is traced back to its first owner. Complete documentation, maintenance history, and an independent technical report.",
                   },
                   {
-                    t: "Curadoria",
-                    d: "Selecionamos menos de 5% dos carros que avaliamos. O que entra no nosso showroom precisa ter algo além de preço alto.",
+                    t: "Curation",
+                    d: "We select fewer than 5% of the cars we appraise. What enters our showroom must offer more than a high price.",
                   },
                   {
-                    t: "Discrição",
-                    d: "Atendimento privado, agendado, sem vitrine de rua. O processo de compra é tão exclusivo quanto o carro.",
+                    t: "Discretion",
+                    d: "Private, by-appointment service, with no street showroom. The buying process is as exclusive as the car.",
                   },
                 ].map((p) => (
                   <div
@@ -226,21 +226,21 @@ export default function Home() {
         <section id="destaque" className="mx-auto max-w-[1280px] px-6 py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="eyebrow">02 / Em destaque</p>
+              <p className="eyebrow">02 / Featured</p>
               <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-                Cada detalhe contado.
+                Every detail accounted for.
                 <br />
-                Cada procedência verificada.
+                Every provenance verified.
               </h2>
             </div>
             <div className="flex flex-wrap gap-3">
               <div className="border-border rounded-full border px-4 py-2">
-                <span className="eyebrow">Modelo</span>{" "}
+                <span className="eyebrow">Model</span>{" "}
                 <span className="text-foreground text-sm font-medium">Aston Martin DB12</span>
               </div>
               <div className="border-border rounded-full border px-4 py-2">
-                <span className="eyebrow">Valor</span>{" "}
-                <span className="text-foreground text-sm font-medium">Sob consulta</span>
+                <span className="eyebrow">Price</span>{" "}
+                <span className="text-foreground text-sm font-medium">Inquire</span>
               </div>
             </div>
           </div>
@@ -254,20 +254,19 @@ export default function Home() {
         <section id="colecao" className="mx-auto max-w-[1280px] px-6 py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="eyebrow">03 / Coleção</p>
+              <p className="eyebrow">03 / Collection</p>
               <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-                Disponíveis no showroom.
+                Available in the showroom.
               </h2>
               <p className="text-muted mt-4 max-w-md text-base leading-7">
-                Uma seleção atualizada semanalmente. Para a coleção completa, agende uma visita
-                privada.
+                A selection updated weekly. For the full collection, book a private visit.
               </p>
             </div>
             <Link
               href="/colecao"
               className="border-border bg-surface text-foreground hover:bg-background inline-flex w-fit items-center gap-3 rounded-full border py-1.5 pr-1.5 pl-5 text-sm font-medium transition-colors"
             >
-              Ver coleção completa
+              View full collection
               <span className="bg-foreground text-background grid size-8 place-items-center rounded-full">
                 →
               </span>
@@ -282,11 +281,11 @@ export default function Home() {
           <div className="border-border bg-surface mt-10 flex flex-col gap-6 rounded-[var(--radius-card)] border p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
             <div>
               <h3 className="text-foreground text-xl font-semibold tracking-tight">
-                Não encontrou o que procura?
+                Did not find what you are looking for?
               </h3>
               <p className="text-muted mt-2 max-w-xl text-sm leading-6">
-                Para modelos específicos, edições limitadas ou unidades em outros estados,
-                compartilhe o que você procura. Buscamos no mercado interno e internacional.
+                For specific models, limited editions, or units in other states, tell us what you
+                are looking for. We search the domestic and international market.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-5">
@@ -294,7 +293,7 @@ export default function Home() {
                 href="#agendar"
                 className="bg-foreground text-background inline-flex items-center gap-3 rounded-full py-1.5 pr-1.5 pl-5 text-sm font-medium transition-opacity hover:opacity-90"
               >
-                Falar com um curador
+                Talk to a curator
                 <span className="bg-background text-foreground grid size-8 place-items-center rounded-full">
                   →
                 </span>
@@ -303,7 +302,7 @@ export default function Home() {
                 href="/colecao"
                 className="text-muted hover:text-foreground hidden text-sm transition-colors sm:block"
               >
-                Ver coleção completa
+                View full collection
               </Link>
             </div>
           </div>
@@ -313,14 +312,14 @@ export default function Home() {
         <section id="servicos" className="mx-auto max-w-[1280px] px-6 py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="eyebrow">04 / Serviços</p>
+              <p className="eyebrow">04 / Services</p>
               <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-                Para além da venda.
+                Beyond the sale.
               </h2>
             </div>
             <p className="text-muted max-w-sm text-sm leading-6 lg:text-right">
-              Estrutura completa para clientes que veem o automóvel como patrimônio, não como mero
-              objeto de consumo.
+              Full support for clients who see the automobile as an asset, not a mere object of
+              consumption.
             </p>
           </div>
 
@@ -337,10 +336,10 @@ export default function Home() {
                 />
               </div>
               <div className="mt-6">
-                <p className="eyebrow">Sourcing Internacional</p>
+                <p className="eyebrow">International Sourcing</p>
                 <p className="text-muted mt-3 text-sm leading-6">
-                  Procura ativa de modelos específicos no mercado europeu, americano e asiático.
-                  Importação completa com toda a documentação regularizada.
+                  Active search for specific models across the European, American, and Asian
+                  markets. Full import with all paperwork handled.
                 </p>
               </div>
             </div>
@@ -354,17 +353,17 @@ export default function Home() {
                 ↗
               </span>
               <p className="text-background/50 font-mono text-[11px] tracking-[0.14em] uppercase">
-                Consignação premium
+                Premium consignment
               </p>
               <h3 className="mt-4 max-w-sm text-2xl leading-snug font-semibold tracking-tight">
-                Vendemos o seu carro do jeito que ele merece ser apresentado.
+                We sell your car the way it deserves to be presented.
               </h3>
               <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6">
                 {[
-                  ["Avaliação justa", "Laudo técnico independente"],
-                  ["Apresentação editorial", "Fotografia · vídeo · ficha"],
-                  ["Rede qualificada", "Compradores verificados"],
-                  ["Discrição total", "Sem exposição em vitrine"],
+                  ["Fair appraisal", "Independent technical report"],
+                  ["Editorial presentation", "Photography · video · spec sheet"],
+                  ["Qualified network", "Verified buyers"],
+                  ["Full discretion", "No street showroom"],
                 ].map(([t, d]) => (
                   <div key={t}>
                     <p className="text-sm font-medium">{t}</p>
@@ -377,17 +376,19 @@ export default function Home() {
             {/* gestão */}
             <div className="bg-surface flex flex-col justify-between rounded-[var(--radius-card)] p-8">
               <div>
-                <p className="eyebrow">Para coleções</p>
-                <p className="text-foreground mt-4 text-4xl font-semibold tracking-tight">Gestão</p>
+                <p className="eyebrow">For collections</p>
+                <p className="text-foreground mt-4 text-4xl font-semibold tracking-tight">
+                  Management
+                </p>
                 <p className="eyebrow mt-4 leading-relaxed">
-                  Climatização · Manutenção · Documentação
+                  Climate storage · Maintenance · Paperwork
                 </p>
               </div>
               <Link
                 href="#agendar"
                 className="border-border text-foreground hover:bg-background mt-8 inline-flex items-center justify-between gap-3 rounded-full border py-1.5 pr-1.5 pl-5 text-sm font-medium transition-colors"
               >
-                Gestão de coleção
+                Collection management
                 <span className="bg-foreground text-background grid size-7 place-items-center rounded-full">
                   ↗
                 </span>
@@ -396,7 +397,7 @@ export default function Home() {
           </div>
 
           <p className="text-muted mt-10 text-center text-lg">
-            Patrimônio merece estrutura à altura.
+            An asset deserves structure to match.
           </p>
         </section>
 
@@ -413,14 +414,13 @@ export default function Home() {
               />
             </div>
             <div className="flex-1">
-              <p className="eyebrow">Edição rara · Acervo SELECTCARS</p>
+              <p className="eyebrow">Rare edition · SELECTCARS inventory</p>
               <p className="text-foreground mt-4 text-2xl leading-snug font-semibold tracking-tight sm:text-3xl">
-                Comprar um carro deveria ser tão refinado quanto dirigi-lo.
+                Buying a car should be as refined as driving one.
               </p>
               <p className="text-muted mt-4 max-w-xl text-sm leading-6">
-                Sem pressa, sem ruído, sem cláusulas escondidas. Cada etapa do processo SELECTCARS é
-                desenhada para que você reconheça o carro certo, sem nunca ser empurrado para
-                nenhum.
+                No pressure, no noise, no hidden clauses. Every step of the SELECTCARS process is
+                designed so you recognize the right car, without ever being pushed toward any.
               </p>
             </div>
             <span className="text-faint inline-flex shrink-0 items-center gap-3 font-mono text-sm tracking-[0.22em]">
@@ -434,14 +434,14 @@ export default function Home() {
         <section id="processo" className="mx-auto max-w-[1280px] scroll-mt-24 px-6 py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="eyebrow">05 / O Processo</p>
+              <p className="eyebrow">05 / The Process</p>
               <h2 className="text-foreground mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-                Comprar um carro deveria ser tão refinado quanto dirigi-lo.
+                Buying a car should be as refined as driving one.
               </h2>
             </div>
             <p className="text-muted max-w-xs text-sm leading-6 lg:text-right">
-              Quatro etapas pensadas para entregar previsibilidade, transparência e o tempo adequado
-              para cada decisão importante.
+              Four steps designed to deliver predictability, transparency, and the right time for
+              every important decision.
             </p>
           </div>
 
@@ -457,7 +457,7 @@ export default function Home() {
                 />
               </div>
               <div className="border-border mt-8 flex items-center justify-between border-t pt-5">
-                <p className="eyebrow">04 etapas · 1 padrão</p>
+                <p className="eyebrow">4 steps · 1 standard</p>
                 <div className="flex gap-2">
                   <span
                     className="border-border text-muted grid size-8 place-items-center rounded-full border"
@@ -482,11 +482,11 @@ export default function Home() {
         <section className="mx-auto max-w-[1280px] px-6 py-16">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <p className="eyebrow">06 / Clientes</p>
+              <p className="eyebrow">06 / Clients</p>
               <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-                O que nos define é
+                What defines us is
                 <br />
-                quem confia em nós.
+                who trusts us.
               </h2>
             </div>
             <div className="hidden gap-2 sm:flex">
@@ -554,9 +554,9 @@ export default function Home() {
         {/* Perguntas / FAQ */}
         <section id="perguntas" className="border-border bg-surface/40 border-t">
           <div className="mx-auto max-w-[1280px] px-6 py-20 sm:py-24">
-            <p className="eyebrow text-center">Perguntas frequentes</p>
+            <p className="eyebrow text-center">Frequently asked</p>
             <h2 className="text-foreground mt-4 text-center text-5xl font-semibold tracking-tight sm:text-6xl">
-              Antes de agendar.
+              Before you book.
             </h2>
             <div className="mx-auto mt-12 max-w-3xl">
               <Faq />
@@ -568,30 +568,29 @@ export default function Home() {
         <section id="agendar" className="mx-auto max-w-[1280px] scroll-mt-20 px-6 py-20 sm:py-24">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <p className="eyebrow">07 / Próximo passo</p>
+              <p className="eyebrow">07 / Next step</p>
               <h2 className="text-foreground mt-4 text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl">
-                Encontre o seu próximo.
+                Find your next one.
                 <br />
-                <span className="text-muted">Ou o que você ainda não sabia que era o seu.</span>
+                <span className="text-muted">Or the one you did not yet know was yours.</span>
               </h2>
               <p className="text-muted mt-6 max-w-md text-base leading-7">
-                Seja para uma compra específica, uma consignação ou uma conversa sobre o que faz
-                sentido para o seu momento, estamos disponíveis. Atendimento privado, sob
-                agendamento.
+                Whether it is a specific purchase, a consignment, or a conversation about what fits
+                your moment, we are available. Private service, by appointment.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="#agendar"
                   className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
                 >
-                  Falar com um curador
+                  Talk to a curator
                   <span aria-hidden="true">→</span>
                 </Link>
                 <Link
                   href="/colecao"
                   className="border-border-strong text-foreground hover:bg-surface rounded-full border px-6 py-3 text-sm font-medium transition-colors"
                 >
-                  Ver coleção
+                  View collection
                 </Link>
               </div>
 
@@ -599,15 +598,15 @@ export default function Home() {
                 {[
                   {
                     t: "Showroom",
-                    lines: ["São Paulo · SP", "Endereço enviado no agendamento"],
+                    lines: ["Miami · FL", "Address shared upon appointment"],
                   },
                   {
-                    t: "Horário",
-                    lines: ["Seg a sex · 10h às 19h", "Sábado · 10h às 14h"],
+                    t: "Hours",
+                    lines: ["Mon to Fri · 10am to 7pm", "Saturday · 10am to 2pm"],
                   },
                   {
-                    t: "Contato direto",
-                    lines: ["+55 11 0000-0000", "contato@selectcars.com.br"],
+                    t: "Direct contact",
+                    lines: ["+1 (305) 000-0000", "contact@selectcars.com"],
                   },
                 ].map((c) => (
                   <div key={c.t}>

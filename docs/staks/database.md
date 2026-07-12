@@ -6,11 +6,11 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Supabase Postgres | 15+ | managed Postgres |
-| pgvector | latest | embeddings for semantic search |
-| Supabase migrations / SQL | - | versioned migrations in `packages/db` |
+| Tool                      | Version | Notes                                 |
+| ------------------------- | ------- | ------------------------------------- |
+| Supabase Postgres         | 15+     | managed Postgres                      |
+| pgvector                  | latest  | embeddings for semantic search        |
+| Supabase migrations / SQL | -       | versioned migrations in `packages/db` |
 
 ## Why we chose this
 
@@ -27,11 +27,11 @@
 
 ## Alternatives considered
 
-| Alternative | Why not (for now) |
-|-------------|-------------------|
-| Neon + Drizzle (from PropAI guide) | Owner chose Supabase all-in; fewer moving parts |
-| Schema-per-tenant | RLS is simpler to operate and demo; better interview story |
-| Separate vector DB (Pinecone) | pgvector is enough at this scale |
+| Alternative                        | Why not (for now)                                          |
+| ---------------------------------- | ---------------------------------------------------------- |
+| Neon + Drizzle (from PropAI guide) | Owner chose Supabase all-in; fewer moving parts            |
+| Schema-per-tenant                  | RLS is simpler to operate and demo; better interview story |
+| Separate vector DB (Pinecone)      | pgvector is enough at this scale                           |
 
 ## Open decisions
 
@@ -40,6 +40,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                                    |
+| ---------- | ------------- | ----------------------------------------- |
 | 2026-07-12 | Created sheet | Supabase Postgres + RLS + pgvector chosen |

@@ -2,27 +2,27 @@ import Link from "next/link";
 
 const COLUMNS = [
   {
-    title: "Navegação",
+    title: "Navigation",
     links: [
-      { label: "Coleção", href: "/colecao" },
-      { label: "Marcas", href: "/colecao" },
-      { label: "Serviços", href: "/#servicos" },
-      { label: "Sobre", href: "/#sobre" },
-      { label: "Contato", href: "/#agendar" },
+      { label: "Collection", href: "/colecao" },
+      { label: "Brands", href: "/colecao" },
+      { label: "Services", href: "/#servicos" },
+      { label: "About", href: "/#sobre" },
+      { label: "Contact", href: "/#agendar" },
     ],
   },
   {
-    title: "Serviços",
+    title: "Services",
     links: [
-      { label: "Sourcing Internacional", href: "/#servicos" },
-      { label: "Consignação premium", href: "/#servicos" },
-      { label: "Gestão de coleção", href: "/#servicos" },
-      { label: "Financiamento e seguro", href: "/#agendar" },
+      { label: "International Sourcing", href: "/#servicos" },
+      { label: "Premium Consignment", href: "/#servicos" },
+      { label: "Collection Management", href: "/#servicos" },
+      { label: "Financing & Insurance", href: "/#agendar" },
     ],
   },
 ];
 
-const SOCIALS = ["Instagram", "LinkedIn", "WhatsApp"];
+const SOCIALS = ["Instagram", "LinkedIn", "YouTube"];
 
 export function SiteFooter() {
   return (
@@ -32,11 +32,11 @@ export function SiteFooter() {
           <div>
             <p className="text-3xl font-semibold tracking-[0.14em]">SELECTCARS</p>
             <p className="text-background/60 mt-5 max-w-xs text-sm leading-6">
-              Curadoria de automóveis premium para o colecionador exigente. Atemporal. Discreta.
-              Inconfundível.
+              Premium automotive curation for the discerning collector. Timeless. Discreet.
+              Unmistakable.
             </p>
             <p className="text-background/40 mt-6 font-mono text-[11px] tracking-[0.16em] uppercase">
-              São Paulo · Brasil
+              Miami · United States
             </p>
           </div>
 
@@ -62,12 +62,12 @@ export function SiteFooter() {
 
           <div>
             <p className="text-background/40 font-mono text-[11px] tracking-[0.16em] uppercase">
-              Contato
+              Contact
             </p>
             <ul className="text-background/80 mt-5 space-y-3 text-sm">
-              <li>+55 11 0000-0000</li>
-              <li>contato@selectcars.com.br</li>
-              <li className="text-background/50">Endereço enviado no agendamento</li>
+              <li>+1 (305) 000-0000</li>
+              <li>contact@selectcars.com</li>
+              <li className="text-background/50">Address shared upon appointment</li>
             </ul>
             <div className="mt-5 flex flex-wrap gap-2">
               {SOCIALS.map((s) => (
@@ -85,16 +85,16 @@ export function SiteFooter() {
         </div>
 
         <div className="border-background/15 text-background/50 mt-16 flex flex-col gap-4 border-t pt-6 text-xs sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} SELECTCARS · Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} SELECTCARS · All rights reserved.</p>
           <p className="order-last sm:order-none">
-            Feito por <span className="text-background/80">Magaiver Magalhães</span>
+            Built by <span className="text-background/80">Magaiver Magalhães</span>
           </p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <a href="#" className="hover:text-background transition-colors">
-              Política de Privacidade
+              Privacy Policy
             </a>
             <a href="#" className="hover:text-background transition-colors">
-              Termos de Uso
+              Terms of Use
             </a>
             <a href="#" className="hover:text-background transition-colors">
               Cookies

@@ -10,29 +10,29 @@ type Item = {
 
 const ITEMS: Item[] = [
   {
-    q: "Como funciona o processo de compra na SELECTCARS?",
-    a: "Tudo começa com uma conversa privada para entender seu perfil, preferências e o uso pretendido. A partir daí podemos:",
+    q: "How does buying at SELECTCARS work?",
+    a: "It starts with a private conversation to understand your profile, preferences, and intended use. From there we can:",
     bullets: [
-      "Apresentar opções do nosso estoque atual no showroom",
-      "Buscar no mercado interno e internacional o carro exato que você procura",
-      "Conduzir todo o processo: laudo técnico, documentação, transferência e entrega",
+      "Present options from our current showroom inventory",
+      "Source the exact car you want, domestically and internationally",
+      "Handle the full process: inspection, paperwork, title transfer, and delivery",
     ],
   },
   {
-    q: "Vocês fazem importação de modelos específicos?",
-    a: "Sim. Grande parte do nosso acervo vem de sourcing internacional. Localizamos o modelo, ano e configuração que você procura na Europa, Estados Unidos ou Ásia, com importação e documentação completas.",
+    q: "Do you import specific models?",
+    a: "Yes. A large part of our inventory comes from international sourcing. We locate the model, year, and specification you want in Europe, the US, or Asia, with full import and paperwork.",
   },
   {
-    q: "Como funciona a consignação?",
-    a: "Cuidamos da avaliação, da apresentação editorial e da negociação do seu veículo, com acesso a uma rede de compradores verificados e total discrição.",
+    q: "How does consignment work?",
+    a: "We handle the appraisal, editorial presentation, and negotiation of your vehicle, with access to a network of verified buyers and complete discretion.",
   },
   {
-    q: "Posso financiar a compra?",
-    a: "Sim. Trabalhamos com parceiros para financiamento e seguro sob medida para veículos de alto valor. Apresentamos as opções no momento da proposta.",
+    q: "Can I finance the purchase?",
+    a: "Yes. We work with partners for financing and insurance tailored to high-value vehicles. We present the options at the offer stage.",
   },
   {
-    q: "Vocês entregam fora de São Paulo?",
-    a: "Sim. Conduzimos toda a negociação à distância e organizamos o transporte porta a porta, com seguro total, para qualquer estado.",
+    q: "Do you deliver outside Miami?",
+    a: "Yes. We handle the entire deal remotely and arrange door-to-door transport, fully insured, nationwide.",
   },
 ];
 

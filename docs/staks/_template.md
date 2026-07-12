@@ -9,7 +9,7 @@
 ## Tools & versions
 
 | Tool | Version | Notes |
-|------|---------|-------|
+| ---- | ------- | ----- |
 |      |         |       |
 
 ## Why we chose this
@@ -19,7 +19,7 @@ Short rationale (1–3 bullets). Focus on the senior-level reason.
 ## Alternatives considered
 
 | Alternative | Why not (for now) |
-|-------------|-------------------|
+| ----------- | ----------------- |
 |             |                   |
 
 ## Open decisions
@@ -30,6 +30,6 @@ Short rationale (1–3 bullets). Focus on the senior-level reason.
 
 > Track everything we add / remove / change here. Newest on top.
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                 |
+| ---------- | ------------- | ---------------------- |
 | YYYY-MM-DD | Created sheet | Initial stack decision |
