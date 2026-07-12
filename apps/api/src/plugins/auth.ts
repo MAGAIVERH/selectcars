@@ -34,7 +34,9 @@ declare module "fastify" {
  * See docs/adr/002-service-auth-jwt-jwks.md.
  */
 const authPlugin: FastifyPluginAsync = async (app) => {
-  const jwks = createRemoteJWKSet(new URL(`${env.AUTH_ISSUER_URL}/api/auth/jwks`), {
+  // Fetched from `jwksUrl` (a network address), but trusted only for tokens whose `iss`
+  // and `aud` equal AUTH_ISSUER_URL (an identity). See env.ts.
+  const jwks = createRemoteJWKSet(new URL(env.jwksUrl), {
     cacheMaxAge: 600_000, // 10 min
     cooldownDuration: 30_000, // do not hammer the issuer on unknown `kid`
   });

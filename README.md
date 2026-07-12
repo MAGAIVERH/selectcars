@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SELECTCARS
 
-## Getting Started
+A multi-tenant car marketplace and dealership operating system for the US market.
 
-First, run the development server:
+Buyers browse a premium showroom. Dealerships get an operating system: inventory, leads,
+test drives, analytics. Many dealerships share one database, and **the database itself**
+refuses to let one see another's data.
+
+> Status: **Phase 1 complete** (multi-tenancy + auth). Inventory, AI, and the CRM pipeline
+> are next. See [`docs/tasks/`](docs/tasks/) for the day-by-day build log.
+
+## The two ideas worth reviewing
+
+**1. Tenant isolation is enforced by Postgres, not by application code.**
+Every business table carries `tenant_id` under Row-Level Security. Queries run as a role
+that _cannot_ bypass RLS (`selectcars_app`), inside a transaction that sets the tenant. A
+forgotten `WHERE tenant_id = ...` cannot leak data, because the filter is not in the query:
+it is in the database. Without a tenant context, a query returns **zero rows**, never
+another tenant's. → [ADR 001](docs/adr/001-rls-multi-tenancy.md)
+
+**2. Services authenticate with asymmetric JWT + JWKS, not a shared secret.**
+The Next app is the identity issuer: it signs short-lived EdDSA access tokens and publishes
+its public keys. The Fastify API verifies them offline. **The API holds no signing key, so it
+can verify identities but never forge one.** The token carries the active dealership, so the
+same cryptographic proof that says _who you are_ also says _which tenant you act for_, and
+that feeds RLS. → [ADR 002](docs/adr/002-service-auth-jwt-jwks.md)
+
+Both are proven by scripts that drive the real stack, not mocks:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm --filter @selectcars/db rls:verify    # isolation at the SQL level
+pnpm --filter @selectcars/db verify:api    # isolation through the API, with real tokens
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`verify:api` signs up two real dealerships, mints real tokens, and asserts that a forged
+token is rejected, that each dealership sees only its own rows, and that the audit trail is
+attributed and never leaks across tenants.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Layer       | Choice                                                   |
+| ----------- | -------------------------------------------------------- |
+| Monorepo    | Turborepo + pnpm                                         |
+| Marketplace | Next.js 16, React 19, Tailwind v4, shadcn/ui             |
+| API         | Fastify 5, Zod type provider, pino                       |
+| Database    | Supabase Postgres, Row-Level Security, pgvector          |
+| Auth        | Better Auth (organization plugin = tenant) + JWT/JWKS    |
+| Contracts   | Zod schemas in `packages/shared`, imported by both sides |
+| Async       | BullMQ + Redis (Phase 3: AI never blocks a request)      |
 
-## Learn More
+```
+apps/
+  marketplace   Next.js buyer-facing app; also the identity issuer (Better Auth)
+  api           Fastify service: business logic, tenant-scoped
+packages/
+  db            pg pool, withTenant() (RLS context), SQL migrations
+  shared        Zod contracts shared by every app: one source of truth
+  ui            shadcn/ui base
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Getting started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Prerequisites:** Node 22, pnpm 11, a Supabase project. Docker only if you want to run the
+API in a container.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm install
+cp .env.example .env        # then fill it in: the file explains every variable
+pnpm --filter @selectcars/db migrate
+```
 
-## Deploy on Vercel
+Two gotchas that will cost you an hour if you skip the comments in `.env.example`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Use the Supabase **session pooler** host, not `db.<ref>.supabase.co`. The direct host is
+  IPv6-only and will not resolve on most networks.
+- The variable is `SELECTCARS_DATABASE_URL`, not `DATABASE_URL`, on purpose: a generic
+  `DATABASE_URL` exported by some other tool in your shell would silently win.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run it:
+
+```bash
+pnpm dev                                   # marketplace on :3000
+pnpm --filter @selectcars/api dev          # API on :3333
+```
+
+Google sign-in expects this exact redirect URI:
+`http://localhost:3000/api/auth/callback/google`
+
+### With Docker
+
+```bash
+docker compose up --build      # api on :3333, redis on :6380
+```
+
+Redis is published on **6380**, not the default 6379, so it can coexist with another
+project's Redis on the same machine. Postgres is intentionally not containerized: the
+database is Supabase, and a second local Postgres would let RLS drift from production.
+
+## Engineering rules
+
+Non-negotiables live in [`docs/rules/engineering-rules.md`](docs/rules/engineering-rules.md):
+TypeScript strict with no `any`, RLS on every business table, Zod contracts shared between
+API and apps, AI always async, en-US copy. Decisions with a real trade-off become an
+[ADR](docs/adr/).
