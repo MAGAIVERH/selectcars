@@ -32,8 +32,7 @@ export const cars: Car[] = [
     year: 2024,
     km: 1200,
     color: "Branco Carrara",
-    description:
-      "Aero kit Weissach, bancos em carbono e procedência impecável de primeiro dono.",
+    description: "Aero kit Weissach, bancos em carbono e procedência impecável de primeiro dono.",
     body: "Coupé",
     transmission: "PDK",
     fuel: "Gasolina",
@@ -48,8 +47,7 @@ export const cars: Car[] = [
     year: 2023,
     km: 3400,
     color: "Rosso Corsa",
-    description:
-      "V6 híbrido turbinado, 830 cv combinados. Histórico completo e revisão oficial.",
+    description: "V6 híbrido turbinado, 830 cv combinados. Histórico completo e revisão oficial.",
     body: "Coupé",
     transmission: "DCT",
     fuel: "Híbrido",
@@ -64,8 +62,7 @@ export const cars: Car[] = [
     year: 2024,
     km: 880,
     color: "Verde Mantis",
-    description:
-      "V10 aspirado, dinâmica de pista, configuração específica para a unidade.",
+    description: "V10 aspirado, dinâmica de pista, configuração específica para a unidade.",
     body: "Coupé",
     transmission: "DCT",
     fuel: "Gasolina",
@@ -80,8 +77,7 @@ export const cars: Car[] = [
     year: 2023,
     km: 5100,
     color: "Preto Obsidiana",
-    description:
-      "Quatro portas com motor 4.0 V8 biturbo. Acabamento Designo e laudo independente.",
+    description: "Quatro portas com motor 4.0 V8 biturbo. Acabamento Designo e laudo independente.",
     body: "Sedan",
     transmission: "Automático",
     fuel: "Gasolina",
@@ -111,8 +107,7 @@ export const cars: Car[] = [
     year: 2023,
     km: 6800,
     color: "Orange Flame",
-    description:
-      "GT de 12 cilindros, interior em couro Mulliner, presença para qualquer agenda.",
+    description: "GT de 12 cilindros, interior em couro Mulliner, presença para qualquer agenda.",
     body: "GT",
     transmission: "Automático",
     fuel: "Gasolina",

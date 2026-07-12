@@ -29,26 +29,22 @@ export function ProcessSteps() {
   const [open, setOpen] = useState(1);
 
   return (
-    <div className="border-t border-border">
+    <div className="border-border border-t">
       {STEPS.map((s, i) => {
         const isOpen = open === i;
         return (
-          <div key={s.n} className="border-b border-border">
+          <div key={s.n} className="border-border border-b">
             <button
               type="button"
               onClick={() => setOpen(isOpen ? -1 : i)}
               aria-expanded={isOpen}
               className="flex w-full items-center gap-4 py-5 text-left"
             >
-              <span className="font-mono text-xs text-faint">{s.n}</span>
-              <span className="flex-1 text-lg font-medium text-foreground">
-                {s.t}
-              </span>
+              <span className="text-faint font-mono text-xs">{s.n}</span>
+              <span className="text-foreground flex-1 text-lg font-medium">{s.t}</span>
               <span
                 className={`grid size-7 shrink-0 place-items-center rounded-full text-base transition-colors ${
-                  isOpen
-                    ? "bg-foreground text-background"
-                    : "border border-border text-muted"
+                  isOpen ? "bg-foreground text-background" : "border-border text-muted border"
                 }`}
                 aria-hidden="true"
               >
@@ -60,9 +56,7 @@ export function ProcessSteps() {
                 isOpen ? "grid-rows-[1fr] pb-6" : "grid-rows-[0fr]"
               }`}
             >
-              <p className="max-w-xl overflow-hidden pl-9 text-sm leading-6 text-muted">
-                {s.d}
-              </p>
+              <p className="text-muted max-w-xl overflow-hidden pl-9 text-sm leading-6">{s.d}</p>
             </div>
           </div>
         );

@@ -44,27 +44,18 @@ export function Faq() {
       {ITEMS.map((item, i) => {
         const isOpen = open === i;
         return (
-          <div
-            key={item.q}
-            className="rounded-[var(--radius-card)] bg-surface px-6 py-1"
-          >
+          <div key={item.q} className="bg-surface rounded-[var(--radius-card)] px-6 py-1">
             <button
               type="button"
               onClick={() => setOpen(isOpen ? null : i)}
               aria-expanded={isOpen}
               className="flex w-full items-center gap-4 py-5 text-left"
             >
-              <span className="font-mono text-xs text-faint">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex-1 text-base font-medium text-foreground">
-                {item.q}
-              </span>
+              <span className="text-faint font-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-foreground flex-1 text-base font-medium">{item.q}</span>
               <span
                 className={`grid size-7 shrink-0 place-items-center rounded-full text-base transition-colors ${
-                  isOpen
-                    ? "bg-foreground text-background"
-                    : "border border-border text-muted"
+                  isOpen ? "bg-foreground text-background" : "border-border text-muted border"
                 }`}
                 aria-hidden="true"
               >
@@ -77,16 +68,11 @@ export function Faq() {
               }`}
             >
               <div className="overflow-hidden pl-9">
-                <p className="max-w-2xl text-sm leading-7 text-muted">
-                  {item.a}
-                </p>
+                <p className="text-muted max-w-2xl text-sm leading-7">{item.a}</p>
                 {item.bullets && (
                   <ul className="mt-3 space-y-1.5">
                     {item.bullets.map((b) => (
-                      <li
-                        key={b}
-                        className="flex gap-2 text-sm leading-6 text-muted"
-                      >
+                      <li key={b} className="text-muted flex gap-2 text-sm leading-6">
                         <span className="text-faint">·</span>
                         {b}
                       </li>

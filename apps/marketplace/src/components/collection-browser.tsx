@@ -34,9 +34,7 @@ const SORTS = {
 type SortKey = keyof typeof SORTS;
 
 function toggle<T>(list: T[], value: T): T[] {
-  return list.includes(value)
-    ? list.filter((v) => v !== value)
-    : [...list, value];
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
 function matchesChip(car: Car, chip: Chip): boolean {
@@ -50,11 +48,7 @@ function matchesChip(car: Car, chip: Chip): boolean {
     case "SUV Premium":
       return car.body === "SUV";
     case "Edições limitadas":
-      return (
-        car.badge === "RARO" ||
-        car.badge === "ÚLTIMA UNIDADE" ||
-        car.badge === "RESERVADO"
-      );
+      return car.badge === "RARO" || car.badge === "ÚLTIMA UNIDADE" || car.badge === "RESERVADO";
     case "Recém-chegados":
       return car.badge === "NOVO";
   }
@@ -79,8 +73,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
       if (car.price !== null && car.price > maxPrice) return false;
       if (selBrands.length && !selBrands.includes(car.brand)) return false;
       if (selBodies.length && !selBodies.includes(car.body)) return false;
-      if (selTransmissions.length && !selTransmissions.includes(car.transmission))
-        return false;
+      if (selTransmissions.length && !selTransmissions.includes(car.transmission)) return false;
       if (selFuels.length && !selFuels.includes(car.fuel)) return false;
       if (q) {
         const haystack = `${car.brand} ${car.model} ${car.color}`.toLowerCase();
@@ -90,10 +83,8 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
     });
 
     result.sort((a, b) => {
-      if (sort === "menor-preco")
-        return (a.price ?? Infinity) - (b.price ?? Infinity);
-      if (sort === "maior-preco")
-        return (b.price ?? -Infinity) - (a.price ?? -Infinity);
+      if (sort === "menor-preco") return (a.price ?? Infinity) - (b.price ?? Infinity);
+      if (sort === "maior-preco") return (b.price ?? -Infinity) - (a.price ?? -Infinity);
       // recém-chegados: mais novo primeiro, depois menor km
       return b.year - a.year || a.km - b.km;
     });
@@ -145,21 +136,21 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2">
+          <label className="border-border bg-surface flex items-center gap-2 rounded-full border px-4 py-2">
             <SearchIcon />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar marca, modelo ou cor"
-              className="w-52 bg-transparent text-sm text-foreground outline-none placeholder:text-faint"
+              className="text-foreground placeholder:text-faint w-52 bg-transparent text-sm outline-none"
             />
           </label>
-          <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm">
+          <label className="border-border bg-surface flex items-center gap-2 rounded-full border px-4 py-2 text-sm">
             <span className="eyebrow">Ordenar</span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
-              className="bg-transparent font-medium text-foreground outline-none"
+              className="text-foreground bg-transparent font-medium outline-none"
             >
               {Object.entries(SORTS).map(([key, label]) => (
                 <option key={key} value={key}>
@@ -173,25 +164,25 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
 
       {/* Body: sidebar + grid */}
       <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-[var(--radius-card)] border border-border bg-surface p-6">
+        <aside className="border-border bg-surface h-fit rounded-[var(--radius-card)] border p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">Filtrar por</h2>
             <button
               type="button"
               onClick={clearAll}
-              className="text-sm text-faint transition-colors hover:text-foreground"
+              className="text-faint hover:text-foreground text-sm transition-colors"
             >
               Limpar
             </button>
           </div>
 
           <FilterGroup label="Disponibilidade">
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-muted">
+            <label className="text-muted flex cursor-pointer items-center gap-2.5 text-sm">
               <input
                 type="checkbox"
                 checked={onlyAvailable}
                 onChange={(e) => setOnlyAvailable(e.target.checked)}
-                className="size-4 accent-foreground"
+                className="accent-foreground size-4"
               />
               Apenas disponíveis para visita
             </label>
@@ -205,9 +196,9 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
               step={50000}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-foreground"
+              className="accent-foreground w-full"
             />
-            <div className="mt-2 flex justify-between font-mono text-[11px] text-faint">
+            <div className="text-faint mt-2 flex justify-between font-mono text-[11px]">
               <span>R$ 0</span>
               <span>até {formatPrice(maxPrice)}</span>
             </div>
@@ -274,12 +265,12 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
 
         <div>
           {filtered.length === 0 ? (
-            <div className="flex h-64 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed border-border text-center">
+            <div className="border-border flex h-64 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed text-center">
               <p className="text-foreground">Nenhum veículo encontrado.</p>
               <button
                 type="button"
                 onClick={clearAll}
-                className="mt-3 text-sm text-muted underline underline-offset-4 hover:text-foreground"
+                className="text-muted hover:text-foreground mt-3 text-sm underline underline-offset-4"
               >
                 Limpar filtros
               </button>
@@ -292,10 +283,9 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           )}
 
-          <div className="mt-10 flex items-center justify-between border-t border-border pt-6 text-sm text-faint">
+          <div className="border-border text-faint mt-10 flex items-center justify-between border-t pt-6 text-sm">
             <p>
-              Exibindo {filtered.length === 0 ? 0 : 1}–{filtered.length} de{" "}
-              {filtered.length}
+              Exibindo {filtered.length === 0 ? 0 : 1}–{filtered.length} de {filtered.length}
             </p>
             <p className="font-mono tracking-[0.1em]">01 / 01</p>
           </div>
@@ -315,7 +305,7 @@ function FilterGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`mt-6 ${last ? "" : "border-b border-border pb-6"}`}>
+    <div className={`mt-6 ${last ? "" : "border-border border-b pb-6"}`}>
       <p className="eyebrow mb-3">{label}</p>
       {children}
     </div>
@@ -332,12 +322,12 @@ function Check({
   onChange: () => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-muted">
+    <label className="text-muted flex cursor-pointer items-center gap-2 text-sm">
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="size-4 accent-foreground"
+        className="accent-foreground size-4"
       />
       {label}
     </label>
@@ -348,12 +338,7 @@ function SearchIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="m20 20-3.2-3.2"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <path d="m20 20-3.2-3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

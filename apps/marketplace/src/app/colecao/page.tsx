@@ -17,7 +17,7 @@ export default function ColecaoPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-[1280px] px-6 py-12">
           <p className="eyebrow">Coleção · Showroom São Paulo</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="text-foreground mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
             {cars.length} veículos no acervo
           </h1>
           <div className="mt-10">

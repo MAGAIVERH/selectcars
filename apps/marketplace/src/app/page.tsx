@@ -39,7 +39,7 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         {/* Hero — cinematic, text-behind-subject */}
-        <section className="relative overflow-hidden border-b border-border">
+        <section className="border-border relative overflow-hidden border-b">
           {/* soft spotlight behind the car */}
           <div
             aria-hidden="true"
@@ -78,22 +78,22 @@ export default function Home() {
                 className="relative z-10 max-w-[86%] sm:max-w-[52%] lg:max-w-[42%]"
                 style={{ animation: "heroReveal 0.9s ease both" }}
               >
-                <h1 className="text-5xl leading-[0.98] font-semibold tracking-[-0.03em] text-foreground sm:text-6xl xl:text-7xl">
+                <h1 className="text-foreground text-5xl leading-[0.98] font-semibold tracking-[-0.03em] sm:text-6xl xl:text-7xl">
                   Carros que não se encontram.
                 </h1>
-                <p className="mt-3 text-3xl font-medium tracking-tight text-muted sm:text-4xl">
+                <p className="text-muted mt-3 text-3xl font-medium tracking-tight sm:text-4xl">
                   Se reconhecem.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-3">
                   <Link
                     href="/colecao"
-                    className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                    className="bg-foreground text-background rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
                   >
                     Ver a coleção
                   </Link>
                   <Link
                     href="#agendar"
-                    className="rounded-full border border-border-strong bg-background/60 px-6 py-3 text-sm font-medium text-foreground backdrop-blur transition-colors hover:bg-surface"
+                    className="border-border-strong bg-background/60 text-foreground hover:bg-surface rounded-full border px-6 py-3 text-sm font-medium backdrop-blur transition-colors"
                   >
                     Agendar visita
                   </Link>
@@ -102,13 +102,12 @@ export default function Home() {
             </div>
 
             {/* bottom bar */}
-            <div className="relative z-10 flex items-center justify-between gap-6 border-t border-border/60 py-5">
+            <div className="border-border/60 relative z-10 flex items-center justify-between gap-6 border-t py-5">
               <p className="eyebrow hidden sm:block">
                 Porsche · Ferrari · Lamborghini · Aston Martin · Bentley
               </p>
-              <p className="max-w-xs text-sm leading-6 text-muted lg:text-right">
-                Uma curadoria para quem entende a diferença entre possuir e
-                pertencer.
+              <p className="text-muted max-w-xs text-sm leading-6 lg:text-right">
+                Uma curadoria para quem entende a diferença entre possuir e pertencer.
               </p>
             </div>
           </div>
@@ -119,7 +118,7 @@ export default function Home() {
           {/* eyebrow + headline */}
           <div className="grid gap-6 lg:grid-cols-[1fr_2fr] lg:items-start">
             <p className="eyebrow pt-3">01 / Sobre</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
               Não vendemos carros.
               <br />
               Entregamos exceções.
@@ -129,7 +128,7 @@ export default function Home() {
           {/* 5% + descrição */}
           <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-16">
             <div>
-              <p className="text-8xl leading-none font-light tracking-tight text-foreground sm:text-9xl">
+              <p className="text-foreground text-8xl leading-none font-light tracking-tight sm:text-9xl">
                 5%
               </p>
               <p className="eyebrow mt-5 max-w-[13rem] leading-relaxed">
@@ -137,22 +136,21 @@ export default function Home() {
               </p>
             </div>
             <div className="max-w-2xl">
-              <div className="space-y-5 text-base leading-7 text-muted">
+              <div className="text-muted space-y-5 text-base leading-7">
                 <p>
-                  A SELECTCARS nasceu da convicção de que um carro extraordinário
-                  merece um processo à altura. Cada veículo no nosso showroom
-                  passou por uma seleção criteriosa: procedência verificada,
-                  histórico documentado, condição mecânica e estética dentro de
-                  padrões que não admitem concessões.
+                  A SELECTCARS nasceu da convicção de que um carro extraordinário merece um processo
+                  à altura. Cada veículo no nosso showroom passou por uma seleção criteriosa:
+                  procedência verificada, histórico documentado, condição mecânica e estética dentro
+                  de padrões que não admitem concessões.
                 </p>
                 <p>
-                  Trabalhamos com um número limitado de unidades por mês. Por
-                  escolha. Porque atender bem importa mais do que vender muito.
+                  Trabalhamos com um número limitado de unidades por mês. Por escolha. Porque
+                  atender bem importa mais do que vender muito.
                 </p>
               </div>
               <Link
                 href="#processo"
-                className="mt-8 inline-flex items-center gap-2 border-b border-foreground pb-1 text-sm font-medium text-foreground transition-opacity hover:opacity-70"
+                className="border-foreground text-foreground mt-8 inline-flex items-center gap-2 border-b pb-1 text-sm font-medium transition-opacity hover:opacity-70"
               >
                 Conheça o processo
                 <span aria-hidden="true">→</span>
@@ -161,12 +159,12 @@ export default function Home() {
           </div>
 
           {/* timeline de eras */}
-          <div className="mt-20 border-t border-border pt-6">
+          <div className="border-border mt-20 border-t pt-6">
             <div className="flex items-center justify-between">
               <p className="eyebrow">Eras representadas no acervo</p>
               <p className="eyebrow">1960 a 2024</p>
             </div>
-            <div className="mt-6 grid grid-cols-6 border-t border-border pt-4">
+            <div className="border-border mt-6 grid grid-cols-6 border-t pt-4">
               {["1960", "1970", "1980", "1990", "2000", "2010"].map((year) => (
                 <span
                   key={year}
@@ -182,7 +180,7 @@ export default function Home() {
 
           {/* imagem + três princípios */}
           <div className="mt-16 grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
-            <div className="flex items-center justify-center rounded-[var(--radius-card)] bg-surface p-8 sm:p-10">
+            <div className="bg-surface flex items-center justify-center rounded-[var(--radius-card)] p-8 sm:p-10">
               <div className="relative h-[200px] w-full sm:h-[240px]">
                 <Image
                   src="/porsche-hero.png"
@@ -196,7 +194,7 @@ export default function Home() {
 
             <div>
               <p className="eyebrow">Três princípios</p>
-              <div className="mt-6 border-t border-border">
+              <div className="border-border mt-6 border-t">
                 {[
                   {
                     t: "Procedência",
@@ -213,12 +211,10 @@ export default function Home() {
                 ].map((p) => (
                   <div
                     key={p.t}
-                    className="grid gap-2 border-b border-border py-6 sm:grid-cols-[1fr_2fr] sm:gap-8"
+                    className="border-border grid gap-2 border-b py-6 sm:grid-cols-[1fr_2fr] sm:gap-8"
                   >
-                    <h3 className="text-lg font-medium text-foreground">
-                      {p.t}
-                    </h3>
-                    <p className="text-sm leading-6 text-muted">{p.d}</p>
+                    <h3 className="text-foreground text-lg font-medium">{p.t}</h3>
+                    <p className="text-muted text-sm leading-6">{p.d}</p>
                   </div>
                 ))}
               </div>
@@ -231,24 +227,20 @@ export default function Home() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow">02 / Em destaque</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 Cada detalhe contado.
                 <br />
                 Cada procedência verificada.
               </h2>
             </div>
             <div className="flex flex-wrap gap-3">
-              <div className="rounded-full border border-border px-4 py-2">
+              <div className="border-border rounded-full border px-4 py-2">
                 <span className="eyebrow">Modelo</span>{" "}
-                <span className="text-sm font-medium text-foreground">
-                  Aston Martin DB12
-                </span>
+                <span className="text-foreground text-sm font-medium">Aston Martin DB12</span>
               </div>
-              <div className="rounded-full border border-border px-4 py-2">
+              <div className="border-border rounded-full border px-4 py-2">
                 <span className="eyebrow">Valor</span>{" "}
-                <span className="text-sm font-medium text-foreground">
-                  Sob consulta
-                </span>
+                <span className="text-foreground text-sm font-medium">Sob consulta</span>
               </div>
             </div>
           </div>
@@ -263,20 +255,20 @@ export default function Home() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow">03 / Coleção</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 Disponíveis no showroom.
               </h2>
-              <p className="mt-4 max-w-md text-base leading-7 text-muted">
-                Uma seleção atualizada semanalmente. Para a coleção completa,
-                agende uma visita privada.
+              <p className="text-muted mt-4 max-w-md text-base leading-7">
+                Uma seleção atualizada semanalmente. Para a coleção completa, agende uma visita
+                privada.
               </p>
             </div>
             <Link
               href="/colecao"
-              className="inline-flex w-fit items-center gap-3 rounded-full border border-border bg-surface py-1.5 pr-1.5 pl-5 text-sm font-medium text-foreground transition-colors hover:bg-background"
+              className="border-border bg-surface text-foreground hover:bg-background inline-flex w-fit items-center gap-3 rounded-full border py-1.5 pr-1.5 pl-5 text-sm font-medium transition-colors"
             >
               Ver coleção completa
-              <span className="grid size-8 place-items-center rounded-full bg-foreground text-background">
+              <span className="bg-foreground text-background grid size-8 place-items-center rounded-full">
                 →
               </span>
             </Link>
@@ -287,30 +279,29 @@ export default function Home() {
           </div>
 
           {/* Não encontrou banner */}
-          <div className="mt-10 flex flex-col gap-6 rounded-[var(--radius-card)] border border-border bg-surface p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+          <div className="border-border bg-surface mt-10 flex flex-col gap-6 rounded-[var(--radius-card)] border p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
             <div>
-              <h3 className="text-xl font-semibold tracking-tight text-foreground">
+              <h3 className="text-foreground text-xl font-semibold tracking-tight">
                 Não encontrou o que procura?
               </h3>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-                Para modelos específicos, edições limitadas ou unidades em outros
-                estados, compartilhe o que você procura. Buscamos no mercado
-                interno e internacional.
+              <p className="text-muted mt-2 max-w-xl text-sm leading-6">
+                Para modelos específicos, edições limitadas ou unidades em outros estados,
+                compartilhe o que você procura. Buscamos no mercado interno e internacional.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-5">
               <Link
                 href="#agendar"
-                className="inline-flex items-center gap-3 rounded-full bg-foreground py-1.5 pr-1.5 pl-5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="bg-foreground text-background inline-flex items-center gap-3 rounded-full py-1.5 pr-1.5 pl-5 text-sm font-medium transition-opacity hover:opacity-90"
               >
                 Falar com um curador
-                <span className="grid size-8 place-items-center rounded-full bg-background text-foreground">
+                <span className="bg-background text-foreground grid size-8 place-items-center rounded-full">
                   →
                 </span>
               </Link>
               <Link
                 href="/colecao"
-                className="hidden text-sm text-muted transition-colors hover:text-foreground sm:block"
+                className="text-muted hover:text-foreground hidden text-sm transition-colors sm:block"
               >
                 Ver coleção completa
               </Link>
@@ -323,19 +314,19 @@ export default function Home() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow">04 / Serviços</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 Para além da venda.
               </h2>
             </div>
-            <p className="max-w-sm text-sm leading-6 text-muted lg:text-right">
-              Estrutura completa para clientes que veem o automóvel como
-              patrimônio, não como mero objeto de consumo.
+            <p className="text-muted max-w-sm text-sm leading-6 lg:text-right">
+              Estrutura completa para clientes que veem o automóvel como patrimônio, não como mero
+              objeto de consumo.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {/* sourcing */}
-            <div className="relative flex flex-col rounded-[var(--radius-card)] bg-surface p-6">
+            <div className="bg-surface relative flex flex-col rounded-[var(--radius-card)] p-6">
               <div className="relative h-36 w-full">
                 <Image
                   src="/porsche-hero.png"
@@ -347,23 +338,22 @@ export default function Home() {
               </div>
               <div className="mt-6">
                 <p className="eyebrow">Sourcing Internacional</p>
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  Procura ativa de modelos específicos no mercado europeu,
-                  americano e asiático. Importação completa com toda a
-                  documentação regularizada.
+                <p className="text-muted mt-3 text-sm leading-6">
+                  Procura ativa de modelos específicos no mercado europeu, americano e asiático.
+                  Importação completa com toda a documentação regularizada.
                 </p>
               </div>
             </div>
 
             {/* consignação (dark) */}
-            <div className="relative flex flex-col rounded-[var(--radius-card)] bg-foreground p-8 text-background">
+            <div className="bg-foreground text-background relative flex flex-col rounded-[var(--radius-card)] p-8">
               <span
-                className="absolute top-6 right-6 grid size-8 place-items-center rounded-full border border-background/25 text-background/70"
+                className="border-background/25 text-background/70 absolute top-6 right-6 grid size-8 place-items-center rounded-full border"
                 aria-hidden="true"
               >
                 ↗
               </span>
-              <p className="font-mono text-[11px] tracking-[0.14em] text-background/50 uppercase">
+              <p className="text-background/50 font-mono text-[11px] tracking-[0.14em] uppercase">
                 Consignação premium
               </p>
               <h3 className="mt-4 max-w-sm text-2xl leading-snug font-semibold tracking-tight">
@@ -378,42 +368,40 @@ export default function Home() {
                 ].map(([t, d]) => (
                   <div key={t}>
                     <p className="text-sm font-medium">{t}</p>
-                    <p className="mt-1 text-xs text-background/50">{d}</p>
+                    <p className="text-background/50 mt-1 text-xs">{d}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* gestão */}
-            <div className="flex flex-col justify-between rounded-[var(--radius-card)] bg-surface p-8">
+            <div className="bg-surface flex flex-col justify-between rounded-[var(--radius-card)] p-8">
               <div>
                 <p className="eyebrow">Para coleções</p>
-                <p className="mt-4 text-4xl font-semibold tracking-tight text-foreground">
-                  Gestão
-                </p>
+                <p className="text-foreground mt-4 text-4xl font-semibold tracking-tight">Gestão</p>
                 <p className="eyebrow mt-4 leading-relaxed">
                   Climatização · Manutenção · Documentação
                 </p>
               </div>
               <Link
                 href="#agendar"
-                className="mt-8 inline-flex items-center justify-between gap-3 rounded-full border border-border py-1.5 pr-1.5 pl-5 text-sm font-medium text-foreground transition-colors hover:bg-background"
+                className="border-border text-foreground hover:bg-background mt-8 inline-flex items-center justify-between gap-3 rounded-full border py-1.5 pr-1.5 pl-5 text-sm font-medium transition-colors"
               >
                 Gestão de coleção
-                <span className="grid size-7 place-items-center rounded-full bg-foreground text-background">
+                <span className="bg-foreground text-background grid size-7 place-items-center rounded-full">
                   ↗
                 </span>
               </Link>
             </div>
           </div>
 
-          <p className="mt-10 text-center text-lg text-muted">
+          <p className="text-muted mt-10 text-center text-lg">
             Patrimônio merece estrutura à altura.
           </p>
         </section>
 
         {/* Statement banner */}
-        <section className="border-y border-border bg-surface">
+        <section className="border-border bg-surface border-y">
           <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-8 px-6 py-14 lg:flex-row lg:gap-12">
             <div className="relative h-28 w-52 shrink-0">
               <Image
@@ -426,42 +414,39 @@ export default function Home() {
             </div>
             <div className="flex-1">
               <p className="eyebrow">Edição rara · Acervo SELECTCARS</p>
-              <p className="mt-4 text-2xl leading-snug font-semibold tracking-tight text-foreground sm:text-3xl">
+              <p className="text-foreground mt-4 text-2xl leading-snug font-semibold tracking-tight sm:text-3xl">
                 Comprar um carro deveria ser tão refinado quanto dirigi-lo.
               </p>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-muted">
-                Sem pressa, sem ruído, sem cláusulas escondidas. Cada etapa do
-                processo SELECTCARS é desenhada para que você reconheça o carro
-                certo, sem nunca ser empurrado para nenhum.
+              <p className="text-muted mt-4 max-w-xl text-sm leading-6">
+                Sem pressa, sem ruído, sem cláusulas escondidas. Cada etapa do processo SELECTCARS é
+                desenhada para que você reconheça o carro certo, sem nunca ser empurrado para
+                nenhum.
               </p>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-3 font-mono text-sm tracking-[0.22em] text-faint">
-              <span className="h-px w-6 bg-faint" aria-hidden="true" />
+            <span className="text-faint inline-flex shrink-0 items-center gap-3 font-mono text-sm tracking-[0.22em]">
+              <span className="bg-faint h-px w-6" aria-hidden="true" />
               SELECT
             </span>
           </div>
         </section>
 
         {/* 05 — O Processo */}
-        <section
-          id="processo"
-          className="mx-auto max-w-[1280px] scroll-mt-24 px-6 py-16"
-        >
+        <section id="processo" className="mx-auto max-w-[1280px] scroll-mt-24 px-6 py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow">05 / O Processo</p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="text-foreground mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
                 Comprar um carro deveria ser tão refinado quanto dirigi-lo.
               </h2>
             </div>
-            <p className="max-w-xs text-sm leading-6 text-muted lg:text-right">
-              Quatro etapas pensadas para entregar previsibilidade,
-              transparência e o tempo adequado para cada decisão importante.
+            <p className="text-muted max-w-xs text-sm leading-6 lg:text-right">
+              Quatro etapas pensadas para entregar previsibilidade, transparência e o tempo adequado
+              para cada decisão importante.
             </p>
           </div>
 
           <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
-            <div className="flex flex-col justify-between rounded-[var(--radius-card)] bg-surface p-5">
+            <div className="bg-surface flex flex-col justify-between rounded-[var(--radius-card)] p-5">
               <div className="relative h-60 w-full sm:h-72">
                 <Image
                   src="/porsche-hero.png"
@@ -471,17 +456,17 @@ export default function Home() {
                   className="object-contain"
                 />
               </div>
-              <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
+              <div className="border-border mt-8 flex items-center justify-between border-t pt-5">
                 <p className="eyebrow">04 etapas · 1 padrão</p>
                 <div className="flex gap-2">
                   <span
-                    className="grid size-8 place-items-center rounded-full border border-border text-muted"
+                    className="border-border text-muted grid size-8 place-items-center rounded-full border"
                     aria-hidden="true"
                   >
                     ‹
                   </span>
                   <span
-                    className="grid size-8 place-items-center rounded-full border border-border text-muted"
+                    className="border-border text-muted grid size-8 place-items-center rounded-full border"
                     aria-hidden="true"
                   >
                     ›
@@ -498,7 +483,7 @@ export default function Home() {
           <div className="flex items-end justify-between gap-6">
             <div>
               <p className="eyebrow">06 / Clientes</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 O que nos define é
                 <br />
                 quem confia em nós.
@@ -506,13 +491,13 @@ export default function Home() {
             </div>
             <div className="hidden gap-2 sm:flex">
               <span
-                className="grid size-9 place-items-center rounded-full border border-border text-muted"
+                className="border-border text-muted grid size-9 place-items-center rounded-full border"
                 aria-hidden="true"
               >
                 ‹
               </span>
               <span
-                className="grid size-9 place-items-center rounded-full border border-border text-muted"
+                className="border-border text-muted grid size-9 place-items-center rounded-full border"
                 aria-hidden="true"
               >
                 ›
@@ -533,17 +518,13 @@ export default function Home() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm font-medium">{t.name}</p>
-                      <p
-                        className={`text-xs ${
-                          dark ? "text-background/50" : "text-faint"
-                        }`}
-                      >
+                      <p className={`text-xs ${dark ? "text-background/50" : "text-faint"}`}>
                         {t.role}
                       </p>
                     </div>
                     {dark && (
                       <span
-                        className="grid size-8 place-items-center rounded-full border border-background/25 text-background/70"
+                        className="border-background/25 text-background/70 grid size-8 place-items-center rounded-full border"
                         aria-hidden="true"
                       >
                         ↗
@@ -571,10 +552,10 @@ export default function Home() {
         </section>
 
         {/* Perguntas / FAQ */}
-        <section id="perguntas" className="border-t border-border bg-surface/40">
+        <section id="perguntas" className="border-border bg-surface/40 border-t">
           <div className="mx-auto max-w-[1280px] px-6 py-20 sm:py-24">
             <p className="eyebrow text-center">Perguntas frequentes</p>
-            <h2 className="mt-4 text-center text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
+            <h2 className="text-foreground mt-4 text-center text-5xl font-semibold tracking-tight sm:text-6xl">
               Antes de agendar.
             </h2>
             <div className="mx-auto mt-12 max-w-3xl">
@@ -584,42 +565,37 @@ export default function Home() {
         </section>
 
         {/* 07 — Próximo passo */}
-        <section
-          id="agendar"
-          className="mx-auto max-w-[1280px] scroll-mt-20 px-6 py-20 sm:py-24"
-        >
+        <section id="agendar" className="mx-auto max-w-[1280px] scroll-mt-20 px-6 py-20 sm:py-24">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
               <p className="eyebrow">07 / Próximo passo</p>
-              <h2 className="mt-4 text-4xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-5xl">
+              <h2 className="text-foreground mt-4 text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl">
                 Encontre o seu próximo.
                 <br />
-                <span className="text-muted">
-                  Ou o que você ainda não sabia que era o seu.
-                </span>
+                <span className="text-muted">Ou o que você ainda não sabia que era o seu.</span>
               </h2>
-              <p className="mt-6 max-w-md text-base leading-7 text-muted">
-                Seja para uma compra específica, uma consignação ou uma conversa
-                sobre o que faz sentido para o seu momento, estamos disponíveis.
-                Atendimento privado, sob agendamento.
+              <p className="text-muted mt-6 max-w-md text-base leading-7">
+                Seja para uma compra específica, uma consignação ou uma conversa sobre o que faz
+                sentido para o seu momento, estamos disponíveis. Atendimento privado, sob
+                agendamento.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="#agendar"
-                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                  className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
                 >
                   Falar com um curador
                   <span aria-hidden="true">→</span>
                 </Link>
                 <Link
                   href="/colecao"
-                  className="rounded-full border border-border-strong px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface"
+                  className="border-border-strong text-foreground hover:bg-surface rounded-full border px-6 py-3 text-sm font-medium transition-colors"
                 >
                   Ver coleção
                 </Link>
               </div>
 
-              <div className="mt-12 grid gap-8 border-t border-border pt-8 sm:grid-cols-3">
+              <div className="border-border mt-12 grid gap-8 border-t pt-8 sm:grid-cols-3">
                 {[
                   {
                     t: "Showroom",
@@ -636,7 +612,7 @@ export default function Home() {
                 ].map((c) => (
                   <div key={c.t}>
                     <p className="eyebrow">{c.t}</p>
-                    <div className="mt-3 space-y-1 text-sm text-muted">
+                    <div className="text-muted mt-3 space-y-1 text-sm">
                       {c.lines.map((l) => (
                         <p key={l}>{l}</p>
                       ))}

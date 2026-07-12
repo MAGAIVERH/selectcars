@@ -65,22 +65,18 @@ const SLIDES: Slide[] = [
 export function HeroCarousel() {
   const [index, setIndex] = useState(0); // always starts on the white Porsche
   const slide = SLIDES[index];
-  const go = (dir: number) =>
-    setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
+  const go = (dir: number) => setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
   // auto-advance; the timer resets whenever the slide changes (manual or auto)
   useEffect(() => {
-    const timer = setInterval(
-      () => setIndex((i) => (i + 1) % SLIDES.length),
-      4500,
-    );
+    const timer = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 4500);
     return () => clearInterval(timer);
   }, [index]);
 
   return (
     <div>
       {/* single white card — car vertically centered, info + actions overlaid at the base */}
-      <div className="relative flex h-[400px] items-center justify-center rounded-[var(--radius-card)] bg-surface px-6 sm:h-[540px] sm:px-10">
+      <div className="bg-surface relative flex h-[400px] items-center justify-center rounded-[var(--radius-card)] px-6 sm:h-[540px] sm:px-10">
         <div className="relative h-[320px] w-full max-w-6xl sm:h-[470px]">
           <Image
             key={slide.image}
@@ -96,10 +92,10 @@ export function HeroCarousel() {
         </div>
 
         <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8">
-          <p className="font-mono text-[11px] tracking-[0.14em] text-faint uppercase">
+          <p className="text-faint font-mono text-[11px] tracking-[0.14em] uppercase">
             {slide.brand} {slide.model} · {slide.year}
           </p>
-          <p className="mt-1 text-lg font-medium text-foreground">
+          <p className="text-foreground mt-1 text-lg font-medium">
             {slide.color} · {slide.km}
           </p>
         </div>
@@ -107,7 +103,7 @@ export function HeroCarousel() {
         <div className="absolute right-6 bottom-6 flex items-center gap-2 sm:right-8 sm:bottom-8">
           <Link
             href="/colecao"
-            className="inline-flex items-center gap-2 rounded-full border border-border-strong px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-background"
+            className="border-border-strong text-foreground hover:bg-background inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-colors"
           >
             Ver coleção
             <span aria-hidden="true">→</span>
@@ -116,7 +112,7 @@ export function HeroCarousel() {
             type="button"
             onClick={() => go(1)}
             aria-label="Próximo veículo"
-            className="grid size-11 place-items-center rounded-full bg-foreground text-background transition-opacity hover:opacity-90"
+            className="bg-foreground text-background grid size-11 place-items-center rounded-full transition-opacity hover:opacity-90"
           >
             <span aria-hidden="true">→</span>
           </button>
@@ -131,7 +127,7 @@ export function HeroCarousel() {
               type="button"
               onClick={() => go(-1)}
               aria-label="Anterior"
-              className="grid size-8 place-items-center rounded-full border border-border text-muted transition-colors hover:border-border-strong hover:text-foreground"
+              className="border-border text-muted hover:border-border-strong hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               <span aria-hidden="true">‹</span>
             </button>
@@ -139,17 +135,17 @@ export function HeroCarousel() {
               type="button"
               onClick={() => go(1)}
               aria-label="Próximo"
-              className="grid size-8 place-items-center rounded-full border border-border text-muted transition-colors hover:border-border-strong hover:text-foreground"
+              className="border-border text-muted hover:border-border-strong hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               <span aria-hidden="true">›</span>
             </button>
           </div>
-          <p className="font-mono text-xs tracking-[0.14em] text-faint">
+          <p className="text-faint font-mono text-xs tracking-[0.14em]">
             {String(index + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
           </p>
         </div>
 
-        <p className="hidden font-mono text-[11px] tracking-[0.12em] text-faint uppercase sm:block">
+        <p className="text-faint hidden font-mono text-[11px] tracking-[0.12em] uppercase sm:block">
           Porsche · Ferrari · Lamborghini · Aston Martin · Bentley · McLaren
         </p>
       </div>
