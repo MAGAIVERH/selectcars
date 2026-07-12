@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import { readdirSync, readFileSync } from "node:fs";
 import { Pool } from "pg";
+import { assertSelectcarsDatabase } from "./guard";
 
 const here = dirname(fileURLToPath(import.meta.url));
 // Secrets live in the repo-root .env (single source of truth for local dev).
@@ -11,6 +12,12 @@ loadEnv({ path: resolve(here, "../../../.env") });
 async function main(): Promise<void> {
   const connectionString = process.env.SELECTCARS_DATABASE_URL;
   if (!connectionString) throw new Error("SELECTCARS_DATABASE_URL is not set.");
+
+  // Refuse to touch anything that is not this project's Supabase database, and say out
+  // loud where we are about to write. A migration that lands in the wrong database is not
+  // an error to recover from: it is one to never make.
+  const target = assertSelectcarsDatabase(connectionString);
+  console.log(`target: ${target.user}@${target.host}/${target.database}\n`);
 
   const pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
   const client = await pool.connect();
