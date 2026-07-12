@@ -13,7 +13,9 @@ export function getPool(): Pool {
 
   const connectionString = process.env.SELECTCARS_DATABASE_URL;
   if (!connectionString) {
-    throw new Error("SELECTCARS_DATABASE_URL is not set (expected the Supabase session pooler URL).");
+    throw new Error(
+      "SELECTCARS_DATABASE_URL is not set (expected the Supabase session pooler URL).",
+    );
   }
 
   pool = new Pool({

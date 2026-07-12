@@ -32,18 +32,31 @@ async function main(): Promise<void> {
   }
 
   // Read scoped to tenant A -> only A's rows.
-  const rowsA = await withTenant(A, async (c) => (await c.query("select name from public.test_items")).rows.map((r) => r.name).sort());
-  check(`tenant A sees only its 2 rows (got ${JSON.stringify(rowsA)})`, rowsA.length === 2 && rowsA.every((n: string) => n.endsWith("A1") || n.endsWith("A2")));
+  const rowsA = await withTenant(A, async (c) =>
+    (await c.query("select name from public.test_items")).rows.map((r) => r.name).sort(),
+  );
+  check(
+    `tenant A sees only its 2 rows (got ${JSON.stringify(rowsA)})`,
+    rowsA.length === 2 && rowsA.every((n: string) => n.endsWith("A1") || n.endsWith("A2")),
+  );
 
   // Read scoped to tenant B -> only B's row.
-  const rowsB = await withTenant(B, async (c) => (await c.query("select name from public.test_items")).rows.map((r) => r.name));
-  check(`tenant B sees only its 1 row (got ${JSON.stringify(rowsB)})`, rowsB.length === 1 && rowsB[0] === "Lamborghini B1");
+  const rowsB = await withTenant(B, async (c) =>
+    (await c.query("select name from public.test_items")).rows.map((r) => r.name),
+  );
+  check(
+    `tenant B sees only its 1 row (got ${JSON.stringify(rowsB)})`,
+    rowsB.length === 1 && rowsB[0] === "Lamborghini B1",
+  );
 
   // Cross-tenant write: as tenant A, try to insert a row tagged as B -> RLS WITH CHECK must reject.
   let writeBlocked = false;
   try {
     await withTenant(A, async (c) => {
-      await c.query("insert into public.test_items (tenant_id, name) values ($1,$2)", [B, "Sneaky B2"]);
+      await c.query("insert into public.test_items (tenant_id, name) values ($1,$2)", [
+        B,
+        "Sneaky B2",
+      ]);
     });
   } catch {
     writeBlocked = true;

@@ -26,7 +26,9 @@ async function main(): Promise<void> {
       .sort();
 
     for (const file of files) {
-      const applied = await client.query("select 1 from public._migrations where name = $1", [file]);
+      const applied = await client.query("select 1 from public._migrations where name = $1", [
+        file,
+      ]);
       if (applied.rowCount) {
         console.log(`skip   ${file}`);
         continue;
