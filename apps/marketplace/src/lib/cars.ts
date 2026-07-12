@@ -1,20 +1,20 @@
-export type Availability = "disponivel" | "sob-consulta";
-export type Badge = "RARO" | "NOVO" | "ÚLTIMA UNIDADE" | "RESERVADO";
-export type Body = "Coupé" | "Sedan" | "GT" | "Conversível" | "SUV";
-export type Transmission = "PDK" | "DCT" | "Automático";
-export type Fuel = "Gasolina" | "Híbrido";
+export type Availability = "available" | "inquire";
+export type Badge = "RARE" | "NEW" | "FINAL UNIT" | "RESERVED";
+export type Body = "Coupe" | "Sedan" | "GT" | "Convertible" | "SUV";
+export type Transmission = "PDK" | "DCT" | "Automatic";
+export type Fuel = "Gas" | "Hybrid";
 
 export interface Car {
   id: string;
   brand: string;
   model: string;
   year: number;
-  km: number;
-  color: string; // e.g. "Branco Carrara"
+  mileage: number; // miles
+  color: string; // e.g. "Carrara White"
   body: Body;
   transmission: Transmission;
   fuel: Fuel;
-  /** price in BRL, or null when "Sob consulta" */
+  /** price in USD, or null when "Inquire" */
   price: number | null;
   badge?: Badge;
   /** short editorial note shown on the showroom card */
@@ -30,14 +30,14 @@ export const cars: Car[] = [
     brand: "Porsche",
     model: "911 GT3 RS",
     year: 2024,
-    km: 1200,
-    color: "Branco Carrara",
-    description: "Aero kit Weissach, bancos em carbono e procedência impecável de primeiro dono.",
-    body: "Coupé",
+    mileage: 750,
+    color: "Carrara White",
+    description: "Weissach package, carbon bucket seats, and impeccable single-owner provenance.",
+    body: "Coupe",
     transmission: "PDK",
-    fuel: "Gasolina",
-    price: 2890000,
-    badge: "RARO",
+    fuel: "Gas",
+    price: 289000,
+    badge: "RARE",
     image: "/Image (Porsche 911 GT3 RS).png",
   },
   {
@@ -45,14 +45,14 @@ export const cars: Car[] = [
     brand: "Ferrari",
     model: "296 GTB",
     year: 2023,
-    km: 3400,
+    mileage: 2100,
     color: "Rosso Corsa",
-    description: "V6 híbrido turbinado, 830 cv combinados. Histórico completo e revisão oficial.",
-    body: "Coupé",
+    description: "Twin-turbo V6 hybrid, 830 combined hp. Full history and factory service.",
+    body: "Coupe",
     transmission: "DCT",
-    fuel: "Híbrido",
+    fuel: "Hybrid",
     price: null,
-    badge: "ÚLTIMA UNIDADE",
+    badge: "FINAL UNIT",
     image: "/Image (Ferrari 296 GTB).png",
   },
   {
@@ -60,14 +60,14 @@ export const cars: Car[] = [
     brand: "Lamborghini",
     model: "Huracán Tecnica",
     year: 2024,
-    km: 880,
-    color: "Verde Mantis",
-    description: "V10 aspirado, dinâmica de pista, configuração específica para a unidade.",
-    body: "Coupé",
+    mileage: 550,
+    color: "Mantis Green",
+    description: "Naturally aspirated V10, track-focused dynamics, one-off specification.",
+    body: "Coupe",
     transmission: "DCT",
-    fuel: "Gasolina",
-    price: 3450000,
-    badge: "NOVO",
+    fuel: "Gas",
+    price: 319000,
+    badge: "NEW",
     image: "/Image (Lamborghini Huracán Tecnica).png",
   },
   {
@@ -75,13 +75,13 @@ export const cars: Car[] = [
     brand: "Mercedes-AMG",
     model: "GT 63 S",
     year: 2023,
-    km: 5100,
-    color: "Preto Obsidiana",
-    description: "Quatro portas com motor 4.0 V8 biturbo. Acabamento Designo e laudo independente.",
+    mileage: 3200,
+    color: "Obsidian Black",
+    description: "Four-door with a 4.0 twin-turbo V8. Designo finish and independent inspection.",
     body: "Sedan",
-    transmission: "Automático",
-    fuel: "Gasolina",
-    price: 1690000,
+    transmission: "Automatic",
+    fuel: "Gas",
+    price: 185000,
     image: "/Image (Mercedes-AMG GT 63 S).png",
   },
   {
@@ -89,15 +89,15 @@ export const cars: Car[] = [
     brand: "Aston Martin",
     model: "DB12",
     year: 2024,
-    km: 1500,
+    mileage: 930,
     color: "British Racing Green",
     description:
-      "Super GT inglês com 680 cv. Couro Bridge of Weir e detalhes em alumínio escovado.",
+      "British super GT with 680 hp. Bridge of Weir leather and brushed aluminum details.",
     body: "GT",
-    transmission: "Automático",
-    fuel: "Gasolina",
+    transmission: "Automatic",
+    fuel: "Gas",
     price: null,
-    badge: "RESERVADO",
+    badge: "RESERVED",
     image: "/Image (Aston Martin DB12).png",
   },
   {
@@ -105,13 +105,13 @@ export const cars: Car[] = [
     brand: "Bentley",
     model: "Continental GT Speed",
     year: 2023,
-    km: 6800,
+    mileage: 4200,
     color: "Orange Flame",
-    description: "GT de 12 cilindros, interior em couro Mulliner, presença para qualquer agenda.",
+    description: "Twelve-cylinder GT, Mulliner leather interior, presence for any occasion.",
     body: "GT",
-    transmission: "Automático",
-    fuel: "Gasolina",
-    price: 2150000,
+    transmission: "Automatic",
+    fuel: "Gas",
+    price: 289000,
     image: "/Image (Bentley Continental GT Speed).png",
   },
   {
@@ -119,14 +119,14 @@ export const cars: Car[] = [
     brand: "BMW",
     model: "M5 Competition",
     year: 2024,
-    km: 2800,
-    color: "Cinza Brooklyn",
+    mileage: 1740,
+    color: "Brooklyn Grey",
     body: "Sedan",
-    transmission: "Automático",
-    fuel: "Gasolina",
-    price: 1290000,
-    badge: "NOVO",
-    // placeholder: real BMW photo pending — design reuses the Porsche shot
+    transmission: "Automatic",
+    fuel: "Gas",
+    price: 122000,
+    badge: "NEW",
+    // placeholder: real BMW photo pending; design reuses the Porsche shot
     image: "/Image (Porsche 911 GT3 RS).png",
     placeholder: true,
   },
@@ -135,13 +135,13 @@ export const cars: Car[] = [
     brand: "Jaguar",
     model: "F-Type R75",
     year: 2023,
-    km: 4200,
-    color: "Azul Velocity",
-    body: "Conversível",
-    transmission: "Automático",
-    fuel: "Gasolina",
-    price: 980000,
-    // placeholder: real Jaguar photo pending — design reuses the Porsche shot
+    mileage: 2600,
+    color: "Velocity Blue",
+    body: "Convertible",
+    transmission: "Automatic",
+    fuel: "Gas",
+    price: 109000,
+    // placeholder: real Jaguar photo pending; design reuses the Porsche shot
     image: "/Image (Porsche 911 GT3 RS).png",
     placeholder: true,
   },
@@ -150,30 +150,30 @@ export const cars: Car[] = [
     brand: "Range Rover",
     model: "SV Autobiography",
     year: 2024,
-    km: 3200,
+    mileage: 2000,
     color: "Belgravia Green",
     body: "SUV",
-    transmission: "Automático",
-    fuel: "Híbrido",
-    price: 1890000,
-    // placeholder: real Range Rover photo pending — design reuses the Mercedes shot
+    transmission: "Automatic",
+    fuel: "Hybrid",
+    price: 215000,
+    // placeholder: real Range Rover photo pending; design reuses the Mercedes shot
     image: "/Image (Mercedes-AMG GT 63 S).png",
     placeholder: true,
   },
 ];
 
-const brl = new Intl.NumberFormat("pt-BR", {
+const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "BRL",
+  currency: "USD",
   maximumFractionDigits: 0,
 });
 
 export function formatPrice(price: number | null): string {
-  return price === null ? "Sob consulta" : brl.format(price);
+  return price === null ? "Inquire" : usd.format(price);
 }
 
-export function formatKm(km: number): string {
-  return `${new Intl.NumberFormat("pt-BR").format(km)} km`;
+export function formatMileage(mileage: number): string {
+  return `${new Intl.NumberFormat("en-US").format(mileage)} mi`;
 }
 
 export const brands = [
@@ -188,6 +188,6 @@ export const brands = [
   "Range Rover",
 ] as const;
 
-export const bodies: Body[] = ["Coupé", "Sedan", "GT", "Conversível", "SUV"];
-export const transmissions: Transmission[] = ["PDK", "DCT", "Automático"];
-export const fuels: Fuel[] = ["Gasolina", "Híbrido"];
+export const bodies: Body[] = ["Coupe", "Sedan", "GT", "Convertible", "SUV"];
+export const transmissions: Transmission[] = ["PDK", "DCT", "Automatic"];
+export const fuels: Fuel[] = ["Gas", "Hybrid"];

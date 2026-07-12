@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const NAV = [
-  { label: "Início", href: "/" },
-  { label: "Sobre", href: "/#sobre" },
-  { label: "Coleção", href: "/colecao" },
-  { label: "Destaque", href: "/#destaque" },
-  { label: "Processo", href: "/#processo" },
-  { label: "Perguntas", href: "/#perguntas" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/#sobre" },
+  { label: "Collection", href: "/colecao" },
+  { label: "Featured", href: "/#destaque" },
+  { label: "Process", href: "/#processo" },
+  { label: "FAQ", href: "/#perguntas" },
 ];
 
 export function SiteHeader() {
@@ -36,14 +36,14 @@ export function SiteHeader() {
           <button
             type="button"
             className="text-muted hover:text-foreground hidden items-center gap-2 text-sm transition-colors sm:flex"
-            aria-label="Buscar"
+            aria-label="Search"
           >
             <SearchIcon />
-            Buscar
+            Search
           </button>
           <button
             type="button"
-            aria-label="Conta"
+            aria-label="Account"
             className="text-muted hover:text-foreground transition-colors"
           >
             <UserIcon />
@@ -52,7 +52,7 @@ export function SiteHeader() {
             href="/#agendar"
             className="bg-foreground text-background rounded-full px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
           >
-            Agendar visita
+            Book a visit
           </Link>
         </div>
       </div>

@@ -6,11 +6,11 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Vercel AI SDK | v6 | via AI Gateway; provider-agnostic `"provider/model"` strings |
-| pgvector | latest | embeddings storage/search |
-| BullMQ | latest | all AI jobs run async |
+| Tool          | Version | Notes                                                        |
+| ------------- | ------- | ------------------------------------------------------------ |
+| Vercel AI SDK | v6      | via AI Gateway; provider-agnostic `"provider/model"` strings |
+| pgvector      | latest  | embeddings storage/search                                    |
+| BullMQ        | latest  | all AI jobs run async                                        |
 
 ## Features (v1)
 
@@ -37,6 +37,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                                   |
+| ---------- | ------------- | ---------------------------------------- |
 | 2026-07-12 | Created sheet | Vercel AI SDK + pgvector + BullMQ chosen |

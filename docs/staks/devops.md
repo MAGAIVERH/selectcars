@@ -6,15 +6,15 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Turborepo | latest | task orchestration + caching |
-| pnpm | 9+ | workspaces |
-| GitHub Actions | - | lint, typecheck, test, deploy previews |
-| Docker | - | api + workers images, local compose |
-| Vercel | - | frontends + microfrontends |
-| Sentry | - | errors on all apps |
-| Upstash Redis | - | BullMQ backend |
+| Tool           | Version | Notes                                  |
+| -------------- | ------- | -------------------------------------- |
+| Turborepo      | latest  | task orchestration + caching           |
+| pnpm           | 9+      | workspaces                             |
+| GitHub Actions | -       | lint, typecheck, test, deploy previews |
+| Docker         | -       | api + workers images, local compose    |
+| Vercel         | -       | frontends + microfrontends             |
+| Sentry         | -       | errors on all apps                     |
+| Upstash Redis  | -       | BullMQ backend                         |
 
 ## Why we chose this
 
@@ -29,6 +29,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                                      |
+| ---------- | ------------- | ------------------------------------------- |
 | 2026-07-12 | Created sheet | Turborepo/pnpm/GitHub Actions/Vercel chosen |

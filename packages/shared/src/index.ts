@@ -8,7 +8,7 @@ import { z } from "zod";
 export const SITE = {
   name: "SELECTCARS",
   tagline: "The car you will not find. Until it finds you.",
-  location: "São Paulo · Private appointments",
+  location: "Miami · Private appointments",
 } as const;
 
 export const bodyStyleSchema = z.enum([

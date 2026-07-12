@@ -6,10 +6,10 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Vitest | latest | unit/integration |
-| Playwright | latest | E2E + visual verification during dev |
+| Tool       | Version | Notes                                |
+| ---------- | ------- | ------------------------------------ |
+| Vitest     | latest  | unit/integration                     |
+| Playwright | latest  | E2E + visual verification during dev |
 
 ## What we test
 
@@ -23,6 +23,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                     |
+| ---------- | ------------- | -------------------------- |
 | 2026-07-12 | Created sheet | Vitest + Playwright chosen |

@@ -6,16 +6,16 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Next.js | 16.x (App Router) | Server Components, Route Handlers |
-| React | 19.x | |
-| TypeScript | 5.x strict | never `any` |
-| Tailwind CSS | v4 | `@tailwindcss/postcss` |
-| shadcn/ui | latest | base component system |
-| GSAP + Lenis | latest | premium animation + smooth scroll |
-| @vercel/microfrontends | latest | compose apps under one domain |
-| next/image | built-in | media (see storage sheet) |
+| Tool                   | Version           | Notes                             |
+| ---------------------- | ----------------- | --------------------------------- |
+| Next.js                | 16.x (App Router) | Server Components, Route Handlers |
+| React                  | 19.x              |                                   |
+| TypeScript             | 5.x strict        | never `any`                       |
+| Tailwind CSS           | v4                | `@tailwindcss/postcss`            |
+| shadcn/ui              | latest            | base component system             |
+| GSAP + Lenis           | latest            | premium animation + smooth scroll |
+| @vercel/microfrontends | latest            | compose apps under one domain     |
+| next/image             | built-in          | media (see storage sheet)         |
 
 ## Why we chose this
 
@@ -25,11 +25,11 @@
 
 ## Alternatives considered
 
-| Alternative | Why not (for now) |
-|-------------|-------------------|
+| Alternative              | Why not (for now)                                                    |
+| ------------------------ | -------------------------------------------------------------------- |
 | Single Next app (no MFE) | Loses the microfrontend/independent-deploy story recruiters look for |
-| MUI / Chakra | Heavier, less ownable than shadcn |
-| Framer Motion only | GSAP + Lenis give finer control for the "$100k" feel |
+| MUI / Chakra             | Heavier, less ownable than shadcn                                    |
+| Framer Motion only       | GSAP + Lenis give finer control for the "$100k" feel                 |
 
 ## Open decisions
 
@@ -38,7 +38,7 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
-| 2026-07-12 | Created sheet; current single app is the marketplace base | Start of monorepo migration |
-| 2026-07-12 | Enlarged featured-car thumbnail + Processo image; added `items-start` to stop grid stretch | UX fixes flagged by owner |
+| Date       | Change                                                                                     | Reason                      |
+| ---------- | ------------------------------------------------------------------------------------------ | --------------------------- |
+| 2026-07-12 | Created sheet; current single app is the marketplace base                                  | Start of monorepo migration |
+| 2026-07-12 | Enlarged featured-car thumbnail + Processo image; added `items-start` to stop grid stretch | UX fixes flagged by owner   |

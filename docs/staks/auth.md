@@ -6,10 +6,10 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Supabase Auth | latest | email/password + OAuth providers |
-| Custom `tenants` / `members` | - | dealership membership + roles |
+| Tool                         | Version | Notes                            |
+| ---------------------------- | ------- | -------------------------------- |
+| Supabase Auth                | latest  | email/password + OAuth providers |
+| Custom `tenants` / `members` | -       | dealership membership + roles    |
 
 ## Why we chose this
 
@@ -24,10 +24,10 @@
 
 ## Alternatives considered
 
-| Alternative | Why not (for now) |
-|-------------|-------------------|
+| Alternative                 | Why not (for now)                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------- |
 | Better Auth (Organizations) | Strong, but adds a second system next to Supabase; revisit if org features fall short |
-| Clerk / Auth0 | Less control over the RLS/JWT claim mapping |
+| Clerk / Auth0               | Less control over the RLS/JWT claim mapping                                           |
 
 ## Open decisions
 
@@ -36,6 +36,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change        | Reason                        |
+| ---------- | ------------- | ----------------------------- |
 | 2026-07-12 | Created sheet | Supabase Auth chosen (all-in) |

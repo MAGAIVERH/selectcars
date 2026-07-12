@@ -6,10 +6,10 @@
 
 ## Tools & versions
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Supabase Storage | latest | private + public buckets, presigned uploads |
-| next/image | built-in | optimization/serving |
+| Tool             | Version  | Notes                                       |
+| ---------------- | -------- | ------------------------------------------- |
+| Supabase Storage | latest   | private + public buckets, presigned uploads |
+| next/image       | built-in | optimization/serving                        |
 
 ## Media strategy
 
@@ -24,8 +24,8 @@
 
 ## Alternatives considered
 
-| Alternative | Why not (for now) |
-|-------------|-------------------|
+| Alternative        | Why not (for now)                                                  |
+| ------------------ | ------------------------------------------------------------------ |
 | Cloudflare R2 / S3 | Fine, but Supabase Storage keeps auth/tenant policies in one place |
 
 ## Open decisions
@@ -35,6 +35,6 @@
 
 ## Changelog
 
-| Date | Change | Reason |
-|------|--------|--------|
+| Date       | Change                                      | Reason                        |
+| ---------- | ------------------------------------------- | ----------------------------- |
 | 2026-07-12 | Created sheet; documented image-sizing rule | Owner flagged small-car issue |

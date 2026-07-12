@@ -6,47 +6,47 @@ import Link from "next/link";
 
 const SPECS = [
   {
-    label: "Motor",
-    value: "V8 4.0 biturbo",
-    note: "680 cv · 0-100 em 3.6s",
+    label: "Engine",
+    value: "4.0L twin-turbo V8",
+    note: "680 hp · 0-60 in 3.5s",
     icon: EngineIcon,
   },
   {
-    label: "Velocidade máxima",
-    value: "325 km/h",
-    note: "Modo Sport Plus",
+    label: "Top speed",
+    value: "202 mph",
+    note: "Sport Plus mode",
     icon: SpeedIcon,
   },
   {
-    label: "Transmissão",
-    value: "Tração traseira",
-    note: "ZF 8 velocidades",
+    label: "Drivetrain",
+    value: "Rear-wheel drive",
+    note: "ZF 8-speed",
     icon: GearIcon,
   },
   {
-    label: "Combustível",
-    value: "Gasolina",
-    note: "12.9 L/100 km · WLTP",
+    label: "Fuel",
+    value: "Gas",
+    note: "18 mpg combined",
     icon: FuelIcon,
   },
 ];
 
-const CATEGORIES = ["Exterior", "Interior", "Rodas", "Mecânica", "Documentação"];
+const CATEGORIES = ["Exterior", "Interior", "Wheels", "Mechanical", "Documents"];
 
 const COLORS = [
-  { name: "Branco Carrara", hex: "#ededed" },
-  { name: "Prata GT", hex: "#c8c8c8" },
-  { name: "Cinza Ágata", hex: "#9a9a9a" },
-  { name: "Grafite", hex: "#5f5f5f" },
-  { name: "Chumbo", hex: "#333333" },
-  { name: "Preto Jet", hex: "#141414" },
+  { name: "Carrara White", hex: "#ededed" },
+  { name: "GT Silver", hex: "#c8c8c8" },
+  { name: "Agate Grey", hex: "#9a9a9a" },
+  { name: "Graphite", hex: "#5f5f5f" },
+  { name: "Lead Grey", hex: "#333333" },
+  { name: "Jet Black", hex: "#141414" },
 ];
 
 const ANNOTATIONS = [
-  { label: "Couro Bridge of Weir", top: "16%", left: "44%" },
-  { label: "Capô em alumínio", top: "12%", left: "66%" },
-  { label: "Freios carbocerâmicos", top: "36%", left: "72%" },
-  { label: "Rodas forjadas 21″", top: "60%", left: "30%" },
+  { label: "Bridge of Weir leather", top: "16%", left: "44%" },
+  { label: "Aluminum hood", top: "12%", left: "66%" },
+  { label: "Carbon-ceramic brakes", top: "36%", left: "72%" },
+  { label: '21" forged wheels', top: "60%", left: "30%" },
 ];
 
 export function FeaturedCar() {
@@ -59,7 +59,7 @@ export function FeaturedCar() {
         {/* sidebar */}
         <aside className="bg-surface h-fit rounded-[var(--radius-card)] p-6">
           <button type="button" className="flex w-full items-center justify-between">
-            <span className="eyebrow">Modelo</span>
+            <span className="eyebrow">Model</span>
             <span className="text-muted" aria-hidden="true">
               ↓
             </span>
@@ -80,14 +80,14 @@ export function FeaturedCar() {
           <div className="mt-3 flex items-center justify-between">
             <button
               type="button"
-              aria-label="Anterior"
+              aria-label="Previous"
               className="border-border text-muted hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               ‹
             </button>
             <button
               type="button"
-              aria-label="Próximo"
+              aria-label="Next"
               className="border-border text-muted hover:text-foreground grid size-8 place-items-center rounded-full border transition-colors"
             >
               ›
@@ -164,7 +164,7 @@ export function FeaturedCar() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="bg-foreground text-background rounded-full px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase">
-              Cores
+              Colors
             </span>
             <div className="flex items-center gap-2">
               {COLORS.map((c, i) => (
@@ -189,13 +189,13 @@ export function FeaturedCar() {
               href="/colecao"
               className="border-border-strong text-foreground hover:bg-surface rounded-full border px-5 py-2.5 text-sm font-medium transition-colors"
             >
-              Ver coleção completa
+              View full collection
             </Link>
             <Link
               href="#agendar"
               className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
             >
-              Solicitar proposta
+              Request an offer
               <span aria-hidden="true">→</span>
             </Link>
           </div>

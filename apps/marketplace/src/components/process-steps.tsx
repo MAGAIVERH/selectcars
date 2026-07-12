@@ -5,23 +5,23 @@ import { useState } from "react";
 const STEPS = [
   {
     n: "01",
-    t: "Conversa inicial",
-    d: "Uma conversa privada para entender seu perfil, o uso pretendido e o que faz sentido para o seu momento. Sem compromisso.",
+    t: "Initial conversation",
+    d: "A private conversation to understand your profile, intended use, and what fits your moment. No obligation.",
   },
   {
     n: "02",
-    t: "Curadoria personalizada",
-    d: "Apresentamos opções do nosso estoque ou buscamos no mercado interno e internacional o carro exato que você procura. Cada candidato é avaliado antes de chegar até você.",
+    t: "Tailored curation",
+    d: "We present options from our inventory or source the exact car you want, domestically and internationally. Every candidate is vetted before it reaches you.",
   },
   {
     n: "03",
-    t: "Inspeção e documentação",
-    d: "Laudo cautelar, inspeção mecânica e checagem documental completa. Você recebe todo o histórico verificado antes de fechar negócio.",
+    t: "Inspection and paperwork",
+    d: "Pre-purchase inspection, mechanical check, and a full documentation review. You receive the verified history before closing.",
   },
   {
     n: "04",
-    t: "Entrega",
-    d: "Transferência, preparação e entrega do veículo, com transporte assegurado para qualquer estado.",
+    t: "Delivery",
+    d: "Transfer, preparation, and delivery of the vehicle, with insured transport nationwide.",
   },
 ];
 
