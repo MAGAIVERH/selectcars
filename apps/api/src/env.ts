@@ -13,6 +13,9 @@ const envSchema = z.object({
   API_HOST: z.string().default("0.0.0.0"),
   // Marketplace/dashboard origin allowed by CORS (also where Better Auth sessions live).
   APP_ORIGIN: z.string().url().default("http://localhost:3000"),
+  // Identity issuer: the app that signs access tokens and serves the JWKS.
+  // Must match the `iss`/`aud` claims, so it is the marketplace's BETTER_AUTH_URL.
+  AUTH_ISSUER_URL: z.string().url().default("http://localhost:3000"),
 });
 
 export const env = envSchema.parse(process.env);

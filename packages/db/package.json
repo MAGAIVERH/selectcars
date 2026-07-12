@@ -11,7 +11,8 @@
   "scripts": {
     "migrate": "tsx src/migrate.ts",
     "rls:verify": "tsx src/scripts/verify-rls.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:api": "tsx src/scripts/verify-api-tenant-isolation.ts"
   },
   "dependencies": {
     "pg": "^8.22.0"

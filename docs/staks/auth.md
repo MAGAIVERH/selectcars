@@ -10,7 +10,17 @@
 | --------------------------------- | ------- | --------------------------------------------------- |
 | Better Auth                       | 1.6.x   | email/password + Google OAuth; runs in the Next app |
 | Better Auth `organization` plugin | 1.6.x   | organization = tenant; `member` = membership + role |
+| Better Auth `jwt` plugin          | 1.6.x   | EdDSA access tokens + JWKS, consumed by the API     |
+| jose                              | 6.x     | JWKS verification on the Fastify side               |
 | Supabase Postgres                 | 15      | stores Better Auth tables (owned by `postgres`)     |
+
+## Service-to-service auth
+
+The marketplace is the **identity issuer**. It mints 5-minute EdDSA access tokens
+(`/api/auth/token`) whose claims carry the tenant (`activeOrganizationId`) and the caller's
+dealership role, and publishes its public keys at `/api/auth/jwks`. The Fastify API
+verifies tokens offline against that JWKS: it holds no signing key and cannot forge
+identities. See [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ## Why we chose this
 

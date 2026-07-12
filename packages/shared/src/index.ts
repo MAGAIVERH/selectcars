@@ -43,6 +43,65 @@ export const readyStatusSchema = z.object({
 });
 export type ReadyStatus = z.infer<typeof readyStatusSchema>;
 
+/**
+ * Dealership roles, ordered from most to least privileged.
+ * `buyer` is the marketplace-side role and never belongs to a dealership.
+ */
+export const dealershipRoleSchema = z.enum(["owner", "manager", "salesperson", "viewer"]);
+export type DealershipRole = z.infer<typeof dealershipRoleSchema>;
+
+/**
+ * Claims the marketplace (Better Auth, the identity issuer) puts in the access token,
+ * and the API verifies via JWKS. This is the contract between the two services: change
+ * it here and both sides fail to compile, never at runtime.
+ *
+ * `activeOrganizationId` is the tenant id that scopes every RLS query.
+ */
+export const accessTokenClaimsSchema = z.object({
+  sub: z.string(),
+  email: z.string().email(),
+  name: z.string().nullish(),
+  activeOrganizationId: z.string().nullable(),
+  role: dealershipRoleSchema.nullable(),
+});
+export type AccessTokenClaims = z.infer<typeof accessTokenClaimsSchema>;
+
+/** Identity resolved from a verified access token, as the API sees it. */
+export const authenticatedUserSchema = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+  tenantId: z.string().nullable(),
+  role: dealershipRoleSchema.nullable(),
+});
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+/** An entry in a dealership's audit trail, written by a database trigger. */
+export const auditLogSchema = z.object({
+  id: z.string().uuid(),
+  actorUserId: z.string().nullable(),
+  action: z.enum(["insert", "update", "delete"]),
+  tableName: z.string(),
+  recordId: z.string().nullable(),
+  createdAt: z.coerce.date(),
+});
+export type AuditLog = z.infer<typeof auditLogSchema>;
+
+/** Shape of every API error response, so clients can handle failures uniformly. */
+export const apiErrorSchema = z.object({
+  error: z.object({
+    code: z.enum([
+      "unauthorized",
+      "forbidden",
+      "no_active_tenant",
+      "not_found",
+      "bad_request",
+      "internal",
+    ]),
+    message: z.string(),
+  }),
+});
+export type ApiError = z.infer<typeof apiErrorSchema>;
+
 /** Core vehicle contract (grows as the inventory module is built). */
 export const vehicleSchema = z.object({
   id: z.string(),
