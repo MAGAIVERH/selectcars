@@ -1,0 +1,18 @@
+# Host artifacts must never leak into the image: node_modules holds platform-specific
+# binaries (built for Windows here, useless on Alpine), and dist is rebuilt inside.
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/coverage
+
+# Secrets: the container gets env vars from compose, never a baked-in .env.
+.env
+.env.*
+!.env.example
+
+.git
+.github
+.vscode
+**/*.log
+docs

@@ -10,7 +10,10 @@ services:
     container_name: selectcars-redis
     command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      # Host port 6380 on purpose: other projects on this machine already run a Redis on
+      # the default 6379, and two containers cannot claim the same host port. Inside the
+      # compose network the API still talks to `redis:6379`, so only local tools care.
+      - "6380:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -31,6 +34,14 @@ services:
       API_HOST: 0.0.0.0
       API_PORT: 3333
       REDIS_URL: redis://redis:6379
+      # Inside a container `localhost` is the container itself, so the marketplace (which
+      # runs on the host) is reached at host.docker.internal. The issuer *identity* stays
+      # http://localhost:3000, because that is what the token's `iss` claim says: only the
+      # place we FETCH the keys from changes, never what we accept.
+      AUTH_JWKS_URL: http://host.docker.internal:3000/api/auth/jwks
+    extra_hosts:
+      # Linux hosts do not define host.docker.internal by default; Docker Desktop does.
+      - "host.docker.internal:host-gateway"
     ports:
       - "3333:3333"
     depends_on:
