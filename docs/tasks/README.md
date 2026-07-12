@@ -43,4 +43,13 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ### Phase 2 — Inventory / Vehicles
 
-Not started. See `DEVELOPMENT-GUIDE.md` (gitignored) for the plan.
+| Day   | Title                                                                   | Status |
+| ----- | ----------------------------------------------------------------------- | ------ |
+| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md) | Done   |
+| 15    | Photo upload (Supabase Storage)                                         | Open   |
+| 16-17 | Dashboard shell + inventory list UI                                     | Open   |
+| 18-19 | Vehicle create/edit form + photo uploader                               | Open   |
+| 20    | Status workflow (draft to sold)                                         | Open   |
+
+The vehicles module introduced a second Postgres role: buyers read through
+`selectcars_public`, which can only ever see `active` listings. See the day log.
