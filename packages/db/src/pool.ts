@@ -1,12 +1,16 @@
 import { Pool } from "pg";
+import { assertSelectcarsDatabase } from "./guard";
 
 let pool: Pool | undefined;
 
 /**
  * Lazily created singleton pg Pool.
  *
- * Reads DATABASE_URL (the Supabase session pooler URL) at first use, so the
+ * Reads SELECTCARS_DATABASE_URL (the Supabase session pooler URL) at first use, so the
  * caller only needs the env var present by the time a query runs, not at import.
+ *
+ * The connection target is asserted before the pool is created: this project may only
+ * ever talk to its own Supabase database, never to another project's. See ./guard.ts.
  */
 export function getPool(): Pool {
   if (pool) return pool;
@@ -17,6 +21,8 @@ export function getPool(): Pool {
       "SELECTCARS_DATABASE_URL is not set (expected the Supabase session pooler URL).",
     );
   }
+
+  assertSelectcarsDatabase(connectionString);
 
   pool = new Pool({
     connectionString,

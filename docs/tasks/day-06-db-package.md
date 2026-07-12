@@ -23,8 +23,22 @@ every app and the API share one database layer.
 - The Supabase **direct** host `db.<ref>.supabase.co` does not resolve on IPv4 (IPv6-only).
   We connect through the **session pooler**: `aws-1-sa-east-1.pooler.supabase.com:5432`,
   user `postgres.<ref>`, password `@` encoded as `%40`.
-- A global `DATABASE_URL` (from the Neon MCP) was hijacking the pool. The app uses a
-  uniquely named `SELECTCARS_DATABASE_URL` to avoid the collision.
+- **A global `DATABASE_URL` hijacked the connection, and a migration ran against the wrong
+  database.** `dotenv` does not override variables already present in the environment, and
+  this machine exports a `DATABASE_URL` pointing at another project's Neon instance. The
+  migration rolled back on its first statement, but it still created its `_migrations`
+  bookkeeping table there (since dropped).
+
+  Two fixes, because the rename alone only removes one collision:
+  1. The variable is now `SELECTCARS_DATABASE_URL`, a name nothing else exports.
+  2. **`packages/db/src/guard.ts` refuses to connect to any host that is not this project's
+     Supabase.** It runs in both the pool and the migration runner, and the runner prints
+     its target before writing anything. Pointing it at another database now fails before a
+     connection is even opened.
+
+  The lesson is not "pick better variable names": it is that **a migration must never run
+  without asserting which database it is about to write to**.
+
 - Tenancy is not a hand-rolled `tenants` table: it comes from the Better Auth
   `organization` / `member` tables (see Day 9).
 
