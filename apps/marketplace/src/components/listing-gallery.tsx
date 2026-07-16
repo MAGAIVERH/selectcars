@@ -23,14 +23,14 @@ export function ListingGallery({ photos, alt }: { photos: VehiclePhoto[]; alt: s
 
   return (
     <div>
-      <div className="bg-surface border-border relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-card)] border">
+      <div className="bg-surface border-border relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-card)] border p-6">
         <Image
           src={current.url}
           alt={current.alt ?? alt}
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 60vw"
-          className="object-cover"
+          className="object-contain p-2 [filter:drop-shadow(0_26px_28px_rgba(0,0,0,0.24))]"
         />
       </div>
 
@@ -52,7 +52,7 @@ export function ListingGallery({ photos, alt }: { photos: VehiclePhoto[]; alt: s
                 alt={photo.alt ?? alt}
                 fill
                 sizes="120px"
-                className="object-cover"
+                className="object-contain p-1"
               />
             </button>
           ))}

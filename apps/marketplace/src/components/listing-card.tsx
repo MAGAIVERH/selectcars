@@ -34,7 +34,7 @@ export function ListingCard({
       <h3 className="text-foreground mt-3 text-xl font-semibold tracking-tight">{vehicle.make}</h3>
       <p className="text-muted text-sm">{vehicle.model}</p>
 
-      <div className="bg-background border-border relative my-6 aspect-[3/2] w-full overflow-hidden rounded-[10px] border">
+      <div className="relative my-6 aspect-[3/2] w-full">
         {primary ? (
           <Image
             src={primary.url}
@@ -42,7 +42,7 @@ export function ListingCard({
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover"
+            className="object-contain [filter:drop-shadow(0_16px_18px_rgba(0,0,0,0.22))]"
           />
         ) : (
           <span className="text-faint absolute inset-0 grid place-items-center font-mono text-[10px] tracking-[0.12em] uppercase">

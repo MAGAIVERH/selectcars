@@ -26,9 +26,10 @@ refuses to let one see another's data.
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
   photo subquery runs under the same read-only role, so a buyer never sees a draft's images.
-- **Seeded showroom**: a demo dealership (`SELECTCARS Showroom`) with 9 active listings and
-  20 photos, owned by a demo dealer you can sign in as to see the platform populated. It is
-  the living test account, and everything a real dealer adds surfaces the same way.
+- **Seeded showroom**: a demo dealership (`SELECTCARS Showroom`) with 9 active listings, each
+  a full car on a transparent background (floating), owned by a demo dealer you can sign in as
+  to see the platform populated. It is the living test account, and everything a real dealer
+  adds surfaces the same way.
 
 ## The two ideas worth reviewing
 

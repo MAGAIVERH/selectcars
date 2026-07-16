@@ -1,13 +1,15 @@
 /**
  * Seed the showroom inventory.
  *
- * Loads a curated set of luxury listings, with their gallery photos, into a single
- * "SELECTCARS Showroom" dealership. Everything the marketplace renders (names, prices,
- * specs, images) then comes from the database rather than a hardcoded file.
+ * Loads a curated set of luxury listings, each with one full-car photo presented on a
+ * transparent background (the car "floating"), into a single "SELECTCARS Showroom"
+ * dealership. Everything the marketplace renders (names, prices, specs, images) then comes
+ * from the database rather than a hardcoded file.
  *
- * The images themselves are free stock photos (Pexels License, no attribution required);
- * provenance is recorded in apps/marketplace/public/cars/CREDITS.json. The rows store only
- * the site-relative path under /public, so moving to Supabase Storage later is a URL swap.
+ * The images are free stock photos (Pexels License, no attribution required) with their
+ * backgrounds removed locally; provenance is in apps/marketplace/public/cars/CREDITS.json.
+ * Each listing's make/model/body is aligned to the actual car in its photo, so nothing
+ * misrepresents what a buyer sees. Rows store the site-relative path under /public.
  *
  * Idempotent: it re-creates the showroom's inventory from scratch on every run, scoped to
  * the showroom tenant by RLS, so it never touches another dealership's cars.
@@ -53,7 +55,7 @@ type SeedVehicle = {
   photos: SeedPhoto[];
 };
 
-const p = (file: string, alt: string, primary = false): SeedPhoto => ({ file, alt, primary });
+const p = (file: string, alt: string): SeedPhoto => ({ file, alt, primary: true });
 
 const VEHICLES: SeedVehicle[] = [
   {
@@ -69,47 +71,37 @@ const VEHICLES: SeedVehicle[] = [
     fuelType: "Gas",
     transmission: "Automatic",
     drivetrain: "RWD",
-    exteriorColor: "Carrara White",
+    exteriorColor: "GT Silver",
     interiorColor: "Black",
     description:
       "Weissach package, carbon bucket seats, and impeccable single-owner provenance. A track weapon that remains a Porsche you can drive home.",
-    photos: [
-      p("porsche-911-white.jpg", "Porsche 911 GT3 RS in Carrara White", true),
-      p("porsche-911-red.jpg", "Porsche 911 in Guards Red"),
-      p("porsche-911-green.jpg", "Porsche 911 in Python Green"),
-      p("porsche-911-turbo.jpg", "Porsche 911 rear three-quarter"),
-    ],
+    photos: [p("porsche-911.png", "Porsche 911 GT3 RS in GT Silver")],
   },
   {
-    slug: "ferrari-296-gtb",
+    slug: "ferrari-488-challenge",
     make: "Ferrari",
-    model: "296 GTB",
-    year: 2023,
-    trim: "Assetto Fiorano",
-    mileage: 2100,
-    priceUsd: 359000,
+    model: "488 Challenge Evo",
+    year: 2021,
+    trim: null,
+    mileage: 3400,
+    priceUsd: 328000,
     condition: "Used",
     bodyStyle: "Coupe",
-    fuelType: "Hybrid",
+    fuelType: "Gas",
     transmission: "Automatic",
     drivetrain: "RWD",
     exteriorColor: "Rosso Corsa",
-    interiorColor: "Nero",
+    interiorColor: "Nero Alcantara",
     description:
-      "Twin-turbo V6 hybrid making 830 combined horsepower. Full Ferrari history and factory service, with the Assetto Fiorano package.",
-    photos: [
-      p("ferrari-red.jpg", "Ferrari 296 GTB in Rosso Corsa", true),
-      p("ferrari-red-showroom.jpg", "Ferrari 296 GTB in the showroom"),
-      p("ferrari-yellow.jpg", "Ferrari in Giallo Modena"),
-      p("ferrari-red-black.jpg", "Ferrari 296 GTB detail"),
-    ],
+      "The 488 Challenge Evo: a race-bred twin-turbo V8, full aero, and competition livery. Track ready, with a documented racing history.",
+    photos: [p("ferrari-488.png", "Ferrari 488 Challenge Evo in Rosso Corsa")],
   },
   {
     slug: "lamborghini-huracan-tecnica",
     make: "Lamborghini",
     model: "Huracan Tecnica",
     year: 2024,
-    trim: "Tecnica",
+    trim: null,
     mileage: 550,
     priceUsd: 319000,
     condition: "New",
@@ -121,43 +113,36 @@ const VEHICLES: SeedVehicle[] = [
     interiorColor: "Nero Ade",
     description:
       "Naturally aspirated 5.2 V10, track-focused dynamics, and a one-off specification. The last of a breed before electrification.",
-    photos: [
-      p("lamborghini-huracan-orange.jpg", "Lamborghini Huracan Tecnica in Arancio Xanto", true),
-      p("lamborghini-green.jpg", "Lamborghini in Verde Mantis"),
-      p("lamborghini-runway.jpg", "Lamborghini Huracan on the runway"),
-    ],
+    photos: [p("lamborghini-huracan.png", "Lamborghini Huracan Tecnica in Arancio Xanto")],
   },
   {
-    slug: "mercedes-amg-gt-63-s",
+    slug: "mercedes-amg-gt-r",
     make: "Mercedes-AMG",
-    model: "GT 63 S",
+    model: "GT R",
     year: 2023,
-    trim: "Edition 1",
-    mileage: 3200,
-    priceUsd: 185000,
-    condition: "Certified",
+    trim: null,
+    mileage: 4100,
+    priceUsd: 168000,
+    condition: "Used",
     bodyStyle: "Coupe",
     fuelType: "Gas",
     transmission: "Automatic",
-    drivetrain: "AWD",
+    drivetrain: "RWD",
     exteriorColor: "Brilliant Blue",
     interiorColor: "Black Nappa",
     description:
-      "Handbuilt 4.0 twin-turbo V8 with AMG Performance 4MATIC+. Designo finish and an independent pre-purchase inspection on file.",
-    photos: [
-      p("mercedes-amg-gtr-blue.jpg", "Mercedes-AMG GT in Brilliant Blue", true),
-      p("mercedes-amg-dealership.jpg", "Mercedes-AMG in the showroom"),
-    ],
+      "The Green Hell GT R: a handbuilt 4.0 twin-turbo V8, active aero, and rear-wheel steering. Finished in a striking Brilliant Blue.",
+    photos: [p("mercedes-amg-gtr.png", "Mercedes-AMG GT R in Brilliant Blue")],
   },
   {
-    slug: "aston-martin-db12",
+    slug: "aston-martin-db11",
     make: "Aston Martin",
-    model: "DB12",
-    year: 2024,
-    trim: "Coupe",
-    mileage: 930,
-    priceUsd: null,
-    condition: "New",
+    model: "DB11",
+    year: 2022,
+    trim: "V8",
+    mileage: 6200,
+    priceUsd: 179000,
+    condition: "Used",
     bodyStyle: "Coupe",
     fuelType: "Gas",
     transmission: "Automatic",
@@ -165,8 +150,46 @@ const VEHICLES: SeedVehicle[] = [
     exteriorColor: "Ice White",
     interiorColor: "Chestnut Tan",
     description:
-      "The self-styled super tourer: 680 horsepower, Bridge of Weir leather, and brushed aluminum details. Priced on application.",
-    photos: [p("aston-martin-white.jpg", "Aston Martin DB12 in Ice White", true)],
+      "The quintessential super tourer: a 4.0 twin-turbo V8, hand-stitched leather, and grand touring comfort with genuine pace.",
+    photos: [p("aston-martin-db11.png", "Aston Martin DB11 in Ice White")],
+  },
+  {
+    slug: "range-rover-evoque",
+    make: "Range Rover",
+    model: "Evoque Dynamic",
+    year: 2024,
+    trim: null,
+    mileage: 5200,
+    priceUsd: 62000,
+    condition: "Certified",
+    bodyStyle: "SUV",
+    fuelType: "Hybrid",
+    transmission: "Automatic",
+    drivetrain: "4WD",
+    exteriorColor: "Fuji White",
+    interiorColor: "Ebony",
+    description:
+      "The compact luxury SUV that started a category. Plug-in hybrid, all-wheel drive, and an interior a class above its size.",
+    photos: [p("range-rover-evoque.png", "Range Rover Evoque Dynamic in Fuji White")],
+  },
+  {
+    slug: "jaguar-xf",
+    make: "Jaguar",
+    model: "XF R-Sport",
+    year: 2022,
+    trim: null,
+    mileage: 12800,
+    priceUsd: 47000,
+    condition: "Used",
+    bodyStyle: "Sedan",
+    fuelType: "Gas",
+    transmission: "Automatic",
+    drivetrain: "RWD",
+    exteriorColor: "Polaris White",
+    interiorColor: "Jet Black",
+    description:
+      "A British executive sport sedan: supercharged, rear-wheel drive, and finished with R-Sport styling. Poised and understated.",
+    photos: [p("jaguar-xf.png", "Jaguar XF R-Sport in Polaris White")],
   },
   {
     slug: "bentley-continental-gt-speed",
@@ -181,72 +204,30 @@ const VEHICLES: SeedVehicle[] = [
     fuelType: "Gas",
     transmission: "Automatic",
     drivetrain: "AWD",
-    exteriorColor: "Silver Frost",
+    exteriorColor: "Onyx Black",
     interiorColor: "Linen",
     description:
       "Twelve-cylinder grand tourer with a Mulliner leather interior. Effortless presence for any occasion, with the full Bentley service book.",
-    photos: [p("bentley-continental-gt.jpg", "Bentley Continental GT Speed in Silver Frost", true)],
+    photos: [p("bentley-continental.png", "Bentley Continental GT Speed in Onyx Black")],
   },
   {
-    slug: "jaguar-f-type-r75",
-    make: "Jaguar",
-    model: "F-Type R75",
-    year: 2023,
-    trim: "R75 Convertible",
-    mileage: 2600,
-    priceUsd: 109000,
-    condition: "Certified",
-    bodyStyle: "Convertible",
-    fuelType: "Gas",
-    transmission: "Automatic",
-    drivetrain: "AWD",
-    exteriorColor: "Firenze Red",
-    interiorColor: "Mars Red",
-    description:
-      "The final-edition supercharged 5.0 V8, one of the last of the breed. Convertible, all-wheel drive, and a soundtrack to match.",
-    photos: [
-      p("jaguar-red.jpg", "Jaguar F-Type R75 in Firenze Red", true),
-      p("jaguar-black-showroom.jpg", "Jaguar in Santorini Black"),
-      p("jaguar-white.jpg", "Jaguar in Fuji White"),
-    ],
-  },
-  {
-    slug: "range-rover-sv-autobiography",
-    make: "Range Rover",
-    model: "SV Autobiography",
-    year: 2024,
-    trim: "SV",
-    mileage: 2000,
-    priceUsd: 215000,
-    condition: "Used",
-    bodyStyle: "SUV",
-    fuelType: "Hybrid",
-    transmission: "Automatic",
-    drivetrain: "4WD",
-    exteriorColor: "Arctic White",
-    interiorColor: "Caraway",
-    description:
-      "The flagship SV: a plug-in hybrid drivetrain, executive rear seating, and the most complete luxury SUV Land Rover builds.",
-    photos: [p("range-rover-white.jpg", "Range Rover SV Autobiography in Arctic White", true)],
-  },
-  {
-    slug: "bmw-m5-competition",
+    slug: "bmw-m2-competition",
     make: "BMW",
-    model: "M5 Competition",
-    year: 2024,
-    trim: "Competition",
-    mileage: 1740,
-    priceUsd: 122000,
+    model: "M2 Competition",
+    year: 2023,
+    trim: null,
+    mileage: 9800,
+    priceUsd: 68000,
     condition: "Used",
-    bodyStyle: "Sedan",
+    bodyStyle: "Coupe",
     fuelType: "Gas",
-    transmission: "Automatic",
-    drivetrain: "AWD",
-    exteriorColor: "Marina Bay Blue",
-    interiorColor: "Silverstone",
+    transmission: "Manual",
+    drivetrain: "RWD",
+    exteriorColor: "Alpine White",
+    interiorColor: "Black",
     description:
-      "The super sedan benchmark: 617 horsepower, M xDrive with a rear-drive mode, and carbon ceramic brakes. A car for every day and every track day.",
-    photos: [p("bmw-blue.jpg", "BMW M5 Competition in Marina Bay Blue", true)],
+      "The purist's M car: a twin-turbo inline-six, a manual gearbox, and rear-wheel drive, wrapped in M Motorsport livery.",
+    photos: [p("bmw-m2.png", "BMW M2 Competition in Alpine White")],
   },
 ];
 
@@ -300,14 +281,7 @@ async function seedInventory(): Promise<{ vehicles: number; photos: number }> {
         await client.query(
           `insert into public.vehicle_photos (vehicle_id, tenant_id, url, alt, position, is_primary)
            values ($1,$2,$3,$4,$5,$6)`,
-          [
-            vehicleId,
-            SHOWROOM.id,
-            `/cars/${photo.file}`,
-            photo.alt,
-            i,
-            photo.primary === true,
-          ],
+          [vehicleId, SHOWROOM.id, `/cars/${photo.file}`, photo.alt, i, photo.primary === true],
         );
         photoCount++;
       }
