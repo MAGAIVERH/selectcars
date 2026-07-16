@@ -48,7 +48,7 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 | 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md) | Done   |
 | 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md) | Done   |
 | 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done   |
-| 18-19 | Vehicle create/edit form + photo uploader                               | Open   |
+| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                 | Done (edit + photos open) |
 | 20    | Status workflow (draft to sold)                                         | Open   |
 
 The vehicles module introduced a second Postgres role: buyers read through

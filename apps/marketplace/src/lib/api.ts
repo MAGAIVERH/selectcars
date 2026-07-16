@@ -1,5 +1,11 @@
 import { headers } from "next/headers";
-import { vehicleListSchema, type VehicleList, type ListVehiclesQuery } from "@selectcars/shared";
+import {
+  vehicleListSchema,
+  vehicleSchema,
+  type VehicleList,
+  type ListVehiclesQuery,
+  type CreateVehicle,
+} from "@selectcars/shared";
 
 /**
  * Server-side client for the SELECTCARS API (the Fastify service).
@@ -54,4 +60,24 @@ export async function fetchInventory(
   const parsed = vehicleListSchema.safeParse(await res.json());
   if (!parsed.success) return { ok: false, status: 502 };
   return { ok: true, data: parsed.data };
+}
+
+export type CreateResult = { ok: true; slug: string } | { ok: false; status: number };
+
+/** Create a vehicle in the signed-in dealer's inventory (RBAC + tenant enforced by the API). */
+export async function createVehicle(input: CreateVehicle): Promise<CreateResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await fetch(`${API_URL}/vehicles`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+  });
+  if (res.status !== 201) return { ok: false, status: res.status };
+
+  const parsed = vehicleSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, slug: parsed.data.slug };
 }
