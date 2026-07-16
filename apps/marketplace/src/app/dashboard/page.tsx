@@ -44,9 +44,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           <EmptyState filtered={status !== null} />
         ) : (
           <ul className="flex flex-col gap-3">
-            {result.data.items.map((vehicle) => (
+            {result.data.items.map((vehicle, i) => (
               <li key={vehicle.id}>
-                <InventoryItem vehicle={vehicle} />
+                <InventoryItem vehicle={vehicle} priority={i === 0} />
               </li>
             ))}
           </ul>

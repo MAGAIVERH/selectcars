@@ -16,7 +16,14 @@ import type {
  * SQL below never filters by `tenant_id`, because RLS does it.
  */
 
-/** The columns the API exposes, mapped to the camelCase contract in one place. */
+/**
+ * The columns the API exposes, mapped to the camelCase contract in one place.
+ *
+ * `photos` is aggregated inline as a correlated subquery, so every read (list, detail, and
+ * the create/update RETURNING) carries the ordered gallery in one round trip. On the public
+ * path the subquery runs as `selectcars_public`, whose RLS policy only reveals photos of
+ * `active` vehicles, so a buyer never receives a draft's images.
+ */
 const VEHICLE_COLUMNS = `
   id, slug, vin, make, model, year, trim, mileage,
   price_usd::float8 as "priceUsd",
@@ -24,6 +31,16 @@ const VEHICLE_COLUMNS = `
   transmission, drivetrain,
   exterior_color as "exteriorColor", interior_color as "interiorColor",
   description, status,
+  coalesce((
+    select json_agg(
+      json_build_object(
+        'id', p.id, 'url', p.url, 'alt', p.alt,
+        'position', p.position, 'isPrimary', p.is_primary
+      ) order by p.position
+    )
+    from public.vehicle_photos p
+    where p.vehicle_id = vehicles.id
+  ), '[]'::json) as photos,
   created_at as "createdAt", updated_at as "updatedAt"
 `;
 

@@ -58,7 +58,7 @@ The vehicles module introduced a second Postgres role: buyers read through
 
 | Day | Title                                                          | Status |
 | --- | -------------------------------------------------------------- | ------ |
-| 21  | Photos on the API responses (dealer + public)                  | Open   |
+| 21  | [Photos on the API responses (dealer + public)](day-21-photos-on-api.md) | Done   |
 | 22  | Marketplace reads `/public/vehicles` (replace static cars.ts)  | Open   |
 | 23  | Public listing detail page + gallery                           | Open   |
 
