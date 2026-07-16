@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Vehicle, BodyStyle, FuelType, Condition } from "@selectcars/shared";
-import { formatPrice } from "@/lib/cars";
+import { formatPrice } from "@/lib/format";
 import { ListingCard } from "@/components/listing-card";
 
 const SORTS = {
