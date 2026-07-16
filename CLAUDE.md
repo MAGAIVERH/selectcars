@@ -11,5 +11,6 @@
 - **Zod contracts live in `packages/shared`** and are shared between the API and the apps.
 - **AI is always async** (BullMQ) — never block HTTP on a model call.
 - **Conventional Commits** in English; **verify UI in the browser** (Playwright) before claiming done.
+- **Keep docs current in the same change:** update `README.md` and the relevant `docs/` file (day log, plan, stack sheet) whenever behavior/setup/architecture/status changes. Shipping without the doc update is not done.
 - Monorepo: **Turborepo + pnpm**, `apps/*` (marketplace, dashboard, api) and `packages/*` (ui, shared, db, config).
 - Track stack changes in `docs/staks/*.md`; record hard trade-offs as ADRs in `docs/adr/`.

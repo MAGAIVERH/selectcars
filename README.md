@@ -6,8 +6,25 @@ Buyers browse a premium showroom. Dealerships get an operating system: inventory
 test drives, analytics. Many dealerships share one database, and **the database itself**
 refuses to let one see another's data.
 
-> Status: **Phase 1 complete** (multi-tenancy + auth). Inventory, AI, and the CRM pipeline
-> are next. See [`docs/tasks/`](docs/tasks/) for the day-by-day build log.
+> Status: **Phase 2 in progress** (inventory + dealer dashboard). Multi-tenancy, auth, the
+> vehicles API, a photo schema, a seeded showroom, and the dealer dashboard's inventory list
+> are live. Next: the marketplace reads listings from the database, dealers add vehicles, and
+> a professional financial/analytics dashboard. See the
+> [build plan](docs/plans/dealer-dashboard-and-marketplace.md) for the full vision and
+> [`docs/tasks/`](docs/tasks/) for the day-by-day log.
+
+## What works today
+
+- **Marketplace** (`:3000`): premium buyer-facing showroom (still rendering static demo cars;
+  moving onto live listings from the database next).
+- **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory, filter by
+  status. Reads the vehicles API with a token minted from your session.
+- **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
+  (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
+  Postgres role. Photos live in `vehicle_photos` with the same two-audience RLS.
+- **Seeded showroom**: a demo dealership (`SELECTCARS Showroom`) with 9 active listings and
+  20 photos, owned by a demo dealer you can sign in as to see the platform populated. It is
+  the living test account, and everything a real dealer adds surfaces the same way.
 
 ## The two ideas worth reviewing
 
@@ -28,8 +45,9 @@ that feeds RLS. → [ADR 002](docs/adr/002-service-auth-jwt-jwks.md)
 Both are proven by scripts that drive the real stack, not mocks:
 
 ```bash
-pnpm --filter @selectcars/db rls:verify    # isolation at the SQL level
-pnpm --filter @selectcars/db verify:api    # isolation through the API, with real tokens
+pnpm --filter @selectcars/db rls:verify       # isolation at the SQL level
+pnpm --filter @selectcars/db verify:api       # isolation through the API, with real tokens
+pnpm --filter @selectcars/db verify:vehicles  # dealer vs public paths, end to end
 ```
 
 `verify:api` signs up two real dealerships, mints real tokens, and asserts that a forged
@@ -67,6 +85,7 @@ API in a container.
 pnpm install
 cp .env.example .env        # then fill it in: the file explains every variable
 pnpm --filter @selectcars/db migrate
+pnpm --filter @selectcars/db seed          # loads the demo SELECTCARS Showroom inventory
 ```
 
 Two gotchas that will cost you an hour if you skip the comments in `.env.example`:
@@ -82,6 +101,11 @@ Run it:
 pnpm dev                                   # marketplace on :3000
 pnpm --filter @selectcars/api dev          # API on :3333
 ```
+
+The dealer dashboard is at `/dashboard`. To see it populated with the seeded showroom, sign
+in as the demo dealer: `demo-dealer@selectcars.test` / `supercar1234` (owner of the
+`SELECTCARS Showroom`). It is created by signing up once and adding the membership; the seed
+loads the inventory it displays.
 
 Google sign-in expects this exact redirect URI:
 `http://localhost:3000/api/auth/callback/google`

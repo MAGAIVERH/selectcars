@@ -43,6 +43,7 @@ Before any operation that reaches outside the current file, stop and confirm **w
 - Branch off the default branch; never push to it directly without asking.
 - Feature-flag risky/expensive features (e.g. `ENABLE_AI_VISION`) so demos work without keys.
 - Every phase updates the matching `docs/staks/*.md` Changelog and, when a trade-off is made, an ADR in `docs/adr/`.
+- **Keep the docs current in the same change.** Whenever behavior, setup, scripts, architecture, or status change, update `README.md` (the front door) and the relevant `docs/` file (day log in `docs/tasks/`, plan in `docs/plans/`, stack sheet) as part of the same commit, not "later". A change that ships without its doc update is not done. The README must always describe what works today and how to run it.
 
 ## Definition of done (per feature)
 
