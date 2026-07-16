@@ -140,6 +140,22 @@ export const vehicleSchema = z.object({
 });
 export type Vehicle = z.infer<typeof vehicleSchema>;
 
+/** A gallery photo for a vehicle. Buyers only ever receive photos of `active` listings. */
+export const vehiclePhotoSchema = z.object({
+  id: z.string().uuid(),
+  url: z.string(),
+  alt: z.string().nullable(),
+  position: z.number().int().nonnegative(),
+  isPrimary: z.boolean(),
+});
+export type VehiclePhoto = z.infer<typeof vehiclePhotoSchema>;
+
+/** A vehicle together with its ordered gallery, primary photo first. */
+export const vehicleWithPhotosSchema = vehicleSchema.extend({
+  photos: z.array(vehiclePhotoSchema),
+});
+export type VehicleWithPhotos = z.infer<typeof vehicleWithPhotosSchema>;
+
 /**
  * What a dealer may send when creating a vehicle.
  *
