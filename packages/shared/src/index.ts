@@ -102,16 +102,111 @@ export const apiErrorSchema = z.object({
 });
 export type ApiError = z.infer<typeof apiErrorSchema>;
 
-/** Core vehicle contract (grows as the inventory module is built). */
+export const transmissionSchema = z.enum(["Automatic", "Manual"]);
+export type Transmission = z.infer<typeof transmissionSchema>;
+
+export const drivetrainSchema = z.enum(["FWD", "RWD", "AWD", "4WD"]);
+export type Drivetrain = z.infer<typeof drivetrainSchema>;
+
+/**
+ * Listing lifecycle. Only `active` is visible to buyers, and that rule is enforced by an
+ * RLS policy, not by a filter someone has to remember to write.
+ */
+export const vehicleStatusSchema = z.enum(["draft", "active", "pending", "sold"]);
+export type VehicleStatus = z.infer<typeof vehicleStatusSchema>;
+
+/** A vehicle as the API returns it. */
 export const vehicleSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
+  slug: z.string(),
+  vin: z.string().nullable(),
   make: z.string(),
   model: z.string(),
   year: z.number().int(),
+  trim: z.string().nullable(),
   mileage: z.number().int().nonnegative(),
   priceUsd: z.number().nonnegative().nullable(),
   condition: conditionSchema,
   bodyStyle: bodyStyleSchema,
   fuelType: fuelTypeSchema,
+  transmission: transmissionSchema.nullable(),
+  drivetrain: drivetrainSchema.nullable(),
+  exteriorColor: z.string().nullable(),
+  interiorColor: z.string().nullable(),
+  description: z.string().nullable(),
+  status: vehicleStatusSchema,
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 export type Vehicle = z.infer<typeof vehicleSchema>;
+
+/**
+ * What a dealer may send when creating a vehicle.
+ *
+ * Note what is absent: `tenant_id`, `id`, `slug`, and the timestamps. The tenant comes from
+ * the verified access token, never from the body, so a caller cannot write into another
+ * dealership by lying in JSON. The slug is derived server-side.
+ */
+export const createVehicleSchema = z.object({
+  // A US VIN is 17 characters and never uses I, O, or Q.
+  vin: z
+    .string()
+    .regex(/^[A-HJ-NPR-Z0-9]{17}$/i, "A VIN is 17 characters and cannot contain I, O, or Q.")
+    .nullish(),
+  make: z.string().min(1).max(60),
+  model: z.string().min(1).max(60),
+  year: z
+    .number()
+    .int()
+    .min(1900)
+    .max(new Date().getFullYear() + 2),
+  trim: z.string().max(60).nullish(),
+  mileage: z.number().int().nonnegative().default(0),
+  priceUsd: z.number().nonnegative().max(100_000_000).nullish(),
+  condition: conditionSchema,
+  bodyStyle: bodyStyleSchema,
+  fuelType: fuelTypeSchema,
+  transmission: transmissionSchema.nullish(),
+  drivetrain: drivetrainSchema.nullish(),
+  exteriorColor: z.string().max(40).nullish(),
+  interiorColor: z.string().max(40).nullish(),
+  description: z.string().max(5000).nullish(),
+  status: vehicleStatusSchema.default("draft"),
+});
+export type CreateVehicle = z.infer<typeof createVehicleSchema>;
+
+/** Every field optional: a partial update. */
+export const updateVehicleSchema = createVehicleSchema.partial();
+export type UpdateVehicle = z.infer<typeof updateVehicleSchema>;
+
+/** Filters a dealer can apply to their own inventory. */
+export const listVehiclesQuerySchema = z.object({
+  status: vehicleStatusSchema.optional(),
+  search: z.string().max(120).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(24),
+  offset: z.coerce.number().int().nonnegative().default(0),
+});
+export type ListVehiclesQuery = z.infer<typeof listVehiclesQuerySchema>;
+
+/** Filters a buyer can apply to the public marketplace. `status` is not one of them. */
+export const publicVehiclesQuerySchema = z.object({
+  make: z.string().max(60).optional(),
+  bodyStyle: bodyStyleSchema.optional(),
+  fuelType: fuelTypeSchema.optional(),
+  condition: conditionSchema.optional(),
+  minPriceUsd: z.coerce.number().nonnegative().optional(),
+  maxPriceUsd: z.coerce.number().nonnegative().optional(),
+  search: z.string().max(120).optional(),
+  limit: z.coerce.number().int().min(1).max(60).default(24),
+  offset: z.coerce.number().int().nonnegative().default(0),
+});
+export type PublicVehiclesQuery = z.infer<typeof publicVehiclesQuerySchema>;
+
+/** A paginated result, so clients can render "showing 24 of 137" without a second call. */
+export const vehicleListSchema = z.object({
+  items: z.array(vehicleSchema),
+  total: z.number().int().nonnegative(),
+  limit: z.number().int(),
+  offset: z.number().int(),
+});
+export type VehicleList = z.infer<typeof vehicleListSchema>;

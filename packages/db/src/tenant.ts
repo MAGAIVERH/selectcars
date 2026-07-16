@@ -8,6 +8,12 @@ import { getPool } from "./pool";
  */
 export const APP_ROLE = "selectcars_app";
 
+/**
+ * Non-bypass role used for anonymous, public marketplace reads. It has no tenant context
+ * and is granted only what a buyer may see: `active` listings, select-only.
+ */
+export const PUBLIC_ROLE = "selectcars_public";
+
 /** Who is acting, and on behalf of which tenant. Both are set as transaction-local GUCs. */
 export type TenantScope = {
   tenantId: string;
@@ -26,6 +32,31 @@ export type TenantScope = {
  * Accepts either a bare tenant id or a {@link TenantScope}: without an actor, mutations
  * are still audited, just without attribution.
  */
+/**
+ * Run `fn` as the anonymous public role: the marketplace's read path.
+ *
+ * There is no tenant here, by design: a buyer browses across every dealership. Safety comes
+ * from the role instead. {@link PUBLIC_ROLE} can only `select`, and its RLS policy admits
+ * only `status = 'active'` rows, so a careless public query still cannot expose a draft or
+ * a sold car. The marketplace is the surface an attacker reaches without credentials, so it
+ * gets the narrowest role in the system.
+ */
+export async function withPublic<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    await client.query(`set local role ${PUBLIC_ROLE}`);
+    const result = await fn(client);
+    await client.query("commit");
+    return result;
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function withTenant<T>(
   scope: string | TenantScope,
   fn: (client: PoolClient) => Promise<T>,
