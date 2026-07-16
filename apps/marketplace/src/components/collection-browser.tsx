@@ -1,30 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  type Car,
-  type Body,
-  type Fuel,
-  type Transmission,
-  bodies,
-  brands,
-  formatPrice,
-  fuels,
-  transmissions,
-} from "@/lib/cars";
-import { CarCard } from "@/components/car-card";
-
-const PRICE_MAX = 350_000;
-
-const CHIPS = [
-  "All",
-  "Sports",
-  "Classics",
-  "Premium SUV",
-  "Limited editions",
-  "Just arrived",
-] as const;
-type Chip = (typeof CHIPS)[number];
+import type { Vehicle, BodyStyle, FuelType, Condition } from "@selectcars/shared";
+import { formatPrice } from "@/lib/cars";
+import { ListingCard } from "@/components/listing-card";
 
 const SORTS = {
   recent: "Just arrived",
@@ -33,99 +12,89 @@ const SORTS = {
 } as const;
 type SortKey = keyof typeof SORTS;
 
+const CONDITIONS: Condition[] = ["New", "Certified", "Used"];
+
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-function matchesChip(car: Car, chip: Chip): boolean {
-  switch (chip) {
-    case "All":
-      return true;
-    case "Sports":
-      return car.body === "Coupe" || car.body === "GT";
-    case "Classics":
-      return car.year <= 2015;
-    case "Premium SUV":
-      return car.body === "SUV";
-    case "Limited editions":
-      return car.badge === "RARE" || car.badge === "FINAL UNIT" || car.badge === "RESERVED";
-    case "Just arrived":
-      return car.badge === "NEW";
-  }
+function uniq<T>(values: T[]): T[] {
+  return [...new Set(values)];
 }
 
-export function CollectionBrowser({ cars }: { cars: Car[] }) {
+/**
+ * Live marketplace browser. Facets are derived from the vehicles the API returns, so the
+ * filters always match the actual inventory: no hardcoded makes or bodies to drift.
+ */
+export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
+  const makes = useMemo(() => uniq(vehicles.map((v) => v.make)).sort(), [vehicles]);
+  const bodies = useMemo(() => uniq(vehicles.map((v) => v.bodyStyle)), [vehicles]);
+  const fuels = useMemo(() => uniq(vehicles.map((v) => v.fuelType)), [vehicles]);
+  const conditions = useMemo(
+    () => CONDITIONS.filter((c) => vehicles.some((v) => v.condition === c)),
+    [vehicles],
+  );
+  const priceCeiling = useMemo(() => {
+    const max = Math.max(0, ...vehicles.map((v) => v.priceUsd ?? 0));
+    return Math.max(50_000, Math.ceil(max / 25_000) * 25_000);
+  }, [vehicles]);
+
   const [search, setSearch] = useState("");
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(PRICE_MAX);
-  const [selBrands, setSelBrands] = useState<string[]>([]);
-  const [selBodies, setSelBodies] = useState<Body[]>([]);
-  const [selTransmissions, setSelTransmissions] = useState<Transmission[]>([]);
-  const [selFuels, setSelFuels] = useState<Fuel[]>([]);
-  const [chip, setChip] = useState<Chip>("All");
+  const [pricedOnly, setPricedOnly] = useState(false);
+  const [maxPrice, setMaxPrice] = useState(priceCeiling);
+  const [selMakes, setSelMakes] = useState<string[]>([]);
+  const [selBodies, setSelBodies] = useState<BodyStyle[]>([]);
+  const [selFuels, setSelFuels] = useState<FuelType[]>([]);
+  const [condition, setCondition] = useState<Condition | "All">("All");
   const [sort, setSort] = useState<SortKey>("recent");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const result = cars.filter((car) => {
-      if (!matchesChip(car, chip)) return false;
-      if (onlyAvailable && car.price === null) return false;
-      if (car.price !== null && car.price > maxPrice) return false;
-      if (selBrands.length && !selBrands.includes(car.brand)) return false;
-      if (selBodies.length && !selBodies.includes(car.body)) return false;
-      if (selTransmissions.length && !selTransmissions.includes(car.transmission)) return false;
-      if (selFuels.length && !selFuels.includes(car.fuel)) return false;
+    const result = vehicles.filter((v) => {
+      if (condition !== "All" && v.condition !== condition) return false;
+      if (pricedOnly && v.priceUsd === null) return false;
+      if (v.priceUsd !== null && v.priceUsd > maxPrice) return false;
+      if (selMakes.length && !selMakes.includes(v.make)) return false;
+      if (selBodies.length && !selBodies.includes(v.bodyStyle)) return false;
+      if (selFuels.length && !selFuels.includes(v.fuelType)) return false;
       if (q) {
-        const haystack = `${car.brand} ${car.model} ${car.color}`.toLowerCase();
+        const haystack = `${v.make} ${v.model} ${v.exteriorColor ?? ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
 
     result.sort((a, b) => {
-      if (sort === "price-asc") return (a.price ?? Infinity) - (b.price ?? Infinity);
-      if (sort === "price-desc") return (b.price ?? -Infinity) - (a.price ?? -Infinity);
-      // just arrived: newest first, then lowest mileage
+      if (sort === "price-asc") return (a.priceUsd ?? Infinity) - (b.priceUsd ?? Infinity);
+      if (sort === "price-desc") return (b.priceUsd ?? -Infinity) - (a.priceUsd ?? -Infinity);
       return b.year - a.year || a.mileage - b.mileage;
     });
 
     return result;
-  }, [
-    cars,
-    search,
-    onlyAvailable,
-    maxPrice,
-    selBrands,
-    selBodies,
-    selTransmissions,
-    selFuels,
-    chip,
-    sort,
-  ]);
+  }, [vehicles, search, pricedOnly, maxPrice, selMakes, selBodies, selFuels, condition, sort]);
 
   function clearAll() {
     setSearch("");
-    setOnlyAvailable(false);
-    setMaxPrice(PRICE_MAX);
-    setSelBrands([]);
+    setPricedOnly(false);
+    setMaxPrice(priceCeiling);
+    setSelMakes([]);
     setSelBodies([]);
-    setSelTransmissions([]);
     setSelFuels([]);
-    setChip("All");
+    setCondition("All");
   }
 
   return (
     <div>
-      {/* Toolbar: chips + search + sort */}
+      {/* Toolbar: condition chips + search + sort */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
-          {CHIPS.map((c) => (
+          {(["All", ...conditions] as const).map((c) => (
             <button
               key={c}
               type="button"
-              onClick={() => setChip(c)}
+              onClick={() => setCondition(c)}
               className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-                chip === c
+                condition === c
                   ? "border-foreground bg-foreground text-background"
                   : "border-border text-muted hover:border-border-strong hover:text-foreground"
               }`}
@@ -180,11 +149,11 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             <label className="text-muted flex cursor-pointer items-center gap-2.5 text-sm">
               <input
                 type="checkbox"
-                checked={onlyAvailable}
-                onChange={(e) => setOnlyAvailable(e.target.checked)}
+                checked={pricedOnly}
+                onChange={(e) => setPricedOnly(e.target.checked)}
                 className="accent-foreground size-4"
               />
-              Available for viewing only
+              Priced listings only
             </label>
           </FilterGroup>
 
@@ -192,7 +161,7 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             <input
               type="range"
               min={0}
-              max={PRICE_MAX}
+              max={priceCeiling}
               step={5000}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -204,63 +173,50 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           </FilterGroup>
 
-          <FilterGroup label="Make">
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-              {brands.map((brand) => (
-                <Check
-                  key={brand}
-                  label={brand}
-                  checked={selBrands.includes(brand)}
-                  onChange={() => setSelBrands((s) => toggle(s, brand))}
-                />
-              ))}
-            </div>
-          </FilterGroup>
+          {makes.length > 0 && (
+            <FilterGroup label="Make">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                {makes.map((make) => (
+                  <Check
+                    key={make}
+                    label={make}
+                    checked={selMakes.includes(make)}
+                    onChange={() => setSelMakes((s) => toggle(s, make))}
+                  />
+                ))}
+              </div>
+            </FilterGroup>
+          )}
 
-          <FilterGroup label="Body">
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-              {bodies.map((body) => (
-                <Check
-                  key={body}
-                  label={body}
-                  checked={selBodies.includes(body)}
-                  onChange={() => setSelBodies((s) => toggle(s, body))}
-                />
-              ))}
-            </div>
-          </FilterGroup>
+          {bodies.length > 0 && (
+            <FilterGroup label="Body">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                {bodies.map((body) => (
+                  <Check
+                    key={body}
+                    label={body}
+                    checked={selBodies.includes(body)}
+                    onChange={() => setSelBodies((s) => toggle(s, body))}
+                  />
+                ))}
+              </div>
+            </FilterGroup>
+          )}
 
-          <FilterGroup label="Transmission">
-            <div className="flex flex-wrap gap-2">
-              {transmissions.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setSelTransmissions((s) => toggle(s, t))}
-                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                    selTransmissions.includes(t)
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border text-muted hover:border-border-strong"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </FilterGroup>
-
-          <FilterGroup label="Fuel" last>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-              {fuels.map((fuel) => (
-                <Check
-                  key={fuel}
-                  label={fuel}
-                  checked={selFuels.includes(fuel)}
-                  onChange={() => setSelFuels((s) => toggle(s, fuel))}
-                />
-              ))}
-            </div>
-          </FilterGroup>
+          {fuels.length > 0 && (
+            <FilterGroup label="Fuel" last>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                {fuels.map((fuel) => (
+                  <Check
+                    key={fuel}
+                    label={fuel}
+                    checked={selFuels.includes(fuel)}
+                    onChange={() => setSelFuels((s) => toggle(s, fuel))}
+                  />
+                ))}
+              </div>
+            </FilterGroup>
+          )}
         </aside>
 
         <div>
@@ -277,8 +233,8 @@ export function CollectionBrowser({ cars }: { cars: Car[] }) {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((car) => (
-                <CarCard key={car.id} car={car} />
+              {filtered.map((vehicle, i) => (
+                <ListingCard key={vehicle.id} vehicle={vehicle} priority={i < 3} />
               ))}
             </div>
           )}
