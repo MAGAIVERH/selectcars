@@ -2,6 +2,15 @@
 
 Non-negotiable rules for SELECTCARS. These exist so the codebase reads like it was built by a senior team.
 
+## Investigate the target before you act
+
+Before any operation that reaches outside the current file, stop and confirm **where** it goes and **why**, then say so before running it. This is not optional and it applies every time, without being asked.
+
+- **Database / external services:** confirm the exact target (host, project, database, role) is the intended one before connecting or querying. This project is Supabase only. Never touch another project's database (the Neon instance belongs to a different project). A guard enforces this: do not work around it, fix the target instead.
+- **Network requests / APIs:** know which endpoint, environment (dev vs prod), and account a request hits before sending it. State it first.
+- **Destructive or hard-to-reverse actions** (migrations, deletes, overwrites, pushes, merges, deploys, sending mail): name the target and the effect, verify it is correct, then proceed. If what you find contradicts how it was described, surface that instead of proceeding.
+- **When unsure, verify, don't assume.** Read the config, check the connection string, list what exists. A wrong target is worse than a slow one.
+
 ## TypeScript
 
 - **`strict: true` everywhere. Never use `any`.** Use `unknown` + narrowing, generics, or Zod-inferred types.

@@ -3,6 +3,7 @@
 
 # SELECTCARS — always-on rules (summary; full set in docs/rules/engineering-rules.md)
 
+- **Investigate the target before you act:** before any request/query/action that leaves the current file, confirm *where* it goes and *why*, and say so first. Supabase only; never touch another project's DB (Neon is not ours). Verify, don't assume.
 - **TypeScript strict; never `any`** (use `unknown` + Zod-inferred types).
 - **en-US only** in product copy; **never the em dash `—`** (reads as AI) — use `:`/`,`/`·`.
 - **shadcn/ui** as the component base; no simplistic "badge" chips as primary UI.
