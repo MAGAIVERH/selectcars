@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Vehicle } from "@selectcars/shared";
-import { formatPrice, formatMileage } from "@/lib/cars";
+import { formatPrice, formatMileage } from "@/lib/format";
 
 /**
  * A marketplace listing card, driven by a live `Vehicle` from the API (photos and all).

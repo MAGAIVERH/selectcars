@@ -15,9 +15,10 @@ refuses to let one see another's data.
 
 ## What works today
 
-- **Marketplace** (`:3000`): premium buyer-facing showroom. The collection (`/colecao`) and
-  the listing detail pages read **live** from the database (every dealership's published
-  listings), with data-derived filters and per-listing galleries. The home preview is next.
+- **Marketplace** (`:3000`): premium buyer-facing showroom. The home preview, the collection
+  (`/colecao`), and the listing detail pages all read **live** from the database (every
+  dealership's published listings), with data-derived filters and per-listing galleries. What
+  a dealer publishes in their dashboard shows up here, same rows via the read-only public role.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
   thumbnails, filter by status. Reads the vehicles API with a token minted from your session.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path

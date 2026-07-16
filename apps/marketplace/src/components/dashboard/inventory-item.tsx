@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Vehicle } from "@selectcars/shared";
-import { formatPrice, formatMileage } from "@/lib/cars";
+import { formatPrice, formatMileage } from "@/lib/format";
 import { StatusPill } from "./status-pill";
 
 const updatedFmt = new Intl.DateTimeFormat("en-US", {

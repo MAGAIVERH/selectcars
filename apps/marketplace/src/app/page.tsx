@@ -7,10 +7,7 @@ import { FeaturedCar } from "@/components/featured-car";
 import { ShowroomGrid } from "@/components/showroom-grid";
 import { ProcessSteps } from "@/components/process-steps";
 import { ContactForm } from "@/components/contact-form";
-import { cars } from "@/lib/cars";
-
-// showroom preview shows the six vehicles with real photography
-const showroomCars = cars.slice(0, 6);
+import { fetchPublicVehicles } from "@/lib/public-api";
 
 const testimonials = [
   {
@@ -33,7 +30,10 @@ const testimonials = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // Home preview: the six most recent published listings, live from the database.
+  const showroomVehicles = (await fetchPublicVehicles()).slice(0, 6);
+
   return (
     <>
       <SiteHeader />
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
 
           <div className="mt-10">
-            <ShowroomGrid cars={showroomCars} />
+            <ShowroomGrid vehicles={showroomVehicles} />
           </div>
 
           {/* Não encontrou banner */}

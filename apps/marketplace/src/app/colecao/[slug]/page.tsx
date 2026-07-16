@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingGallery } from "@/components/listing-gallery";
 import { fetchPublicVehicleBySlug } from "@/lib/public-api";
-import { formatPrice, formatMileage } from "@/lib/cars";
+import { formatPrice, formatMileage } from "@/lib/format";
 
 type Params = Promise<{ slug: string }>;
 

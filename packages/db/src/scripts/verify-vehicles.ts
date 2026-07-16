@@ -13,6 +13,8 @@ import { dirname, resolve } from "node:path";
 
 loadEnv({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../../../../.env") });
 
+import { getPool } from "@selectcars/db";
+
 const APP = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
 const API = process.env.API_URL ?? "http://127.0.0.1:3333";
 
@@ -25,7 +27,7 @@ function check(label: string, ok: boolean, detail?: unknown): void {
   }
 }
 
-type Dealer = { token: string; dealership: string };
+type Dealer = { token: string; dealership: string; orgId: string };
 
 async function createDealer(name: string, dealership: string): Promise<Dealer> {
   const email = `${name.toLowerCase()}-${Date.now()}@selectcars.test`;
@@ -55,7 +57,20 @@ async function createDealer(name: string, dealership: string): Promise<Dealer> {
 
   const tokenRes = await fetch(`${APP}/api/auth/token`, { headers: { cookie, origin: APP } });
   const { token } = (await tokenRes.json()) as { token: string };
-  return { token, dealership };
+  return { token, dealership, orgId: id };
+}
+
+/**
+ * Remove the throwaway dealerships this run created. Without this, their `active` listings
+ * linger in the database and show up on the public marketplace, which reads live inventory.
+ * The seeded SELECTCARS Showroom is never touched.
+ */
+async function cleanup(orgIds: string[]): Promise<void> {
+  try {
+    await getPool().query(`delete from public."organization" where id = any($1::text[])`, [orgIds]);
+  } catch (err) {
+    console.warn(`cleanup skipped: ${(err as Error).message}`);
+  }
 }
 
 function authed(token: string): Record<string, string> {
@@ -259,6 +274,11 @@ async function main(): Promise<void> {
     filtered.items.length > 0 && filtered.items.every((v) => v.make === "Ferrari"),
     filtered.items.map((v) => v.make),
   );
+
+  // Always tidy up this run's throwaway dealerships, pass or fail, so they never leak onto
+  // the public marketplace.
+  await cleanup([alpha.orgId, bravo.orgId]);
+  await getPool().end();
 
   console.log("");
   if (failures) {
