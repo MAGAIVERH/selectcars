@@ -20,7 +20,8 @@ refuses to let one see another's data.
   dealership's published listings), with data-derived filters and per-listing galleries. What
   a dealer publishes in their dashboard shows up here, same rows via the read-only public role.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
-  thumbnails, filter by status. Reads the vehicles API with a token minted from your session.
+  thumbnails, filter by status, and add a vehicle (save as draft or publish straight to the
+  marketplace). Reads and writes the vehicles API with a token minted from your session.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
