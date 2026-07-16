@@ -53,3 +53,30 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 The vehicles module introduced a second Postgres role: buyers read through
 `selectcars_public`, which can only ever see `active` listings. See the day log.
+
+### Phase 3 — Live marketplace (dashboard reflects on the public site)
+
+| Day | Title                                                          | Status |
+| --- | -------------------------------------------------------------- | ------ |
+| 21  | Photos on the API responses (dealer + public)                  | Open   |
+| 22  | Marketplace reads `/public/vehicles` (replace static cars.ts)  | Open   |
+| 23  | Public listing detail page + gallery                           | Open   |
+
+Whatever a dealer publishes surfaces here automatically: same rows, read-only public role.
+
+### Phase 4 — Professional dashboard (financials + CRM)
+
+| Day   | Title                                                     | Status |
+| ----- | --------------------------------------------------------- | ------ |
+| 24-25 | Sales / deals schema (gross front + back end)             | Open   |
+| 26-27 | Dashboard overview: inventory value, units, gross, aging  | Open   |
+| 28-29 | Leads / CRM pipeline from marketplace interest            | Open   |
+
+### Phase 5 — Analytics + AI insights
+
+| Day | Title                                                | Status |
+| --- | ---------------------------------------------------- | ------ |
+| 30+ | Trend charts, inventory turn, async AI (pricing)     | Open   |
+
+The full intent behind Phases 3-5 lives in
+[`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).
