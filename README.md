@@ -15,8 +15,9 @@ refuses to let one see another's data.
 
 ## What works today
 
-- **Marketplace** (`:3000`): premium buyer-facing showroom (still rendering static demo cars;
-  moving onto live listings from the database next).
+- **Marketplace** (`:3000`): premium buyer-facing showroom. The collection (`/colecao`) and
+  the listing detail pages read **live** from the database (every dealership's published
+  listings), with data-derived filters and per-listing galleries. The home preview is next.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
   thumbnails, filter by status. Reads the vehicles API with a token minted from your session.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
