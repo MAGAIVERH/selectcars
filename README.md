@@ -17,11 +17,12 @@ refuses to let one see another's data.
 
 - **Marketplace** (`:3000`): premium buyer-facing showroom (still rendering static demo cars;
   moving onto live listings from the database next).
-- **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory, filter by
-  status. Reads the vehicles API with a token minted from your session.
+- **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
+  thumbnails, filter by status. Reads the vehicles API with a token minted from your session.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
-  Postgres role. Photos live in `vehicle_photos` with the same two-audience RLS.
+  Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
+  photo subquery runs under the same read-only role, so a buyer never sees a draft's images.
 - **Seeded showroom**: a demo dealership (`SELECTCARS Showroom`) with 9 active listings and
   20 photos, owned by a demo dealer you can sign in as to see the platform populated. It is
   the living test account, and everything a real dealer adds surfaces the same way.

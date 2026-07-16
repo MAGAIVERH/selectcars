@@ -115,7 +115,20 @@ export type Drivetrain = z.infer<typeof drivetrainSchema>;
 export const vehicleStatusSchema = z.enum(["draft", "active", "pending", "sold"]);
 export type VehicleStatus = z.infer<typeof vehicleStatusSchema>;
 
-/** A vehicle as the API returns it. */
+/** A gallery photo for a vehicle. Buyers only ever receive photos of `active` listings. */
+export const vehiclePhotoSchema = z.object({
+  id: z.string().uuid(),
+  url: z.string(),
+  alt: z.string().nullable(),
+  position: z.number().int().nonnegative(),
+  isPrimary: z.boolean(),
+});
+export type VehiclePhoto = z.infer<typeof vehiclePhotoSchema>;
+
+/**
+ * A vehicle as the API returns it, with its ordered gallery (primary first). `photos` is
+ * always present: an empty array when a listing has none, never missing.
+ */
 export const vehicleSchema = z.object({
   id: z.string().uuid(),
   slug: z.string(),
@@ -135,26 +148,11 @@ export const vehicleSchema = z.object({
   interiorColor: z.string().nullable(),
   description: z.string().nullable(),
   status: vehicleStatusSchema,
+  photos: z.array(vehiclePhotoSchema).default([]),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 export type Vehicle = z.infer<typeof vehicleSchema>;
-
-/** A gallery photo for a vehicle. Buyers only ever receive photos of `active` listings. */
-export const vehiclePhotoSchema = z.object({
-  id: z.string().uuid(),
-  url: z.string(),
-  alt: z.string().nullable(),
-  position: z.number().int().nonnegative(),
-  isPrimary: z.boolean(),
-});
-export type VehiclePhoto = z.infer<typeof vehiclePhotoSchema>;
-
-/** A vehicle together with its ordered gallery, primary photo first. */
-export const vehicleWithPhotosSchema = vehicleSchema.extend({
-  photos: z.array(vehiclePhotoSchema),
-});
-export type VehicleWithPhotos = z.infer<typeof vehicleWithPhotosSchema>;
 
 /**
  * What a dealer may send when creating a vehicle.
