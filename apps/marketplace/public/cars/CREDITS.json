@@ -1,0 +1,25 @@
+{
+  "note": "Free stock photos. Source: Pexels (https://www.pexels.com/license/). The Pexels License allows free use, including commercial, with no attribution required. Sources are recorded here for provenance and good practice.",
+  "images": [
+    { "file": "porsche-911-white.jpg", "brand": "Porsche", "color": "White", "source": "https://www.pexels.com/photo/white-porsche-911-on-road-3954783/" },
+    { "file": "porsche-911-red.jpg", "brand": "Porsche", "color": "Red", "source": "https://www.pexels.com/photo/red-porsche-911-on-black-surface-5195363/" },
+    { "file": "porsche-911-green.jpg", "brand": "Porsche", "color": "Green", "source": "https://www.pexels.com/photo/green-porsche-911-on-road-4062371/" },
+    { "file": "porsche-911-turbo.jpg", "brand": "Porsche", "color": "Silver", "source": "https://www.pexels.com/photo/911-amitsuriphotography-porsche-tubro-260171" },
+    { "file": "ferrari-red.jpg", "brand": "Ferrari", "color": "Red", "source": "https://www.pexels.com/photo/photo-of-red-ferrari-sports-car-1085171/" },
+    { "file": "ferrari-red-showroom.jpg", "brand": "Ferrari", "color": "Red", "source": "https://www.pexels.com/photo/red-ferrari-sports-car-in-showroom-display-30735110/" },
+    { "file": "ferrari-yellow.jpg", "brand": "Ferrari", "color": "Yellow", "source": "https://www.pexels.com/photo/yellow-and-red-ferrari-sports-car-5195379/" },
+    { "file": "ferrari-red-black.jpg", "brand": "Ferrari", "color": "Red", "source": "https://www.pexels.com/photo/photo-of-a-red-and-black-ferrari-sports-car-12351384/" },
+    { "file": "lamborghini-huracan-orange.jpg", "brand": "Lamborghini", "color": "Orange", "source": "https://www.pexels.com/photo/orange-lamborghini-huracan-sports-car-17632044/" },
+    { "file": "lamborghini-green.jpg", "brand": "Lamborghini", "color": "Green", "source": "https://www.pexels.com/photo/colorado-supercar-lamborghini-denver-16124150/" },
+    { "file": "lamborghini-runway.jpg", "brand": "Lamborghini", "color": "Orange", "source": "https://www.pexels.com/photo/lamborghini-supercar-on-open-plain-runway-29115172/" },
+    { "file": "mercedes-amg-dealership.jpg", "brand": "Mercedes-AMG", "color": "White", "source": "https://www.pexels.com/photo/luxury-mercedes-benz-amg-in-modern-dealership-28891882/" },
+    { "file": "mercedes-amg-gtr-blue.jpg", "brand": "Mercedes-AMG", "color": "Blue", "source": "https://www.pexels.com/photo/a-modern-blue-mercedes-amg-gt-r-parked-in-front-of-the-car-salon-16511358/" },
+    { "file": "aston-martin-white.jpg", "brand": "Aston Martin", "color": "White", "source": "https://www.pexels.com/photo/white-aston-martin-on-road-7116872/" },
+    { "file": "bentley-continental-gt.jpg", "brand": "Bentley", "color": "Silver", "source": "https://www.pexels.com/photo/bentley-continental-gt-parked-in-garage-6872600/" },
+    { "file": "jaguar-red.jpg", "brand": "Jaguar", "color": "Red", "source": "https://www.pexels.com/photo/red-jaguar-car-12175805/" },
+    { "file": "jaguar-black-showroom.jpg", "brand": "Jaguar", "color": "Black", "source": "https://www.pexels.com/photo/sleek-black-jaguar-car-in-modern-showroom-32267493/" },
+    { "file": "jaguar-white.jpg", "brand": "Jaguar", "color": "White", "source": "https://www.pexels.com/photo/white-jaguar-car-parked-near-green-field-4096528/" },
+    { "file": "range-rover-white.jpg", "brand": "Range Rover", "color": "White", "source": "https://www.pexels.com/photo/white-land-rover-range-rover-suv-on-road-116675/" },
+    { "file": "bmw-blue.jpg", "brand": "BMW", "color": "Blue", "source": "https://www.pexels.com/photo/blue-bmw-car-on-the-road-6920503/" }
+  ]
+}

@@ -10,6 +10,7 @@
   },
   "scripts": {
     "migrate": "tsx src/migrate.ts",
+    "seed": "tsx src/scripts/seed-showroom.ts",
     "rls:verify": "tsx src/scripts/verify-rls.ts",
     "typecheck": "tsc --noEmit",
     "verify:api": "tsx src/scripts/verify-api-tenant-isolation.ts",
