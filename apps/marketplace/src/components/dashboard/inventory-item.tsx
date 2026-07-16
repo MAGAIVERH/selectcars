@@ -35,7 +35,7 @@ export function InventoryItem({
             fill
             priority={priority}
             sizes="(max-width: 640px) 100vw, 128px"
-            className="object-cover"
+            className="object-contain p-1"
           />
         ) : (
           <span className="text-faint absolute inset-0 grid place-items-center font-mono text-[10px] tracking-[0.12em] uppercase">

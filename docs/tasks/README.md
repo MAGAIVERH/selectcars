@@ -62,6 +62,7 @@ The vehicles module introduced a second Postgres role: buyers read through
 | 22  | [Marketplace reads `/public/vehicles` (collection)](day-22-marketplace-from-db.md) | Done   |
 | 23  | [Public listing detail page + gallery](day-22-marketplace-from-db.md) | Done   |
 | 23b | [Home preview live + static data removed + verify self-cleans](day-23b-home-live-and-cleanup.md) | Done   |
+| 24  | [Full-car photos, backgrounds removed, cars floating](day-24-floating-photos.md) | Done   |
 
 Whatever a dealer publishes surfaces here automatically: same rows, read-only public role.
 
