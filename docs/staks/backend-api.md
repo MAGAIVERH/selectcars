@@ -46,7 +46,8 @@
 
 ## Changelog
 
-| Date       | Change                            | Reason                                           |
-| ---------- | --------------------------------- | ------------------------------------------------ |
-| 2026-07-12 | Created sheet                     | Initial decision: Fastify + BullMQ service       |
-| 2026-07-12 | Scaffolded `apps/api` (Fastify 5) | Day 10: cors, helmet, pino, Zod, /health, /ready |
+| Date       | Change                                            | Reason                                                                                                                                                                                   |
+| ---------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-12 | Created sheet                                     | Initial decision: Fastify + BullMQ service                                                                                                                                               |
+| 2026-07-12 | Scaffolded `apps/api` (Fastify 5)                 | Day 10: cors, helmet, pino, Zod, /health, /ready                                                                                                                                         |
+| 2026-07-28 | `409 conflict` added to the shared error contract | Day 25: a refused status transition is a state conflict, not a bad request. `PATCH /vehicles/:id` now validates the move against the row's locked status inside the writing transaction. |

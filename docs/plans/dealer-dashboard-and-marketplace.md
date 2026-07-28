@@ -18,8 +18,8 @@ So the headline behavior is non-negotiable and must always hold:
 > A new dealer signs up, creates their dealership, adds inventory, and those cars show up on
 > the public site the moment they are `active`, scoped to nothing but their own tenant.
 
-The marketplace currently still renders static demo cars from `apps/marketplace/src/lib/cars.ts`.
-Moving it onto the live database is an explicit, near-term milestone (Phase 3 below).
+This holds today: the marketplace reads `/public/vehicles` live (the static `cars.ts` is gone),
+and a listing leaves the public site the moment a dealer unpublishes or sells it.
 
 ## The demo account: a living test screen
 
@@ -66,10 +66,13 @@ inventory list. Remaining and upcoming, in order:
    responses (dealer and public). Switch the marketplace off `cars.ts` onto
    `/public/vehicles`, with a real listing detail page. Thumbnails appear in the dashboard
    list. This makes the dashboard to marketplace reflection visible end to end.
-2. **Add / edit vehicle + photo upload (Phase 2 finish).** The create/edit form posting to the
-   API, with photo upload to Supabase Storage (presigned). Closes the loop: a dealer adds a
-   car and it shows on the marketplace.
-3. **Status workflow.** Publish draft to active, mark pending/sold, from the dashboard.
+2. **Add / edit vehicle + photo upload (Phase 2 finish).** Create and edit are **done**
+   (Days 18-19 and 25): the form posts to the API and a dealer's car shows on the marketplace.
+   Photo upload to Supabase Storage (presigned) is what remains, and it is the next piece.
+3. **Status workflow.** **Done (Day 25).** Publish draft to active, mark pending, mark sold,
+   relist, from the row or the edit page. The legal moves live in one map in
+   `packages/shared`; the API validates against it inside the writing transaction, so the UI
+   cannot offer a move the server refuses.
 4. **Dashboard overview with financial KPIs (Phase 4).** The home screen above. Needs the
    sales/deals table (sale price, cost, recon, gross) and the derived metrics.
 5. **Leads / CRM (Phase 4).** Capture buyer interest from the marketplace into a per-tenant

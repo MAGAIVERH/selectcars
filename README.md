@@ -6,11 +6,11 @@ Buyers browse a premium showroom. Dealerships get an operating system: inventory
 test drives, analytics. Many dealerships share one database, and **the database itself**
 refuses to let one see another's data.
 
-> Status: **Phase 2 in progress** (inventory + dealer dashboard). Multi-tenancy, auth, the
-> vehicles API, a photo schema, a seeded showroom, and the dealer dashboard's inventory list
-> are live. Next: the marketplace reads listings from the database, dealers add vehicles, and
-> a professional financial/analytics dashboard. See the
-> [build plan](docs/plans/dealer-dashboard-and-marketplace.md) for the full vision and
+> Status: **Phases 2 and 3 are done except photo upload.** Multi-tenancy, auth, the vehicles
+> API, a seeded showroom, a live marketplace, and a dealer dashboard where a car is created,
+> edited, and moved through its lifecycle (draft, active, pending, sold) are all in place.
+> Next: photo upload to Supabase Storage, then the financial/analytics dashboard (Phase 4).
+> See the [build plan](docs/plans/dealer-dashboard-and-marketplace.md) for the full vision and
 > [`docs/tasks/`](docs/tasks/) for the day-by-day log.
 
 ## What works today
@@ -21,7 +21,11 @@ refuses to let one see another's data.
   a dealer publishes in their dashboard shows up here, same rows via the read-only public role.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
   thumbnails, filter by status, and add a vehicle (save as draft or publish straight to the
-  marketplace). Reads and writes the vehicles API with a token minted from your session.
+  marketplace). Every listing can be edited, and moved through its lifecycle from the row or
+  the edit page: publish a draft, mark a deal pending, mark it sold, relist it. Which moves
+  are offered comes from one map in `packages/shared` that the API validates against, so the
+  buttons and the server can never disagree. Reads and writes the vehicles API with a token
+  minted from your session.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
@@ -99,6 +103,13 @@ Two gotchas that will cost you an hour if you skip the comments in `.env.example
   IPv6-only and will not resolve on most networks.
 - The variable is `SELECTCARS_DATABASE_URL`, not `DATABASE_URL`, on purpose: a generic
   `DATABASE_URL` exported by some other tool in your shell would silently win.
+
+If the pooler answers `tenant/user postgres.<ref> not found`, the credentials are almost
+certainly fine: a free-tier Supabase project **pauses** after about a week of inactivity, and
+a paused project loses its `db.<ref>.supabase.co` DNS record and stops answering at the
+pooler. Restore it from the Supabase dashboard. Confirm with
+`nslookup db.<ref>.supabase.co`: `Non-existent domain` means paused or deleted, not a wrong
+password.
 
 Run it:
 
