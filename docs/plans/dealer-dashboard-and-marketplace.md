@@ -126,8 +126,10 @@ inventory list. Remaining and upcoming, in order:
    relist, from the row or the edit page. The legal moves live in one map in
    `packages/shared`; the API validates against it inside the writing transaction, so the UI
    cannot offer a move the server refuses.
-4. **Dashboard overview with financial KPIs (Phase 4).** The home screen above. Needs the
-   sales/deals table (sale price, cost, recon, gross) and the derived metrics.
+4. **Dashboard overview with financial KPIs (Phase 4).** **Done (Day 29).** `/dashboard` is
+   the overview; the inventory list moved to `/dashboard/inventory`. The `deals` table holds
+   sale price, cost, recon and back-end gross, with front-end and total gross as generated
+   columns so no screen can define them differently. Owners and managers only.
 5. **Leads / CRM (Phase 4).** Capture buyer interest from the marketplace into a per-tenant
    pipeline, surfaced in the dashboard. This is where the **salesperson** role finally shows
    up in the product: a lead is assigned to a person inside the dealership, while the listing

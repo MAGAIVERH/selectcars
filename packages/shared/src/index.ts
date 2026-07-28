@@ -360,6 +360,91 @@ export type CreateVehicle = z.infer<typeof createVehicleSchema>;
 export const updateVehicleSchema = createVehicleSchema.partial();
 export type UpdateVehicle = z.infer<typeof updateVehicleSchema>;
 
+/**
+ * A recorded sale.
+ *
+ * The gross figures are computed by the database (generated columns), never sent by a client:
+ * two screens can disagree about a filter, but they cannot disagree about what front-end
+ * gross means.
+ */
+export const dealSchema = z.object({
+  id: z.string().uuid(),
+  vehicleId: z.string().uuid(),
+  /** Denormalised for display, so a deal list does not need a second call. */
+  vehicleLabel: z.string(),
+  soldAt: z.string(),
+  salePriceUsd: z.number(),
+  vehicleCostUsd: z.number(),
+  reconCostUsd: z.number(),
+  backEndGrossUsd: z.number(),
+  frontEndGrossUsd: z.number(),
+  totalGrossUsd: z.number(),
+  buyerName: z.string().nullable(),
+  notes: z.string().nullable(),
+  /** Days between the car being listed and the sale closing. Null if the listing is gone. */
+  daysToSale: z.number().int().nullable(),
+});
+export type Deal = z.infer<typeof dealSchema>;
+
+/** What a dealer types when a car is sold. Everything else is derived. */
+export const createDealSchema = z.object({
+  vehicleId: z.string().uuid(),
+  soldAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Use a date like 2026-07-28.")
+    .optional(),
+  salePriceUsd: z.number().nonnegative().max(100_000_000),
+  vehicleCostUsd: z.number().nonnegative().max(100_000_000),
+  reconCostUsd: z.number().nonnegative().max(1_000_000).default(0),
+  // Can be negative: a finance office does lose money on a deal sometimes.
+  backEndGrossUsd: z.number().min(-1_000_000).max(1_000_000).default(0),
+  buyerName: z.string().max(120).nullish(),
+  notes: z.string().max(1000).nullish(),
+});
+export type CreateDeal = z.infer<typeof createDealSchema>;
+
+export const dealListSchema = z.object({ items: z.array(dealSchema) });
+export type DealList = z.infer<typeof dealListSchema>;
+
+/**
+ * The dealership's numbers, as its principal checks them.
+ *
+ * The set is the standard one used across the trade (Cox Automotive's used-car KPIs, the
+ * dashboards in Tekion and DealerSocket): what is on the lot and what it is worth, what sold
+ * and what it made, how fast it turned, and what is going stale.
+ *
+ * Everything is tenant-scoped and computed in the database, so no client can arrive at a
+ * different answer by summing differently.
+ */
+export const dealershipMetricsSchema = z.object({
+  inventory: z.object({
+    /** Unsold units: draft, active, and pending. */
+    unitsInStock: z.number().int().nonnegative(),
+    active: z.number().int().nonnegative(),
+    draft: z.number().int().nonnegative(),
+    pending: z.number().int().nonnegative(),
+    /** Asking price of everything still in stock. */
+    valueUsd: z.number().nonnegative(),
+    /** Average days on lot across unsold units. */
+    averageDaysOnLot: z.number().nonnegative(),
+    /** Units that have sat 60 days or more: the money that is going stale. */
+    aging60Plus: z.number().int().nonnegative(),
+  }),
+  sales: z.object({
+    /** Sales recorded in the trailing 30 days, and all time. */
+    unitsSold30d: z.number().int().nonnegative(),
+    unitsSoldTotal: z.number().int().nonnegative(),
+    frontEndGrossUsd: z.number(),
+    backEndGrossUsd: z.number(),
+    totalGrossUsd: z.number(),
+    /** Gross per vehicle retailed: total gross divided by units. Zero when nothing sold. */
+    grossPerUnitUsd: z.number(),
+    /** Average days from listing to sale. Null until something has sold. */
+    averageDaysToSale: z.number().nullable(),
+  }),
+});
+export type DealershipMetrics = z.infer<typeof dealershipMetricsSchema>;
+
 /** Filters a dealer can apply to their own inventory. */
 export const listVehiclesQuerySchema = z.object({
   status: vehicleStatusSchema.optional(),

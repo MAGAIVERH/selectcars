@@ -10,7 +10,7 @@ export default function NewVehiclePage() {
   return (
     <div className="mx-auto max-w-[900px]">
       <Link
-        href="/dashboard"
+        href="/dashboard/inventory"
         className="text-muted hover:text-foreground text-sm transition-colors"
       >
         <span aria-hidden="true">←</span> Back to inventory

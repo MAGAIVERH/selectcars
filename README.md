@@ -33,6 +33,11 @@ refuses to let one see another's data.
 - **Photo upload**: a dealer uploads photos straight to Supabase Storage under a ticket the
   API signs for one object key, so a 5 MB photo never travels through our servers and the
   storage credential never reaches a browser. → [ADR 003](docs/adr/003-direct-to-storage-uploads.md)
+- **The dealership's numbers** (`/dashboard`): inventory value, what is live, average days on
+  lot, what is aging past 60 days, units sold, front and back end gross, gross per unit, and
+  days to sale. Gross is computed by Postgres as a generated column, so no screen gets to
+  define it. Owners and managers only: a salesperson sells cars without seeing what the store
+  paid for them.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the

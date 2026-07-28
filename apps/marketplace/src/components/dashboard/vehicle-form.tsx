@@ -210,7 +210,7 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/dashboard"
+            href="/dashboard/inventory"
             className="border-border-strong text-muted hover:border-foreground hover:text-foreground rounded-full border px-5 py-2.5 text-sm transition-colors"
           >
             Cancel

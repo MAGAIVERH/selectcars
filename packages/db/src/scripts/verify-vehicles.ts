@@ -481,6 +481,94 @@ async function main(): Promise<void> {
     check("the owner deletes the photo -> 204", deleted.status === 204, deleted.status);
   }
 
+  // --- deals and the dashboard numbers -------------------------------------
+  // What a dealership paid for a car is the most sensitive data on the platform: it must not
+  // reach another dealership, and it must never reach a buyer. There is no public grant on
+  // the table at all, so these checks are about the API surface and the tenant boundary.
+  const recordDeal = (token: string, body: Record<string, unknown>) =>
+    fetch(`${API}/deals`, { method: "POST", headers: authed(token), body: JSON.stringify(body) });
+
+  // The Ferrari is `active` again after the workflow section above.
+  const tooEarly = await recordDeal(alpha.token, {
+    vehicleId: ferrariId,
+    salePriceUsd: 380000,
+    vehicleCostUsd: 340000,
+  });
+  check(
+    "recording a sale on a listing that is still active -> 409",
+    tooEarly.status === 409,
+    tooEarly.status,
+  );
+
+  await setStatus(ferrariId, "sold");
+  const recorded = await recordDeal(alpha.token, {
+    vehicleId: ferrariId,
+    salePriceUsd: 380000,
+    vehicleCostUsd: 340000,
+    reconCostUsd: 6000,
+    backEndGrossUsd: 5000,
+    buyerName: "Verification Run",
+  });
+  check("recording a sale on a sold listing -> 201", recorded.status === 201, recorded.status);
+
+  const deal = (await recorded.json()) as {
+    id: string;
+    frontEndGrossUsd: number;
+    totalGrossUsd: number;
+  };
+  check(
+    "gross is computed by the database, not by the caller",
+    deal.frontEndGrossUsd === 34000 && deal.totalGrossUsd === 39000,
+    deal,
+  );
+
+  const crossDeal = await recordDeal(bravo.token, {
+    vehicleId: ferrariId,
+    salePriceUsd: 1,
+    vehicleCostUsd: 1,
+  });
+  check(
+    "another dealership cannot record a sale on this car -> 404",
+    crossDeal.status === 404,
+    crossDeal.status,
+  );
+
+  const bravoDeals = (await (
+    await fetch(`${API}/deals`, { headers: authed(bravo.token) })
+  ).json()) as { items: { id: string }[] };
+  check(
+    "another dealership's deal list does not contain this deal",
+    !bravoDeals.items.some((d) => d.id === deal.id),
+    bravoDeals.items.map((d) => d.id),
+  );
+
+  const alphaMetrics = (await (
+    await fetch(`${API}/metrics`, { headers: authed(alpha.token) })
+  ).json()) as { sales: { unitsSoldTotal: number; totalGrossUsd: number } };
+  check(
+    "the seller's own metrics count the sale",
+    alphaMetrics.sales.unitsSoldTotal === 1 && alphaMetrics.sales.totalGrossUsd === 39000,
+    alphaMetrics.sales,
+  );
+
+  const bravoMetrics = (await (
+    await fetch(`${API}/metrics`, { headers: authed(bravo.token) })
+  ).json()) as { sales: { unitsSoldTotal: number; totalGrossUsd: number } };
+  check(
+    "another dealership's metrics are untouched by it",
+    bravoMetrics.sales.unitsSoldTotal === 0 && bravoMetrics.sales.totalGrossUsd === 0,
+    bravoMetrics.sales,
+  );
+
+  // Put the Ferrari back on the market, so the filter check below still has one to find.
+  // The deal has to go first: the vehicle FK is `on delete restrict` precisely so a sale
+  // cannot quietly disappear with the car.
+  await fetch(`${API}/deals/${deal.id}`, {
+    method: "DELETE",
+    headers: authedNoBody(alpha.token),
+  });
+  await setStatus(ferrariId, "active");
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];

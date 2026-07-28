@@ -1,12 +1,17 @@
 import { headers } from "next/headers";
 import {
   apiErrorSchema,
+  dealListSchema,
   dealerProfileSchema,
+  dealershipMetricsSchema,
   photoUploadTicketSchema,
   vehicleListSchema,
   vehicleSchema,
   type AttachPhoto,
+  type CreateDeal,
+  type Deal,
   type DealerProfile,
+  type DealershipMetrics,
   type PhotoUploadRequest,
   type PhotoUploadTicket,
   type UpdateDealerProfile,
@@ -174,6 +179,62 @@ export async function updateDealership(patch: UpdateDealerProfile): Promise<Muta
     cache: "no-store",
   });
   if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+export type MetricsResult = { ok: true; data: DealershipMetrics } | { ok: false; status: number };
+
+/**
+ * The dealership's numbers. Owners and managers only, enforced by the API: a salesperson may
+ * sell a car but does not get to read what the store paid for it.
+ */
+export async function fetchMetrics(): Promise<MetricsResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await fetch(`${API_URL}/metrics`, {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = dealershipMetricsSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data };
+}
+
+export type DealsResult = { ok: true; data: Deal[] } | { ok: false; status: number };
+
+/** Recorded sales, newest first. Pass a `vehicleId` for one car's history. */
+export async function fetchDeals(vehicleId?: string): Promise<DealsResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const query = vehicleId ? `?vehicleId=${encodeURIComponent(vehicleId)}` : "";
+  const res = await fetch(`${API_URL}/deals${query}`, {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = dealListSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data.items };
+}
+
+/** Record what a sold car actually made. The gross figures come back computed by Postgres. */
+export async function createDeal(input: CreateDeal): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/deals`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+  });
+  if (res.status !== 201)
+    return { ok: false, status: res.status, message: await readApiError(res) };
   return { ok: true };
 }
 

@@ -73,11 +73,11 @@ dealership has published rather than one anonymous pile.
 
 ### Phase 4 — Professional dashboard (financials + CRM)
 
-| Day   | Title                                                    | Status |
-| ----- | -------------------------------------------------------- | ------ |
-| 29-30 | Sales / deals schema (gross front + back end)            | Open   |
-| 31-32 | Dashboard overview: inventory value, units, gross, aging | Open   |
-| 33-34 | Leads / CRM pipeline from marketplace interest           | Open   |
+| Day   | Title                                                      | Status                               |
+| ----- | ---------------------------------------------------------- | ------------------------------------ |
+| 29    | [Deals + dashboard overview](day-29-deals-and-overview.md) | Done (38/38 verified, browser + API) |
+| 31-32 | Leads / CRM pipeline from marketplace interest             | Open                                 |
+| 33-34 | Trends over time and inventory turn charts                 | Open                                 |
 
 ### Phase 5 — Analytics + AI insights
 
