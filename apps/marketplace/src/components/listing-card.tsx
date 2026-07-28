@@ -55,6 +55,21 @@ export function ListingCard({
         <p className="text-faint font-mono text-[11px] tracking-[0.1em]">
           {specs.join("  ·  ").toUpperCase()}
         </p>
+
+        {vehicle.dealer && (
+          <p className="text-muted mt-3 text-xs">
+            Sold by{" "}
+            <Link
+              href={`/dealers/${vehicle.dealer.slug}`}
+              className="text-foreground underline-offset-2 hover:underline"
+            >
+              {vehicle.dealer.name}
+            </Link>
+            {vehicle.dealer.city && vehicle.dealer.state
+              ? ` · ${vehicle.dealer.city}, ${vehicle.dealer.state}`
+              : ""}
+          </p>
+        )}
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-foreground text-base font-semibold">{formatPrice(vehicle.priceUsd)}</p>
           <Link

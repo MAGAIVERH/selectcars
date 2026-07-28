@@ -21,6 +21,57 @@ So the headline behavior is non-negotiable and must always hold:
 This holds today: the marketplace reads `/public/vehicles` live (the static `cars.ts` is gone),
 and a listing leaves the public site the moment a dealer unpublishes or sells it.
 
+## Who sells: the seller model
+
+SELECTCARS is a **multi-seller platform**, not one shop's website. The full loop, which every
+part of the build must keep true:
+
+1. A business signs up and creates its dealership. That dealership is the tenant: its own
+   isolated inventory, its own team, its own numbers.
+2. Its team adds vehicles in the dashboard and publishes them.
+3. Those cars appear in the public collection **immediately**, alongside every other
+   dealership's cars, because the marketplace reads the same rows through the read-only
+   public role.
+4. A buyer can see who is selling each car, open that seller's page, and filter the whole
+   collection down to one seller.
+
+As more businesses join, dealerships, rental companies unloading their fleet, independent
+lots, the collection is simply the union of what they have all published. Nothing is
+special-cased per seller.
+
+### The seller is the dealership, not the salesperson
+
+This was researched rather than assumed. In the US market the seller of record on a listing is
+the store: a franchised dealership, an independent dealership, or a private seller. Cars.com
+and Autotrader both structure listings that way, and buyers filter and judge by dealer. A
+salesperson is **internal staff**: they work leads and close deals inside a dealership; they
+never own a listing.
+
+So the platform reads:
+
+- **Dealership = the tenant** (a Better Auth organization). It has a public profile
+  (`dealer_profiles`): name, city, state, phone, and a short pitch. This is what "Sold by"
+  shows, what `/dealers/<slug>` resolves to, and what the Seller filter selects.
+- **Salesperson = a role inside it** (`owner`, `manager`, `salesperson`, `viewer`). Roles
+  decide who may publish, price, or rename the store. They are never shown to buyers.
+
+A dealership becomes visible to buyers the moment it publishes its first car and disappears
+when it has none live. That rule is enforced by an RLS policy, not by a query someone writes,
+so an empty seller can never be linked or enumerated. See
+[Day 26](../tasks/day-26-dealer-identity.md).
+
+Private sellers (an individual listing one car) are a separate account type and are
+deliberately not modeled yet.
+
+### The data is the platform's memory
+
+Everything above lives in the database, never in the code: listings, photos, sellers, and
+their profiles. The seeded showroom's cars belong to a real dealership account like any
+other, and its photographs are that dealership's inventory photos. That is why they survive a
+restart, a deploy, or a new browser: the site renders whatever the database holds at that
+moment, for every seller at once. A car added by any dealership tomorrow shows up the same
+way, with no code change and no second copy of the data.
+
 ## The demo account: a living test screen
 
 There is one seeded dealership, `SELECTCARS Showroom` (tenant `org_selectcars_showroom`),
@@ -76,8 +127,17 @@ inventory list. Remaining and upcoming, in order:
 4. **Dashboard overview with financial KPIs (Phase 4).** The home screen above. Needs the
    sales/deals table (sale price, cost, recon, gross) and the derived metrics.
 5. **Leads / CRM (Phase 4).** Capture buyer interest from the marketplace into a per-tenant
-   pipeline, surfaced in the dashboard.
+   pipeline, surfaced in the dashboard. This is where the **salesperson** role finally shows
+   up in the product: a lead is assigned to a person inside the dealership, while the listing
+   stays owned by the dealership.
 6. **Analytics + AI insights (Phase 5).** Charts and async AI (pricing, aging, lead scoring).
+
+Delivered alongside the above, out of sequence because the marketplace needed it to be a real
+platform:
+
+- **Seller identity (Day 26).** Dealer profiles, "Sold by" on every listing, a seller
+  directory at `/dealers`, one storefront per dealership, and a Seller filter. See the model
+  described above.
 
 ## Non-negotiables that apply throughout
 

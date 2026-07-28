@@ -82,6 +82,32 @@ export default async function ListingPage({ params }: { params: Params }) {
                 <span aria-hidden="true">→</span>
               </Link>
 
+              {/* Who is selling, and where the car physically is. Buyers rank a hidden
+                  location among their top complaints about listing sites, so it is stated
+                  next to the seller rather than buried in the specs. */}
+              {vehicle.dealer && (
+                <div className="border-border bg-surface mt-8 rounded-[var(--radius-card)] border p-5">
+                  <p className="eyebrow">Sold by</p>
+                  <Link
+                    href={`/dealers/${vehicle.dealer.slug}`}
+                    className="text-foreground mt-2 inline-block text-lg font-semibold tracking-tight underline-offset-4 hover:underline"
+                  >
+                    {vehicle.dealer.name}
+                  </Link>
+                  {vehicle.dealer.city && vehicle.dealer.state && (
+                    <p className="text-muted mt-1 text-sm">
+                      {vehicle.dealer.city}, {vehicle.dealer.state}
+                    </p>
+                  )}
+                  <Link
+                    href={`/dealers/${vehicle.dealer.slug}`}
+                    className="text-muted hover:text-foreground mt-4 inline-block text-sm transition-colors"
+                  >
+                    See their full inventory <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              )}
+
               <dl className="border-border mt-10 grid grid-cols-2 gap-x-6 gap-y-5 border-t pt-8">
                 {specs
                   .filter((s) => s.value)

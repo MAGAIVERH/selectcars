@@ -45,6 +45,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <span className="text-faint"> · {dealership.role}</span>
               </span>
             )}
+            <Link
+              href="/dashboard"
+              className="text-muted hover:text-foreground text-sm transition-colors"
+            >
+              Inventory
+            </Link>
+            <Link
+              href="/dashboard/dealership"
+              className="text-muted hover:text-foreground text-sm transition-colors"
+            >
+              Dealership
+            </Link>
             <Link href="/" className="text-muted hover:text-foreground text-sm transition-colors">
               View site
             </Link>

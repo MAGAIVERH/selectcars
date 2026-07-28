@@ -27,7 +27,7 @@ function check(label: string, ok: boolean, detail?: unknown): void {
   }
 }
 
-type Dealer = { token: string; dealership: string; orgId: string };
+type Dealer = { token: string; dealership: string; orgId: string; slug: string };
 
 async function createDealer(name: string, dealership: string): Promise<Dealer> {
   const email = `${name.toLowerCase()}-${Date.now()}@selectcars.test`;
@@ -41,10 +41,13 @@ async function createDealer(name: string, dealership: string): Promise<Dealer> {
   if (!signUp.ok) throw new Error(`sign-up: ${await signUp.text()}`);
   const cookie = signUp.headers.getSetCookie().join("; ");
 
+  // The dealer profile buyers see is created by a database trigger on this insert, so it
+  // exists from here on without the sign-up flow doing anything about it.
+  const slug = `${name.toLowerCase()}-${Date.now()}`;
   const org = await fetch(`${APP}/api/auth/organization/create`, {
     method: "POST",
     headers: { ...headers, cookie },
-    body: JSON.stringify({ name: dealership, slug: `${name.toLowerCase()}-${Date.now()}` }),
+    body: JSON.stringify({ name: dealership, slug }),
   });
   if (!org.ok) throw new Error(`org: ${await org.text()}`);
   const { id } = (await org.json()) as { id: string };
@@ -57,7 +60,7 @@ async function createDealer(name: string, dealership: string): Promise<Dealer> {
 
   const tokenRes = await fetch(`${APP}/api/auth/token`, { headers: { cookie, origin: APP } });
   const { token } = (await tokenRes.json()) as { token: string };
-  return { token, dealership, orgId: id };
+  return { token, dealership, orgId: id, slug };
 }
 
 /**
@@ -327,6 +330,76 @@ async function main(): Promise<void> {
     draftToSold.status,
   );
 
+  // --- who is selling -----------------------------------------------------
+  // A listing carries its seller, and the seller directory only ever contains dealerships a
+  // buyer can actually buy from. Both of those come from RLS composing: the policy on
+  // `dealer_profiles` asks whether the dealership has any visible vehicle, and "visible" is
+  // already decided by the policy on `vehicles`.
+  type PublicDealer = { slug: string; name: string; listingCount: number };
+
+  const directory = (await (await fetch(`${API}/public/dealers`)).json()) as {
+    items: PublicDealer[];
+  };
+  const directorySlugs = directory.items.map((d) => d.slug);
+  check(
+    "a dealership with active inventory appears in the seller directory",
+    directorySlugs.includes(alpha.slug) && directorySlugs.includes(bravo.slug),
+    directorySlugs,
+  );
+
+  const bravoEntry = directory.items.find((d) => d.slug === bravo.slug);
+  check(
+    "the directory counts only what that dealership has live",
+    bravoEntry?.listingCount === 1,
+    bravoEntry,
+  );
+
+  const bravoPublic = (await (
+    await fetch(`${API}/public/vehicles?dealer=${bravo.slug}`)
+  ).json()) as {
+    items: { slug: string; dealer: { slug: string; name: string } | null }[];
+    total: number;
+  };
+  check(
+    "filtering the marketplace by seller returns only that seller's cars",
+    bravoPublic.total === 1 && bravoPublic.items[0]?.slug === bravoSlug,
+    bravoPublic.items.map((v) => v.slug),
+  );
+  check(
+    "every public listing carries the dealership that is selling it",
+    bravoPublic.items.every((v) => v.dealer?.slug === bravo.slug),
+    bravoPublic.items.map((v) => v.dealer),
+  );
+
+  // A dealership that has signed up but published nothing must be invisible: buyers cannot
+  // enumerate the platform's tenants, and an empty storefront is never linkable.
+  const quiet = await createDealer("Quiet", "Quiet Motors");
+  await addVehicle(quiet.token, {
+    make: "Toyota",
+    model: "Supra",
+    year: 2023,
+    condition: "Used",
+    bodyStyle: "Coupe",
+    fuelType: "Gas",
+    status: "draft",
+  });
+
+  const directoryAfter = (await (await fetch(`${API}/public/dealers`)).json()) as {
+    items: PublicDealer[];
+  };
+  check(
+    "a dealership with only drafts stays out of the seller directory",
+    !directoryAfter.items.some((d) => d.slug === quiet.slug),
+    directoryAfter.items.map((d) => d.slug),
+  );
+
+  const quietPage = await fetch(`${API}/public/dealers/${quiet.slug}`);
+  check(
+    "asking for that dealership by its exact slug -> 404",
+    quietPage.status === 404,
+    quietPage.status,
+  );
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];
@@ -339,7 +412,7 @@ async function main(): Promise<void> {
 
   // Always tidy up this run's throwaway dealerships, pass or fail, so they never leak onto
   // the public marketplace.
-  await cleanup([alpha.orgId, bravo.orgId]);
+  await cleanup([alpha.orgId, bravo.orgId, quiet.orgId]);
   await getPool().end();
 
   console.log("");

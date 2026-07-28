@@ -42,6 +42,13 @@ const VEHICLE_COLUMNS = `
     from public.vehicle_photos p
     where p.vehicle_id = vehicles.id
   ), '[]'::json) as photos,
+  (
+    select json_build_object(
+      'slug', d.slug, 'name', d.display_name, 'city', d.city, 'state', d.state
+    )
+    from public.dealer_profiles d
+    where d.tenant_id = vehicles.tenant_id
+  ) as dealer,
   created_at as "createdAt", updated_at as "updatedAt"
 `;
 
@@ -237,6 +244,16 @@ export async function listPublic(
     values.push(value);
     filters.push(`${column} = $${values.length}`);
   };
+
+  // Filter by seller through the slug, never through a tenant id. A tenant id is an internal
+  // handle; letting a public query name one would invite probing for dealerships that have
+  // published nothing. The slug only resolves for a seller the public role may already see.
+  if (query.dealer) {
+    values.push(query.dealer);
+    filters.push(
+      `tenant_id = (select d.tenant_id from public.dealer_profiles d where d.slug = $${values.length})`,
+    );
+  }
 
   eq("make", query.make);
   eq("body_style", query.bodyStyle);

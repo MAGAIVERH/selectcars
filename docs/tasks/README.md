@@ -63,22 +63,25 @@ The vehicles module introduced a second Postgres role: buyers read through
 | 23  | [Public listing detail page + gallery](day-22-marketplace-from-db.md)                            | Done   |
 | 23b | [Home preview live + static data removed + verify self-cleans](day-23b-home-live-and-cleanup.md) | Done   |
 | 24  | [Full-car photos, backgrounds removed, cars floating](day-24-floating-photos.md)                 | Done   |
+| 26  | [Dealer identity: sold by, seller directory, storefronts](day-26-dealer-identity.md)             | Done   |
 
 Whatever a dealer publishes surfaces here automatically: same rows, read-only public role.
+Since Day 26 it also surfaces **with its seller**, so the collection is the union of what every
+dealership has published rather than one anonymous pile.
 
 ### Phase 4 — Professional dashboard (financials + CRM)
 
 | Day   | Title                                                    | Status |
 | ----- | -------------------------------------------------------- | ------ |
-| 26-27 | Sales / deals schema (gross front + back end)            | Open   |
-| 28-29 | Dashboard overview: inventory value, units, gross, aging | Open   |
-| 30-31 | Leads / CRM pipeline from marketplace interest           | Open   |
+| 27-28 | Sales / deals schema (gross front + back end)            | Open   |
+| 29-30 | Dashboard overview: inventory value, units, gross, aging | Open   |
+| 31-32 | Leads / CRM pipeline from marketplace interest           | Open   |
 
 ### Phase 5 — Analytics + AI insights
 
 | Day | Title                                            | Status |
 | --- | ------------------------------------------------ | ------ |
-| 32+ | Trend charts, inventory turn, async AI (pricing) | Open   |
+| 33+ | Trend charts, inventory turn, async AI (pricing) | Open   |
 
 The full intent behind Phases 3-5 lives in
 [`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).

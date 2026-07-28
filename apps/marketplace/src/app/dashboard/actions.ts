@@ -5,14 +5,18 @@ import { redirect } from "next/navigation";
 import {
   changeVehicleStatusSchema,
   createVehicleSchema,
+  updateDealerProfileSchema,
   updateVehicleSchema,
 } from "@selectcars/shared";
-import { createVehicle, deleteVehicle, updateVehicle } from "@/lib/api";
+import { createVehicle, deleteVehicle, updateDealership, updateVehicle } from "@/lib/api";
 
 export type VehicleFormState = {
   error?: string;
   fieldErrors?: Record<string, string>;
 };
+
+/** Same shape, plus the one thing a settings screen needs that a create form does not. */
+export type DealershipFormState = VehicleFormState & { saved?: boolean };
 
 function str(v: FormDataEntryValue | null): string | undefined {
   const s = typeof v === "string" ? v.trim() : "";
@@ -153,6 +157,38 @@ export async function changeVehicleStatusAction(
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/vehicles/${id}`);
   return {};
+}
+
+/**
+ * Save the dealership's public identity: the name, city, and pitch buyers read next to every
+ * one of its cars. Owners and managers only, enforced by the API, not by hiding the form.
+ *
+ * `saved` rather than a redirect: this is a settings screen a dealer stays on, and being
+ * thrown back to the inventory after a one-field edit reads as an error.
+ */
+export async function updateDealershipAction(
+  _prev: DealershipFormState,
+  formData: FormData,
+): Promise<DealershipFormState> {
+  const parsed = updateDealerProfileSchema.safeParse({
+    name: str(formData.get("name")),
+    city: str(formData.get("city")) ?? null,
+    // Uppercased here so a dealer typing "fl" is not lectured about a format.
+    state: str(formData.get("state"))?.toUpperCase() ?? null,
+    phone: str(formData.get("phone")) ?? null,
+    about: str(formData.get("about")) ?? null,
+  });
+  if (!parsed.success) return toFieldErrors(parsed.error.issues);
+
+  const result = await updateDealership(parsed.data);
+  if (!result.ok) return { error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard/dealership");
+  // The public pages are deliberately NOT revalidated here. They read the API with
+  // `cache: "no-store"`, so every visitor already gets the current seller name and city;
+  // there is no cache entry to invalidate. Asking for it anyway made the dev server
+  // re-render three routes at once and fail its own `/api/auth/token` call mid-save.
+  return { saved: true };
 }
 
 /** Remove a listing for good. The API restricts this to owners and managers. */
