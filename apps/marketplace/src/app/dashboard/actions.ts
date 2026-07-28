@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   changeVehicleStatusSchema,
+  createDealSchema,
   createVehicleSchema,
   photoUploadRequestSchema,
   updateDealerProfileSchema,
@@ -12,6 +13,7 @@ import {
 } from "@selectcars/shared";
 import {
   attachPhoto,
+  createDeal,
   createVehicle,
   deletePhoto,
   deleteVehicle,
@@ -121,6 +123,7 @@ export async function createVehicleAction(
 
   // The dashboard list and (if published) the marketplace read live, so refresh them.
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   // Straight to the new listing rather than back to the list: photos can only be attached
   // to a car that exists, so this is where the dealer's next step actually is.
   redirect(`/dashboard/vehicles/${result.id}`);
@@ -148,8 +151,9 @@ export async function updateVehicleAction(
   if (!result.ok) return { error: describeFailure(result.status, result.message) };
 
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${id}`);
-  redirect("/dashboard");
+  redirect("/dashboard/inventory");
 }
 
 /**
@@ -174,6 +178,7 @@ export async function changeVehicleStatusAction(
 
   // Stay where we are: the dealer wants to see the new state, not be sent somewhere.
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${id}`);
   return {};
 }
@@ -249,6 +254,7 @@ export async function attachPhotoAction(
   if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
 
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${vehicleId}`);
   return { ok: true };
 }
@@ -261,6 +267,7 @@ export async function deletePhotoAction(
   if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
 
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${vehicleId}`);
   return { ok: true };
 }
@@ -273,8 +280,41 @@ export async function setPrimaryPhotoAction(
   if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
 
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${vehicleId}`);
   return { ok: true };
+}
+
+/**
+ * Record what a sold car actually made.
+ *
+ * Only four figures are typed: sale price, what the unit cost, reconditioning, and the
+ * finance office's contribution. Front-end and total gross are **not** sent: they are
+ * generated columns, so the dashboard cannot be talked into a total that does not add up.
+ */
+export async function recordSaleAction(
+  _prev: VehicleFormState,
+  formData: FormData,
+): Promise<VehicleFormState> {
+  const parsed = createDealSchema.safeParse({
+    vehicleId: str(formData.get("vehicleId")),
+    soldAt: str(formData.get("soldAt")),
+    salePriceUsd: num(formData.get("salePriceUsd")),
+    vehicleCostUsd: num(formData.get("vehicleCostUsd")),
+    reconCostUsd: num(formData.get("reconCostUsd")) ?? 0,
+    backEndGrossUsd: num(formData.get("backEndGrossUsd")) ?? 0,
+    buyerName: str(formData.get("buyerName")) ?? null,
+    notes: str(formData.get("notes")) ?? null,
+  });
+  if (!parsed.success) return toFieldErrors(parsed.error.issues);
+
+  const result = await createDeal(parsed.data);
+  if (!result.ok) return { error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/inventory");
+  revalidatePath(`/dashboard/vehicles/${parsed.data.vehicleId}`);
+  return {};
 }
 
 /** Remove a listing for good. The API restricts this to owners and managers. */
@@ -289,5 +329,6 @@ export async function deleteVehicleAction(
   if (!result.ok) return { error: describeFailure(result.status, result.message) };
 
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/dashboard/inventory");
+  redirect("/dashboard/inventory");
 }

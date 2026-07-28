@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SITE, type VehicleStatus } from "@selectcars/shared";
-import { fetchVehicle } from "@/lib/api";
+import { SITE, type Deal, type VehicleStatus } from "@selectcars/shared";
+import { fetchDeals, fetchVehicle } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { StatusActions } from "@/components/dashboard/status-actions";
 import { DeleteVehicle } from "@/components/dashboard/delete-vehicle";
 import { PhotoManager } from "@/components/dashboard/photo-manager";
+import { RecordSale } from "@/components/dashboard/record-sale";
 import { VehicleForm } from "@/components/dashboard/vehicle-form";
 
 type Params = Promise<{ id: string }>;
@@ -38,10 +39,15 @@ export default async function EditVehiclePage({ params }: { params: Params }) {
   const vehicle = result.data;
   const title = `${vehicle.make} ${vehicle.model}`;
 
+  // Only sold cars have a deal, and only owners and managers may read one. A salesperson
+  // gets a 403 here, which is a fact about their role rather than an error to shout about,
+  // so the section explains itself instead of breaking the page.
+  const sale = await loadSale(vehicle.id, vehicle.status === "sold");
+
   return (
     <div className="mx-auto max-w-[900px]">
       <Link
-        href="/dashboard"
+        href="/dashboard/inventory"
         className="text-muted hover:text-foreground text-sm transition-colors"
       >
         <span aria-hidden="true">←</span> Back to inventory
@@ -83,6 +89,21 @@ export default async function EditVehiclePage({ params }: { params: Params }) {
         </div>
       </section>
 
+      {vehicle.status === "sold" && (
+        <section aria-labelledby="deal-heading" className="mt-10">
+          <h2 id="deal-heading" className="eyebrow">
+            The deal
+          </h2>
+          {sale.visible ? (
+            <RecordSale vehicleId={vehicle.id} deal={sale.deal} />
+          ) : (
+            <p className="text-muted mt-3 text-sm">
+              What this car made is limited to owners and managers.
+            </p>
+          )}
+        </section>
+      )}
+
       <section aria-labelledby="photos-heading" className="mt-10">
         <h2 id="photos-heading" className="eyebrow">
           Photos
@@ -111,6 +132,18 @@ export default async function EditVehiclePage({ params }: { params: Params }) {
       </section>
     </div>
   );
+}
+
+/** Whether this viewer may see the money, and the deal itself when there is one. */
+async function loadSale(
+  vehicleId: string,
+  isSold: boolean,
+): Promise<{ visible: boolean; deal?: Deal }> {
+  if (!isSold) return { visible: false };
+
+  const deals = await fetchDeals(vehicleId);
+  if (!deals.ok) return { visible: false };
+  return { visible: true, deal: deals.data[0] };
 }
 
 function LoadFailed({ status }: { status: number }) {

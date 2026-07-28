@@ -16,7 +16,9 @@ export function StatusTabs({ active }: { active: VehicleStatus | null }) {
     <nav className="border-border flex items-center gap-1 border-b" aria-label="Filter by status">
       {TABS.map((tab) => {
         const isActive = tab.value === active;
-        const href = tab.value ? `/dashboard?status=${tab.value}` : "/dashboard";
+        const href = tab.value
+          ? `/dashboard/inventory?status=${tab.value}`
+          : "/dashboard/inventory";
         return (
           <Link
             key={tab.label}

@@ -33,6 +33,17 @@ import { assertSelectcarsDatabase, describeTarget } from "../guard";
 
 type SeedPhoto = { file: string; alt: string; primary?: boolean };
 
+/** A closed sale, so the dashboard's financial numbers have real history behind them. */
+type SeedSale = {
+  /** Days ago the deal closed, relative to the seed run. */
+  soldDaysAgo: number;
+  salePriceUsd: number;
+  vehicleCostUsd: number;
+  reconCostUsd: number;
+  backEndGrossUsd: number;
+  buyerName: string;
+};
+
 type SeedVehicle = {
   slug: string;
   make: string;
@@ -50,6 +61,14 @@ type SeedVehicle = {
   interiorColor: string;
   description: string;
   photos: SeedPhoto[];
+  /**
+   * How long ago this car was listed. Without it every unit would have arrived today, and the
+   * two numbers a dealer principal actually watches, average days on lot and what is aging
+   * past 60 days, would be a flat zero on a screen that is supposed to warn them.
+   */
+  listedDaysAgo: number;
+  /** Present on units that have already been sold. Those carry no photos: see the note below. */
+  sale?: SeedSale;
 };
 
 /** A dealership account, exactly as a real one looks after signing up and filling its profile. */
@@ -95,6 +114,7 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "Twelve-cylinder grand tourer with a Mulliner leather interior. Effortless presence for any occasion, with the full Bentley service book.",
         photos: [p("bentley-continental-gt.png", "Bentley Continental GT in Anthracite Satin")],
+        listedDaysAgo: 74,
       },
       {
         slug: "mercedes-amg-c63-coupe",
@@ -114,6 +134,7 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "A handbuilt AMG V8 under a widebody kit, forged wheels, and a fixed rear wing. Loud where it should be, finished to a standard that is not.",
         photos: [p("mercedes-amg-c63.png", "Mercedes-AMG C 63 Coupe in Bronze Metallic")],
+        listedDaysAgo: 21,
       },
       {
         slug: "jaguar-f-type-r",
@@ -133,6 +154,7 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "The supercharged V8 F-Type, all-wheel drive, and one of the last of its kind. Certified, with the remainder of its factory warranty.",
         photos: [p("jaguar-f-type.png", "Jaguar F-Type R in Fuji White")],
+        listedDaysAgo: 38,
       },
       {
         slug: "bmw-i8",
@@ -152,6 +174,66 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "Carbon-fibre passenger cell, plug-in hybrid drivetrain, and doors that still stop traffic. A future classic that is genuinely usable today.",
         photos: [p("bmw-i8.png", "BMW i8 in E-Copper")],
+        listedDaysAgo: 96,
+      },
+
+      // --- Sold: history, so the dashboard opens with real numbers -----------------------
+      // These carry no photos on purpose. A sold car is invisible to buyers (RLS admits only
+      // `active` rows), so a photo would be work nobody ever sees, and inventing one would
+      // mean showing the same image on two different listings in the dealer's own list.
+      {
+        slug: "porsche-911-carrera-s",
+        make: "Porsche",
+        model: "911 Carrera S",
+        year: 2021,
+        trim: null,
+        mileage: 14200,
+        priceUsd: 142000,
+        condition: "Used",
+        bodyStyle: "Coupe",
+        fuelType: "Gas",
+        transmission: "Automatic",
+        drivetrain: "RWD",
+        exteriorColor: "Chalk",
+        interiorColor: "Bordeaux Red",
+        description: "Sport Chrono, ceramic brakes, and a documented single-owner history.",
+        photos: [],
+        listedDaysAgo: 55,
+        sale: {
+          soldDaysAgo: 12,
+          salePriceUsd: 142000,
+          vehicleCostUsd: 118000,
+          reconCostUsd: 3200,
+          backEndGrossUsd: 4800,
+          buyerName: "R. Whitfield",
+        },
+      },
+      {
+        slug: "audi-r8-v10",
+        make: "Audi",
+        model: "R8 V10 performance",
+        year: 2022,
+        trim: null,
+        mileage: 8700,
+        priceUsd: 168000,
+        condition: "Used",
+        bodyStyle: "Coupe",
+        fuelType: "Gas",
+        transmission: "Automatic",
+        drivetrain: "AWD",
+        exteriorColor: "Kemora Grey",
+        interiorColor: "Black",
+        description: "The last naturally aspirated V10 supercar, with carbon exterior package.",
+        photos: [],
+        listedDaysAgo: 90,
+        sale: {
+          soldDaysAgo: 34,
+          salePriceUsd: 168000,
+          vehicleCostUsd: 145000,
+          reconCostUsd: 5500,
+          backEndGrossUsd: 2900,
+          buyerName: "M. Okafor",
+        },
       },
     ],
   },
@@ -183,6 +265,7 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "Our executive car: a twin-turbo V6 flagship sedan with rear-seat comfort that embarrasses cars twice the price. Serviced on schedule, one fleet owner.",
         photos: [p("genesis-g90.png", "Genesis G90 in Vik Black")],
+        listedDaysAgo: 12,
       },
       {
         slug: "hyundai-kona",
@@ -202,6 +285,7 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "A compact crossover that spent its life on airport runs: highway miles, dealer-serviced, and cheap to run. Clean title, full maintenance record.",
         photos: [p("hyundai-kona.png", "Hyundai Kona SEL in Surf Blue")],
+        listedDaysAgo: 47,
       },
       {
         slug: "hyundai-elantra",
@@ -221,6 +305,90 @@ const DEALERSHIPS: SeedDealership[] = [
         description:
           "The value pick of the fleet: a well-equipped Limited with the balance of its factory warranty, priced to move as it leaves the rental line.",
         photos: [p("hyundai-elantra.png", "Hyundai Elantra Limited in Fluid Metal")],
+        listedDaysAgo: 63,
+      },
+
+      // --- Sold: a volume seller's history, thin gross and quick turns --------------------
+      {
+        slug: "nissan-altima-sv",
+        make: "Nissan",
+        model: "Altima SV",
+        year: 2023,
+        trim: null,
+        mileage: 34100,
+        priceUsd: 21400,
+        condition: "Used",
+        bodyStyle: "Sedan",
+        fuelType: "Gas",
+        transmission: "Automatic",
+        drivetrain: "FWD",
+        exteriorColor: "Gun Metallic",
+        interiorColor: "Charcoal",
+        description: "Ex-rental sedan, dealer serviced, clean title.",
+        photos: [],
+        listedDaysAgo: 30,
+        sale: {
+          soldDaysAgo: 8,
+          salePriceUsd: 21400,
+          vehicleCostUsd: 17800,
+          reconCostUsd: 900,
+          backEndGrossUsd: 1650,
+          buyerName: "D. Alvarez",
+        },
+      },
+      {
+        slug: "kia-sportage-lx",
+        make: "Kia",
+        model: "Sportage LX",
+        year: 2022,
+        trim: null,
+        mileage: 41800,
+        priceUsd: 24900,
+        condition: "Used",
+        bodyStyle: "SUV",
+        fuelType: "Gas",
+        transmission: "Automatic",
+        drivetrain: "AWD",
+        exteriorColor: "Snow White Pearl",
+        interiorColor: "Black",
+        description: "Compact SUV off the rental line, full maintenance record.",
+        photos: [],
+        listedDaysAgo: 41,
+        sale: {
+          soldDaysAgo: 19,
+          salePriceUsd: 24900,
+          vehicleCostUsd: 21000,
+          reconCostUsd: 1250,
+          backEndGrossUsd: 2100,
+          buyerName: "T. Nguyen",
+        },
+      },
+      {
+        slug: "chevrolet-malibu-lt",
+        make: "Chevrolet",
+        model: "Malibu LT",
+        year: 2022,
+        trim: null,
+        mileage: 47600,
+        priceUsd: 19600,
+        condition: "Used",
+        bodyStyle: "Sedan",
+        fuelType: "Gas",
+        transmission: "Automatic",
+        drivetrain: "FWD",
+        exteriorColor: "Mosaic Black",
+        interiorColor: "Jet Black",
+        description: "High-mileage but honest: fleet maintained and priced to move.",
+        photos: [],
+        listedDaysAgo: 74,
+        sale: {
+          soldDaysAgo: 51,
+          salePriceUsd: 19600,
+          vehicleCostUsd: 16900,
+          reconCostUsd: 700,
+          backEndGrossUsd: 1200,
+          buyerName: "S. Brennan",
+        },
       },
     ],
   },
@@ -257,20 +425,29 @@ async function upsertDealership(client: PoolClient, dealership: SeedDealership):
   );
 }
 
-async function seedInventory(dealership: SeedDealership): Promise<number> {
+async function seedInventory(
+  dealership: SeedDealership,
+): Promise<{ photos: number; deals: number }> {
   return withTenant(dealership.id, async (client) => {
-    // Rebuild this dealership's inventory from scratch. RLS scopes the delete to this tenant,
-    // and the FK cascade removes the old photos, so a re-run never duplicates or leaks.
+    // Rebuild this dealership's inventory from scratch. RLS scopes both deletes to this
+    // tenant. Deals go first: the vehicle FK is `on delete restrict` precisely so a sale
+    // cannot be erased as a side effect of deleting a car, which means the seed has to say
+    // out loud that it is throwing the history away too.
+    await client.query("delete from public.deals where tenant_id = $1", [dealership.id]);
     await client.query("delete from public.vehicles where tenant_id = $1", [dealership.id]);
 
     let photoCount = 0;
+    let dealCount = 0;
     for (const v of dealership.vehicles) {
       const inserted = await client.query<{ id: string }>(
         `insert into public.vehicles (
            tenant_id, slug, make, model, year, trim, mileage, price_usd,
            condition, body_style, fuel_type, transmission, drivetrain,
-           exterior_color, interior_color, description, status
-         ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'active')
+           exterior_color, interior_color, description, status, created_at
+         ) values (
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
+           now() - ($18 || ' days')::interval
+         )
          returning id`,
         [
           dealership.id,
@@ -289,6 +466,8 @@ async function seedInventory(dealership: SeedDealership): Promise<number> {
           v.exteriorColor,
           v.interiorColor,
           v.description,
+          v.sale ? "sold" : "active",
+          String(v.listedDaysAgo),
         ],
       );
       const vehicleId = inserted.rows[0].id;
@@ -302,9 +481,33 @@ async function seedInventory(dealership: SeedDealership): Promise<number> {
         );
         photoCount++;
       }
+
+      if (v.sale) {
+        // Only the four figures a dealer actually types. Front-end and total gross are
+        // generated columns, so the seed cannot invent numbers that do not add up.
+        await client.query(
+          `insert into public.deals (
+             tenant_id, vehicle_id, sold_at, sale_price_usd, vehicle_cost_usd,
+             recon_cost_usd, back_end_gross_usd, buyer_name
+           ) values (
+             $1, $2, (current_date - ($3 || ' days')::interval)::date, $4, $5, $6, $7, $8
+           )`,
+          [
+            dealership.id,
+            vehicleId,
+            String(v.sale.soldDaysAgo),
+            v.sale.salePriceUsd,
+            v.sale.vehicleCostUsd,
+            v.sale.reconCostUsd,
+            v.sale.backEndGrossUsd,
+            v.sale.buyerName,
+          ],
+        );
+        dealCount++;
+      }
     }
 
-    return photoCount;
+    return { photos: photoCount, deals: dealCount };
   });
 }
 
@@ -329,20 +532,24 @@ async function main(): Promise<void> {
 
   let vehicles = 0;
   let photos = 0;
+  let deals = 0;
   for (const dealership of DEALERSHIPS) {
     const count = await seedInventory(dealership);
+    const live = dealership.vehicles.filter((v) => !v.sale).length;
     vehicles += dealership.vehicles.length;
-    photos += count;
+    photos += count.photos;
+    deals += count.deals;
     console.log(
       `${dealership.name} (${dealership.city}, ${dealership.state}): ` +
-        `${dealership.vehicles.length} vehicles, ${count} photos`,
+        `${live} live, ${count.deals} sold, ${count.photos} photos`,
     );
   }
 
   console.log(
-    `\nseeded: ${DEALERSHIPS.length} dealerships, ${vehicles} vehicles, ${photos} photos`,
+    `\nseeded: ${DEALERSHIPS.length} dealerships, ${vehicles} vehicles ` +
+      `(${vehicles - deals} live, ${deals} sold), ${photos} photos, ${deals} deals`,
   );
-  console.log("all listings are status=active, so they are live on the marketplace");
+  console.log("live listings are status=active; sold units carry a recorded deal instead");
 
   await pool.end();
   console.log("\ndone.");
