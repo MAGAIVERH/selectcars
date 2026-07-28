@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
   apiErrorSchema,
+  canTransitionStatus,
   createVehicleSchema,
   listVehiclesQuerySchema,
   publicVehiclesQuerySchema,
@@ -110,21 +111,46 @@ export async function vehicleRoutes(app: FastifyInstance): Promise<void> {
           401: apiErrorSchema,
           403: apiErrorSchema,
           404: apiErrorSchema,
+          409: apiErrorSchema,
         },
       },
     },
     async (request, reply) => {
       const { tenantId, userId } = requireTenantContext(request);
-      const vehicle = await withTenant({ tenantId, actorUserId: userId }, (client) =>
-        vehicles.update(client, request.params.id, request.body),
-      );
+      const patch = request.body;
 
-      if (!vehicle) {
+      // Read the current row and write the new one inside the SAME transaction. Checking
+      // the status in one connection and updating in another would leave a window where
+      // two dealers could each pass the check and both write, so the rule would hold in
+      // testing and fail exactly when two people work the same car.
+      const outcome = await withTenant({ tenantId, actorUserId: userId }, async (client) => {
+        const current = await vehicles.lockStatusForUpdate(client, request.params.id);
+        if (!current) return { kind: "not_found" } as const;
+
+        if (patch.status && !canTransitionStatus(current, patch.status)) {
+          return { kind: "illegal_transition", from: current, to: patch.status } as const;
+        }
+
+        const updated = await vehicles.update(client, request.params.id, patch);
+        return updated
+          ? ({ kind: "ok", vehicle: updated } as const)
+          : ({ kind: "not_found" } as const);
+      });
+
+      if (outcome.kind === "not_found") {
         return reply
           .code(404)
           .send({ error: { code: "not_found", message: "Vehicle not found." } });
       }
-      return vehicle;
+      if (outcome.kind === "illegal_transition") {
+        return reply.code(409).send({
+          error: {
+            code: "conflict",
+            message: `A ${outcome.from} listing cannot move to ${outcome.to}.`,
+          },
+        });
+      }
+      return outcome.vehicle;
     },
   );
 

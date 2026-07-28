@@ -8,28 +8,67 @@ import {
   fuelTypeSchema,
   transmissionSchema,
   drivetrainSchema,
+  type Vehicle,
 } from "@selectcars/shared";
-import { createVehicleAction, type VehicleFormState } from "@/app/dashboard/actions";
+import {
+  createVehicleAction,
+  updateVehicleAction,
+  type VehicleFormState,
+} from "@/app/dashboard/actions";
 
 const initial: VehicleFormState = {};
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export function VehicleForm() {
-  const [state, formAction, pending] = useActionState(createVehicleAction, initial);
+/**
+ * The vehicle form, in both of its modes.
+ *
+ * Pass a `vehicle` and it edits that one; pass nothing and it creates. It is one component
+ * on purpose: two forms over the same eighteen fields would drift, and the day someone adds
+ * a field they would remember one of them.
+ *
+ * The difference between the modes is deliberately small: edit carries the id in a hidden
+ * field and drops the publish choice, because moving a listing through its lifecycle has
+ * rules of its own and belongs to the status actions, not to a save button.
+ */
+export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
+  const editing = vehicle !== undefined;
+  const [state, formAction, pending] = useActionState(
+    editing ? updateVehicleAction : createVehicleAction,
+    initial,
+  );
   const err = state.fieldErrors ?? {};
 
   return (
     <form action={formAction} className="mt-8">
+      {editing && <input type="hidden" name="id" value={vehicle.id} />}
+
       {state.error && (
-        <p className="border-border-strong bg-surface text-foreground mb-6 rounded-[10px] border px-4 py-3 text-sm">
+        <p
+          role="alert"
+          className="border-border-strong bg-surface text-foreground mb-6 rounded-[10px] border px-4 py-3 text-sm"
+        >
           {state.error}
         </p>
       )}
 
       <Section title="Identity">
-        <Field name="make" label="Make" required error={err.make} placeholder="Porsche" />
-        <Field name="model" label="Model" required error={err.model} placeholder="911 GT3 RS" />
+        <Field
+          name="make"
+          label="Make"
+          required
+          error={err.make}
+          placeholder="Porsche"
+          defaultValue={vehicle?.make}
+        />
+        <Field
+          name="model"
+          label="Model"
+          required
+          error={err.model}
+          placeholder="911 GT3 RS"
+          defaultValue={vehicle?.model}
+        />
         <Field
           name="year"
           label="Year"
@@ -39,9 +78,22 @@ export function VehicleForm() {
           min={1900}
           max={CURRENT_YEAR + 2}
           placeholder={String(CURRENT_YEAR)}
+          defaultValue={vehicle ? String(vehicle.year) : undefined}
         />
-        <Field name="trim" label="Trim" error={err.trim} placeholder="Weissach" />
-        <Field name="vin" label="VIN" error={err.vin} placeholder="17 characters" />
+        <Field
+          name="trim"
+          label="Trim"
+          error={err.trim}
+          placeholder="Weissach"
+          defaultValue={vehicle?.trim ?? undefined}
+        />
+        <Field
+          name="vin"
+          label="VIN"
+          error={err.vin}
+          placeholder="17 characters"
+          defaultValue={vehicle?.vin ?? undefined}
+        />
       </Section>
 
       <Section title="Details">
@@ -51,6 +103,7 @@ export function VehicleForm() {
           required
           options={conditionSchema.options}
           error={err.condition}
+          defaultValue={vehicle?.condition}
         />
         <SelectField
           name="bodyStyle"
@@ -58,6 +111,7 @@ export function VehicleForm() {
           required
           options={bodyStyleSchema.options}
           error={err.bodyStyle}
+          defaultValue={vehicle?.bodyStyle}
         />
         <SelectField
           name="fuelType"
@@ -65,6 +119,7 @@ export function VehicleForm() {
           required
           options={fuelTypeSchema.options}
           error={err.fuelType}
+          defaultValue={vehicle?.fuelType}
         />
         <SelectField
           name="transmission"
@@ -72,6 +127,7 @@ export function VehicleForm() {
           options={transmissionSchema.options}
           error={err.transmission}
           allowEmpty
+          defaultValue={vehicle?.transmission ?? undefined}
         />
         <SelectField
           name="drivetrain"
@@ -79,6 +135,7 @@ export function VehicleForm() {
           options={drivetrainSchema.options}
           error={err.drivetrain}
           allowEmpty
+          defaultValue={vehicle?.drivetrain ?? undefined}
         />
         <Field
           name="mileage"
@@ -87,6 +144,7 @@ export function VehicleForm() {
           min={0}
           error={err.mileage}
           placeholder="0"
+          defaultValue={vehicle ? String(vehicle.mileage) : undefined}
         />
         <Field
           name="priceUsd"
@@ -95,6 +153,7 @@ export function VehicleForm() {
           min={0}
           error={err.priceUsd}
           placeholder="Leave blank for Inquire"
+          defaultValue={vehicle?.priceUsd != null ? String(vehicle.priceUsd) : undefined}
         />
       </Section>
 
@@ -104,12 +163,14 @@ export function VehicleForm() {
           label="Exterior color"
           error={err.exteriorColor}
           placeholder="Carrara White"
+          defaultValue={vehicle?.exteriorColor ?? undefined}
         />
         <Field
           name="interiorColor"
           label="Interior color"
           error={err.interiorColor}
           placeholder="Black"
+          defaultValue={vehicle?.interiorColor ?? undefined}
         />
       </Section>
 
@@ -121,24 +182,31 @@ export function VehicleForm() {
           id="description"
           name="description"
           rows={4}
+          defaultValue={vehicle?.description ?? undefined}
           placeholder="One or two lines of editorial copy for the listing."
           className="border-border bg-surface text-foreground focus:border-foreground w-full rounded-[10px] border px-3 py-2 text-sm transition-colors outline-none"
         />
       </div>
 
       <div className="border-border mt-8 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <label htmlFor="status" className="flex items-center gap-3 text-sm">
-          <span className="eyebrow">Publish</span>
-          <select
-            id="status"
-            name="status"
-            defaultValue="draft"
-            className="border-border bg-surface text-foreground focus:border-foreground rounded-[10px] border px-3 py-2 font-medium outline-none"
-          >
-            <option value="draft">Save as draft</option>
-            <option value="active">Publish to marketplace</option>
-          </select>
-        </label>
+        {editing ? (
+          <p className="text-faint text-xs">
+            Use the lifecycle panel to publish, mark pending, or mark sold.
+          </p>
+        ) : (
+          <label htmlFor="status" className="flex items-center gap-3 text-sm">
+            <span className="eyebrow">Publish</span>
+            <select
+              id="status"
+              name="status"
+              defaultValue="draft"
+              className="border-border bg-surface text-foreground focus:border-foreground rounded-[10px] border px-3 py-2 font-medium outline-none"
+            >
+              <option value="draft">Save as draft</option>
+              <option value="active">Publish to marketplace</option>
+            </select>
+          </label>
+        )}
 
         <div className="flex items-center gap-3">
           <Link
@@ -152,7 +220,7 @@ export function VehicleForm() {
             disabled={pending}
             className="bg-foreground text-background rounded-full px-6 py-2.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {pending ? "Saving" : "Save vehicle"}
+            {pending ? "Saving" : editing ? "Save changes" : "Save vehicle"}
           </button>
         </div>
       </div>
@@ -179,6 +247,7 @@ function Field({
   placeholder,
   min,
   max,
+  defaultValue,
 }: {
   name: string;
   label: string;
@@ -188,6 +257,7 @@ function Field({
   placeholder?: string;
   min?: number;
   max?: number;
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -203,6 +273,7 @@ function Field({
         placeholder={placeholder}
         min={min}
         max={max}
+        defaultValue={defaultValue}
         aria-invalid={error ? true : undefined}
         className="border-border bg-surface text-foreground focus:border-foreground w-full rounded-[10px] border px-3 py-2 text-sm transition-colors outline-none aria-[invalid]:border-red-500"
       />
@@ -218,6 +289,7 @@ function SelectField({
   required,
   error,
   allowEmpty,
+  defaultValue,
 }: {
   name: string;
   label: string;
@@ -225,6 +297,7 @@ function SelectField({
   required?: boolean;
   error?: string;
   allowEmpty?: boolean;
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -236,7 +309,7 @@ function SelectField({
         id={name}
         name={name}
         required={required}
-        defaultValue={allowEmpty ? "" : options[0]}
+        defaultValue={defaultValue ?? (allowEmpty ? "" : options[0])}
         aria-invalid={error ? true : undefined}
         className="border-border bg-surface text-foreground focus:border-foreground w-full rounded-[10px] border px-3 py-2 text-sm transition-colors outline-none"
       >

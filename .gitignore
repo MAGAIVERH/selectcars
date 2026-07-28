@@ -13,6 +13,10 @@ node_modules/
 # testing
 coverage/
 
+# browser verification artifacts (Playwright MCP writes snapshots, console logs, screenshots
+# here while a feature is being checked; the proof belongs in the day log, not in git)
+.playwright-mcp/
+
 # next.js (any app)
 .next/
 out/

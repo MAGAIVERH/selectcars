@@ -1,7 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Vehicle } from "@selectcars/shared";
 import { formatPrice, formatMileage } from "@/lib/format";
 import { StatusPill } from "./status-pill";
+import { StatusActions } from "./status-actions";
 
 const updatedFmt = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -46,8 +48,15 @@ export function InventoryItem({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-3">
-          <h3 className="text-foreground truncate text-lg font-semibold tracking-tight">
-            {vehicle.make} {vehicle.model}
+          <h3 className="truncate text-lg font-semibold tracking-tight">
+            {/* The whole row is not a link: it holds its own buttons, and nesting a button
+                inside a link is invalid and unusable with a keyboard. The title is the link. */}
+            <Link
+              href={`/dashboard/vehicles/${vehicle.id}`}
+              className="text-foreground hover:underline"
+            >
+              {vehicle.make} {vehicle.model}
+            </Link>
           </h3>
           <StatusPill status={vehicle.status} />
         </div>
@@ -60,9 +69,21 @@ export function InventoryItem({
         </p>
       </div>
 
-      <div className="flex items-center justify-between gap-6 sm:flex-col sm:items-end sm:justify-center">
-        <p className="text-foreground text-base font-semibold">{formatPrice(vehicle.priceUsd)}</p>
-        <p className="text-faint text-xs">Updated {updatedFmt.format(vehicle.updatedAt)}</p>
+      <div className="flex flex-col gap-3 sm:items-end">
+        <div className="flex items-baseline justify-between gap-6 sm:flex-col sm:items-end sm:gap-1">
+          <p className="text-foreground text-base font-semibold">{formatPrice(vehicle.priceUsd)}</p>
+          <p className="text-faint text-xs">Updated {updatedFmt.format(vehicle.updatedAt)}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          <StatusActions vehicleId={vehicle.id} status={vehicle.status} />
+          <Link
+            href={`/dashboard/vehicles/${vehicle.id}`}
+            className="border-border-strong text-muted hover:border-foreground hover:text-foreground rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors"
+          >
+            Edit
+          </Link>
+        </div>
       </div>
     </article>
   );

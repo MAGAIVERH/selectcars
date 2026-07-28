@@ -1,10 +1,13 @@
 import { headers } from "next/headers";
 import {
+  apiErrorSchema,
   vehicleListSchema,
   vehicleSchema,
+  type Vehicle,
   type VehicleList,
   type ListVehiclesQuery,
   type CreateVehicle,
+  type UpdateVehicle,
 } from "@selectcars/shared";
 
 /**
@@ -80,4 +83,73 @@ export async function createVehicle(input: CreateVehicle): Promise<CreateResult>
   const parsed = vehicleSchema.safeParse(await res.json());
   if (!parsed.success) return { ok: false, status: 502 };
   return { ok: true, slug: parsed.data.slug };
+}
+
+export type VehicleResult = { ok: true; data: Vehicle } | { ok: false; status: number };
+
+/** Fetch one vehicle from the dealer's own inventory. Another tenant's id reads as 404. */
+export async function fetchVehicle(id: string): Promise<VehicleResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await fetch(`${API_URL}/vehicles/${id}`, {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = vehicleSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data };
+}
+
+export type MutationResult = { ok: true } | { ok: false; status: number; message: string | null };
+
+/**
+ * Read the API's own explanation out of a failed response.
+ *
+ * Worth the extra parse for one case in particular: a refused status change (409) carries a
+ * message that names the actual rule ("A sold listing cannot move to draft."). Inventing our
+ * own wording here would eventually contradict the API.
+ */
+async function readApiError(res: Response): Promise<string | null> {
+  try {
+    const parsed = apiErrorSchema.safeParse(await res.json());
+    return parsed.success ? parsed.data.error.message : null;
+  } catch {
+    // A non-JSON body (a proxy error page, a crash) is not worth failing over.
+    return null;
+  }
+}
+
+/** Patch a vehicle. Only the fields present in `patch` are touched. */
+export async function updateVehicle(id: string, patch: UpdateVehicle): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${id}`, {
+    method: "PATCH",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(patch),
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+/** Delete a vehicle. The API allows this for owners and managers only. */
+export async function deleteVehicle(id: string): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${id}`, {
+    method: "DELETE",
+    // No content-type: this request has no body, and announcing JSON without one makes
+    // Fastify reject it as malformed.
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (res.status !== 204)
+    return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
 }

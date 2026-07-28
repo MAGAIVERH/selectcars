@@ -43,42 +43,42 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ### Phase 2 — Inventory / Vehicles
 
-| Day   | Title                                                                   | Status |
-| ----- | ----------------------------------------------------------------------- | ------ |
-| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md) | Done   |
-| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md) | Done   |
-| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done   |
-| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                 | Done (edit + photos open) |
-| 20    | Status workflow (draft to sold)                                         | Open   |
+| Day   | Title                                                                          | Status                               |
+| ----- | ------------------------------------------------------------------------------ | ------------------------------------ |
+| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md)        | Done                                 |
+| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md)    | Done                                 |
+| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done                                 |
+| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                        | Done (edit + photos open)            |
+| 25    | [Status workflow + edit a listing](day-25-status-workflow-and-edit.md)         | Done (23/23 verified, browser + API) |
 
 The vehicles module introduced a second Postgres role: buyers read through
 `selectcars_public`, which can only ever see `active` listings. See the day log.
 
 ### Phase 3 — Live marketplace (dashboard reflects on the public site)
 
-| Day | Title                                                          | Status |
-| --- | -------------------------------------------------------------- | ------ |
-| 21  | [Photos on the API responses (dealer + public)](day-21-photos-on-api.md) | Done   |
-| 22  | [Marketplace reads `/public/vehicles` (collection)](day-22-marketplace-from-db.md) | Done   |
-| 23  | [Public listing detail page + gallery](day-22-marketplace-from-db.md) | Done   |
+| Day | Title                                                                                            | Status |
+| --- | ------------------------------------------------------------------------------------------------ | ------ |
+| 21  | [Photos on the API responses (dealer + public)](day-21-photos-on-api.md)                         | Done   |
+| 22  | [Marketplace reads `/public/vehicles` (collection)](day-22-marketplace-from-db.md)               | Done   |
+| 23  | [Public listing detail page + gallery](day-22-marketplace-from-db.md)                            | Done   |
 | 23b | [Home preview live + static data removed + verify self-cleans](day-23b-home-live-and-cleanup.md) | Done   |
-| 24  | [Full-car photos, backgrounds removed, cars floating](day-24-floating-photos.md) | Done   |
+| 24  | [Full-car photos, backgrounds removed, cars floating](day-24-floating-photos.md)                 | Done   |
 
 Whatever a dealer publishes surfaces here automatically: same rows, read-only public role.
 
 ### Phase 4 — Professional dashboard (financials + CRM)
 
-| Day   | Title                                                     | Status |
-| ----- | --------------------------------------------------------- | ------ |
-| 24-25 | Sales / deals schema (gross front + back end)             | Open   |
-| 26-27 | Dashboard overview: inventory value, units, gross, aging  | Open   |
-| 28-29 | Leads / CRM pipeline from marketplace interest            | Open   |
+| Day   | Title                                                    | Status |
+| ----- | -------------------------------------------------------- | ------ |
+| 26-27 | Sales / deals schema (gross front + back end)            | Open   |
+| 28-29 | Dashboard overview: inventory value, units, gross, aging | Open   |
+| 30-31 | Leads / CRM pipeline from marketplace interest           | Open   |
 
 ### Phase 5 — Analytics + AI insights
 
-| Day | Title                                                | Status |
-| --- | ---------------------------------------------------- | ------ |
-| 30+ | Trend charts, inventory turn, async AI (pricing)     | Open   |
+| Day | Title                                            | Status |
+| --- | ------------------------------------------------ | ------ |
+| 32+ | Trend charts, inventory turn, async AI (pricing) | Open   |
 
 The full intent behind Phases 3-5 lives in
 [`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).

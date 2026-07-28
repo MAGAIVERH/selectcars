@@ -5,6 +5,7 @@ import type {
   PublicVehiclesQuery,
   UpdateVehicle,
   Vehicle,
+  VehicleStatus,
 } from "@selectcars/shared";
 
 /**
@@ -102,6 +103,27 @@ export async function findByIdForTenant(
     [id],
   );
   return result.rows[0];
+}
+
+/**
+ * The current status of one vehicle, with the row locked until the transaction ends.
+ *
+ * Used before a status change: `for update` makes a second request touching the same car
+ * wait, so it re-reads the committed status instead of validating against a stale one. Two
+ * managers clicking "Mark sold" and "Unpublish" at the same second cannot both win.
+ *
+ * It selects only `status`, not the full row: the caller needs one value, and skipping the
+ * photo aggregation keeps the lock short.
+ */
+export async function lockStatusForUpdate(
+  client: PoolClient,
+  id: string,
+): Promise<VehicleStatus | undefined> {
+  const result = await client.query<{ status: VehicleStatus }>(
+    "select status from public.vehicles where id = $1 for update",
+    [id],
+  );
+  return result.rows[0]?.status;
 }
 
 export async function create(

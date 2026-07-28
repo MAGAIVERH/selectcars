@@ -265,6 +265,68 @@ async function main(): Promise<void> {
     afterPublish.status,
   );
 
+  // --- the status workflow ------------------------------------------------
+  // The lifecycle is a graph, not four loose labels: `VEHICLE_STATUS_TRANSITIONS` in
+  // packages/shared says which moves exist, the API validates the request against the row's
+  // committed status, and the dashboard draws its buttons from that same map. These checks
+  // prove the rule at the boundary, where a hand-written request lands too.
+  const setStatus = (id: string, status: string) =>
+    fetch(`${API}/vehicles/${id}`, {
+      method: "PATCH",
+      headers: authed(alpha.token),
+      body: JSON.stringify({ status }),
+    });
+
+  const ferrariId = active.id!;
+
+  const toPending = await setStatus(ferrariId, "pending");
+  check("active -> pending allowed -> 200", toPending.status === 200, toPending.status);
+
+  const pendingToDraft = await setStatus(ferrariId, "draft");
+  check(
+    "pending -> draft refused -> 409 (a deal in progress is not a draft)",
+    pendingToDraft.status === 409,
+    pendingToDraft.status,
+  );
+
+  const toSold = await setStatus(ferrariId, "sold");
+  check("pending -> sold allowed -> 200", toSold.status === 200, toSold.status);
+
+  const soldPublicly = await fetch(`${API}/public/vehicles/${activeSlug}`);
+  check(
+    "a sold listing leaves the public marketplace -> 404",
+    soldPublicly.status === 404,
+    soldPublicly.status,
+  );
+
+  const soldToDraft = await setStatus(ferrariId, "draft");
+  check(
+    "sold -> draft refused -> 409 (it would erase the sale from the record)",
+    soldToDraft.status === 409,
+    soldToDraft.status,
+  );
+
+  const relisted = await setStatus(ferrariId, "active");
+  check("sold -> active (relist) allowed -> 200", relisted.status === 200, relisted.status);
+
+  const freshDraft = await addVehicle(alpha.token, {
+    make: "Aston Martin",
+    model: "Vantage",
+    year: 2023,
+    mileage: 3100,
+    priceUsd: 165000,
+    condition: "Used",
+    bodyStyle: "Coupe",
+    fuelType: "Gas",
+    status: "draft",
+  });
+  const draftToSold = await setStatus(freshDraft.id!, "sold");
+  check(
+    "draft -> sold refused -> 409 (a car nobody could see cannot have been sold)",
+    draftToSold.status === 409,
+    draftToSold.status,
+  );
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];

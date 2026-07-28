@@ -94,6 +94,9 @@ export const apiErrorSchema = z.object({
       "forbidden",
       "no_active_tenant",
       "not_found",
+      // The request was well formed and allowed, but the resource's current state refuses
+      // it: a listing that is `sold` cannot be moved back to `draft`, for example.
+      "conflict",
       "bad_request",
       "internal",
     ]),
@@ -114,6 +117,63 @@ export type Drivetrain = z.infer<typeof drivetrainSchema>;
  */
 export const vehicleStatusSchema = z.enum(["draft", "active", "pending", "sold"]);
 export type VehicleStatus = z.infer<typeof vehicleStatusSchema>;
+
+/**
+ * The listing lifecycle as a graph: from each status, the statuses a dealer may move to.
+ *
+ * This is a business rule, not a UI detail, so it lives with the contract. The dashboard
+ * reads it to decide which buttons to render, and the API reads the same map to reject a
+ * request that skips a step. Neither side can drift, and a hand-crafted `curl` gets the
+ * same answer as the button.
+ *
+ * The shape of the workflow, in words:
+ * - `draft` is private work in progress: the only way out is to publish it.
+ * - `active` is live on the marketplace: unpublish it, put a deal on it, or sell it.
+ * - `pending` is a deal in progress: it closes (`sold`) or it falls through (`active`).
+ * - `sold` is terminal for the deal, but a unit can come back (a financing failure, a
+ *   returned trade), so relisting is allowed. Going straight back to `draft` is not: a
+ *   sold car quietly becoming an unpublished draft would erase it from the sales record.
+ */
+export const VEHICLE_STATUS_TRANSITIONS: Record<VehicleStatus, readonly VehicleStatus[]> = {
+  draft: ["active"],
+  active: ["draft", "pending", "sold"],
+  pending: ["active", "sold"],
+  sold: ["active"],
+} as const;
+
+/**
+ * Is this status change allowed?
+ *
+ * Staying put counts as allowed: saving the edit form without touching the status is not a
+ * transition, and must not be rejected as one.
+ */
+export function canTransitionStatus(from: VehicleStatus, to: VehicleStatus): boolean {
+  return from === to || VEHICLE_STATUS_TRANSITIONS[from].includes(to);
+}
+
+/**
+ * The label a dealer sees on the button for a transition. The wording depends on where the
+ * car is coming from: moving to `active` is "Publish" for a draft but "Relist" for a car
+ * that was sold, and calling both "Activate" would tell the dealer nothing.
+ */
+export function statusActionLabel(from: VehicleStatus, to: VehicleStatus): string {
+  switch (to) {
+    case "active":
+      if (from === "draft") return "Publish";
+      if (from === "sold") return "Relist";
+      return "Back to active";
+    case "draft":
+      return "Unpublish";
+    case "pending":
+      return "Mark pending";
+    case "sold":
+      return "Mark sold";
+  }
+}
+
+/** Body of a status-only change, used by the dashboard's row actions. */
+export const changeVehicleStatusSchema = z.object({ status: vehicleStatusSchema });
+export type ChangeVehicleStatus = z.infer<typeof changeVehicleStatusSchema>;
 
 /** A gallery photo for a vehicle. Buyers only ever receive photos of `active` listings. */
 export const vehiclePhotoSchema = z.object({
