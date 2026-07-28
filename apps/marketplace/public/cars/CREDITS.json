@@ -1,14 +1,46 @@
 {
-  "note": "Free stock photos (Pexels License: free commercial use, no attribution required). Backgrounds were removed locally (offline u2net model) to present each car floating on a transparent background. Sources recorded for provenance.",
+  "note": "Free stock photos (Pexels License: free commercial use, no attribution required). Every car was chosen for the SAME framing: a complete vehicle in side profile. Backgrounds were removed locally with an offline u2net model, images were mirrored where needed so all seven cars face the same direction, and the alpha was trimmed tight.",
+  "standard": "Side profile, full car, facing left, transparent background, at most 1200px wide.",
   "images": [
-    { "file": "porsche-911.png", "brand": "Porsche", "source": "https://www.pexels.com/photo/911-amitsuriphotography-porsche-tubro-260171" },
-    { "file": "ferrari-488.png", "brand": "Ferrari", "source": "https://www.pexels.com/photo/red-ferrari-sports-car-in-showroom-display-30735110/" },
-    { "file": "lamborghini-huracan.png", "brand": "Lamborghini", "source": "https://www.pexels.com/photo/orange-lamborghini-huracan-sports-car-17632044/" },
-    { "file": "mercedes-amg-gtr.png", "brand": "Mercedes-AMG", "source": "https://www.pexels.com/photo/a-modern-blue-mercedes-amg-gt-r-parked-in-front-of-the-car-salon-16511358/" },
-    { "file": "aston-martin-db11.png", "brand": "Aston Martin", "source": "https://www.pexels.com/photo/white-aston-martin-on-road-7116872/" },
-    { "file": "range-rover-evoque.png", "brand": "Range Rover", "source": "https://www.pexels.com/photo/white-land-rover-range-rover-suv-on-road-116675/" },
-    { "file": "jaguar-xf.png", "brand": "Jaguar", "source": "https://www.pexels.com/photo/white-jaguar-car-parked-near-green-field-4096528/" },
-    { "file": "bentley-continental.png", "brand": "Bentley", "source": "https://www.pexels.com/photo/bentley-continental-gt-parked-in-garage-6872600/" },
-    { "file": "bmw-m2.png", "brand": "BMW", "source": "https://www.pexels.com/photo/shiny-bmw-m2-parked-on-an-open-space-12249431/" }
+    {
+      "file": "bentley-continental-gt.png",
+      "brand": "Bentley",
+      "source": "https://www.pexels.com/photo/black-luxury-coupe-on-plain-background-261986/"
+    },
+    {
+      "file": "bmw-i8.png",
+      "brand": "BMW",
+      "source": "https://www.pexels.com/photo/orange-bmw-sports-car-in-studio-19076555/",
+      "note": "Mirrored to face left."
+    },
+    {
+      "file": "mercedes-amg-c63.png",
+      "brand": "Mercedes-AMG",
+      "source": "https://www.pexels.com/photo/sports-car-in-minimal-studio-setting-15864702/",
+      "note": "Mirrored to face left."
+    },
+    {
+      "file": "jaguar-f-type.png",
+      "brand": "Jaguar",
+      "source": "https://www.pexels.com/photo/white-sports-car-modern-luxury-design-20695256/"
+    },
+    {
+      "file": "genesis-g90.png",
+      "brand": "Genesis",
+      "source": "https://www.pexels.com/photo/side-profile-of-a-luxury-genesis-sedan-12122221/"
+    },
+    {
+      "file": "hyundai-elantra.png",
+      "brand": "Hyundai",
+      "source": "https://www.pexels.com/photo/modern-hyundai-sedan-in-a-dark-studio-14696345/"
+    },
+    {
+      "file": "hyundai-kona.png",
+      "brand": "Hyundai",
+      "source": "https://www.pexels.com/photo/studio-shot-of-a-hyundai-kona-suv-12163946/"
+    }
+  ],
+  "rejected": [
+    "A Ferrari F12 and a Lamborghini Gallardo were cut and thrown away: both are dark cars on a black background, and the segmentation model ate their rear ends even after the mask was computed from a brightened copy. Kept out rather than shipped broken."
   ]
 }
