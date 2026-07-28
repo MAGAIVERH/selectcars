@@ -175,6 +175,54 @@ export function statusActionLabel(from: VehicleStatus, to: VehicleStatus): strin
 export const changeVehicleStatusSchema = z.object({ status: vehicleStatusSchema });
 export type ChangeVehicleStatus = z.infer<typeof changeVehicleStatusSchema>;
 
+/**
+ * The seller of a listing, as a buyer sees it.
+ *
+ * In the US market the seller of record is the **dealership**, not an individual. A
+ * salesperson is staff inside a dealership (see `dealershipRoleSchema`): they work leads and
+ * deals, they do not own listings. So this is the dealership's public identity, and it is
+ * what "Sold by" shows, what the marketplace filters on, and what `/dealers/<slug>` resolves.
+ */
+export const dealerSummarySchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  city: z.string().nullable(),
+  state: z.string().nullable(),
+});
+export type DealerSummary = z.infer<typeof dealerSummarySchema>;
+
+/** The full public profile, including what only the dealership's own team edits. */
+export const dealerProfileSchema = dealerSummarySchema.extend({
+  phone: z.string().nullable(),
+  about: z.string().nullable(),
+});
+export type DealerProfile = z.infer<typeof dealerProfileSchema>;
+
+/**
+ * What a dealership may change about its public identity. The slug is absent on purpose:
+ * it is the address buyers and search engines already have, so it is not a field to retype.
+ */
+export const updateDealerProfileSchema = z.object({
+  name: z.string().min(2).max(80),
+  city: z.string().max(80).nullish(),
+  state: z
+    .string()
+    .regex(/^[A-Z]{2}$/, "Use the two-letter state code, like FL.")
+    .nullish(),
+  phone: z.string().max(32).nullish(),
+  about: z.string().max(600).nullish(),
+});
+export type UpdateDealerProfile = z.infer<typeof updateDealerProfileSchema>;
+
+/** A seller in the marketplace's seller directory, with how much it has for sale. */
+export const dealerListingSchema = dealerSummarySchema.extend({
+  listingCount: z.number().int().nonnegative(),
+});
+export type DealerListing = z.infer<typeof dealerListingSchema>;
+
+export const dealerListSchema = z.object({ items: z.array(dealerListingSchema) });
+export type DealerList = z.infer<typeof dealerListSchema>;
+
 /** A gallery photo for a vehicle. Buyers only ever receive photos of `active` listings. */
 export const vehiclePhotoSchema = z.object({
   id: z.string().uuid(),
@@ -209,6 +257,12 @@ export const vehicleSchema = z.object({
   description: z.string().nullable(),
   status: vehicleStatusSchema,
   photos: z.array(vehiclePhotoSchema).default([]),
+  /**
+   * The dealership selling this car. Nullable because it is read with a left join: the
+   * database creates a profile for every dealership, but a listing must never vanish from
+   * its own dealer's inventory because a profile row is missing.
+   */
+  dealer: dealerSummarySchema.nullable().default(null),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -264,6 +318,8 @@ export type ListVehiclesQuery = z.infer<typeof listVehiclesQuerySchema>;
 
 /** Filters a buyer can apply to the public marketplace. `status` is not one of them. */
 export const publicVehiclesQuerySchema = z.object({
+  /** A dealership's slug: "show me only this seller's cars". */
+  dealer: z.string().max(160).optional(),
   make: z.string().max(60).optional(),
   bodyStyle: bodyStyleSchema.optional(),
   fuelType: fuelTypeSchema.optional(),

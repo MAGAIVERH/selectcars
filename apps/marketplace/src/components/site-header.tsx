@@ -4,6 +4,7 @@ const NAV = [
   { label: "Home", href: "/" },
   { label: "About", href: "/#sobre" },
   { label: "Collection", href: "/colecao" },
+  { label: "Dealerships", href: "/dealers" },
   { label: "Featured", href: "/#destaque" },
   { label: "Process", href: "/#processo" },
   { label: "FAQ", href: "/#perguntas" },

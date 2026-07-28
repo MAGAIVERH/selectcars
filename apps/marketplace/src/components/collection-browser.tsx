@@ -34,6 +34,18 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
     () => CONDITIONS.filter((c) => vehicles.some((v) => v.condition === c)),
     [vehicles],
   );
+  /**
+   * The sellers present in this inventory. Keyed by slug because two dealerships may
+   * legitimately trade under similar names, and the slug is what the platform guarantees
+   * unique.
+   */
+  const dealers = useMemo(() => {
+    const bySlug = new Map<string, string>();
+    for (const v of vehicles) if (v.dealer) bySlug.set(v.dealer.slug, v.dealer.name);
+    return [...bySlug]
+      .map(([slug, name]) => ({ slug, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [vehicles]);
   const priceCeiling = useMemo(() => {
     const max = Math.max(0, ...vehicles.map((v) => v.priceUsd ?? 0));
     return Math.max(50_000, Math.ceil(max / 25_000) * 25_000);
@@ -45,6 +57,7 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
   const [selMakes, setSelMakes] = useState<string[]>([]);
   const [selBodies, setSelBodies] = useState<BodyStyle[]>([]);
   const [selFuels, setSelFuels] = useState<FuelType[]>([]);
+  const [selDealers, setSelDealers] = useState<string[]>([]);
   const [condition, setCondition] = useState<Condition | "All">("All");
   const [sort, setSort] = useState<SortKey>("recent");
 
@@ -57,6 +70,7 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
       if (selMakes.length && !selMakes.includes(v.make)) return false;
       if (selBodies.length && !selBodies.includes(v.bodyStyle)) return false;
       if (selFuels.length && !selFuels.includes(v.fuelType)) return false;
+      if (selDealers.length && !(v.dealer && selDealers.includes(v.dealer.slug))) return false;
       if (q) {
         const haystack = `${v.make} ${v.model} ${v.exteriorColor ?? ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
@@ -71,7 +85,18 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
     });
 
     return result;
-  }, [vehicles, search, pricedOnly, maxPrice, selMakes, selBodies, selFuels, condition, sort]);
+  }, [
+    vehicles,
+    search,
+    pricedOnly,
+    maxPrice,
+    selMakes,
+    selBodies,
+    selFuels,
+    selDealers,
+    condition,
+    sort,
+  ]);
 
   function clearAll() {
     setSearch("");
@@ -80,6 +105,7 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
     setSelMakes([]);
     setSelBodies([]);
     setSelFuels([]);
+    setSelDealers([]);
     setCondition("All");
   }
 
@@ -204,7 +230,7 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
           )}
 
           {fuels.length > 0 && (
-            <FilterGroup label="Fuel" last>
+            <FilterGroup label="Fuel" last={dealers.length < 2}>
               <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
                 {fuels.map((fuel) => (
                   <Check
@@ -212,6 +238,23 @@ export function CollectionBrowser({ vehicles }: { vehicles: Vehicle[] }) {
                     label={fuel}
                     checked={selFuels.includes(fuel)}
                     onChange={() => setSelFuels((s) => toggle(s, fuel))}
+                  />
+                ))}
+              </div>
+            </FilterGroup>
+          )}
+
+          {/* Only worth showing once there is a choice to make: with a single seller on the
+              platform, a "Seller" facet is a control that can only ever do nothing. */}
+          {dealers.length > 1 && (
+            <FilterGroup label="Seller" last>
+              <div className="flex flex-col gap-2.5">
+                {dealers.map((dealer) => (
+                  <Check
+                    key={dealer.slug}
+                    label={dealer.name}
+                    checked={selDealers.includes(dealer.slug)}
+                    onChange={() => setSelDealers((s) => toggle(s, dealer.slug))}
                   />
                 ))}
               </div>

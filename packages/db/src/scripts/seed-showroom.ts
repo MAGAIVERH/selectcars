@@ -27,11 +27,21 @@ import { getPool } from "../pool";
 import { withTenant } from "../tenant";
 import { assertSelectcarsDatabase, describeTarget } from "../guard";
 
-/** A stable id and slug so re-running the seed reuses the same dealership. */
+/**
+ * A stable id and slug so re-running the seed reuses the same dealership, plus the public
+ * profile buyers see next to every one of its cars. This dealership is the seller of record
+ * for the inventory below: on the marketplace the listings read "Sold by SELECTCARS
+ * Showroom", and `/dealers/selectcars-showroom` is its storefront.
+ */
 const SHOWROOM = {
   id: "org_selectcars_showroom",
   name: "SELECTCARS Showroom",
   slug: "selectcars-showroom",
+  city: "Miami",
+  state: "FL",
+  phone: "+1 (305) 000-0000",
+  about:
+    "A private Miami showroom dealing in low-mileage performance and grand touring cars. Every unit is inspected in house and sold with its full service history.",
 } as const;
 
 type SeedPhoto = { file: string; alt: string; primary?: boolean };
@@ -237,6 +247,16 @@ async function upsertShowroom(client: PoolClient): Promise<void> {
      values ($1, $2, $3, now())
      on conflict (id) do update set name = excluded.name`,
     [SHOWROOM.id, SHOWROOM.name, SHOWROOM.slug],
+  );
+
+  // The profile row itself is created by a trigger on `organization` (migration 0008), so
+  // this only fills in what a dealership would type in its dashboard. Update, not insert:
+  // if the row were missing, the trigger is broken and the seed should not hide that.
+  await client.query(
+    `update public.dealer_profiles
+        set display_name = $2, city = $3, state = $4, phone = $5, about = $6
+      where tenant_id = $1`,
+    [SHOWROOM.id, SHOWROOM.name, SHOWROOM.city, SHOWROOM.state, SHOWROOM.phone, SHOWROOM.about],
   );
 }
 

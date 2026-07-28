@@ -1,8 +1,11 @@
 import { headers } from "next/headers";
 import {
   apiErrorSchema,
+  dealerProfileSchema,
   vehicleListSchema,
   vehicleSchema,
+  type DealerProfile,
+  type UpdateDealerProfile,
   type Vehicle,
   type VehicleList,
   type ListVehiclesQuery,
@@ -128,6 +131,39 @@ export async function updateVehicle(id: string, patch: UpdateVehicle): Promise<M
   if (!token) return { ok: false, status: 401, message: null };
 
   const res = await fetch(`${API_URL}/vehicles/${id}`, {
+    method: "PATCH",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(patch),
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+export type DealerProfileResult = { ok: true; data: DealerProfile } | { ok: false; status: number };
+
+/** The signed-in dealership's public profile, as buyers see it on every one of its listings. */
+export async function fetchDealership(): Promise<DealerProfileResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await fetch(`${API_URL}/dealership`, {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = dealerProfileSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data };
+}
+
+/** Save the dealership's public profile (owners and managers only, enforced by the API). */
+export async function updateDealership(patch: UpdateDealerProfile): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/dealership`, {
     method: "PATCH",
     headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
     body: JSON.stringify(patch),

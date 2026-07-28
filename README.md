@@ -19,6 +19,10 @@ refuses to let one see another's data.
   (`/colecao`), and the listing detail pages all read **live** from the database (every
   dealership's published listings), with data-derived filters and per-listing galleries. What
   a dealer publishes in their dashboard shows up here, same rows via the read-only public role.
+- **Multi-seller by design**: every listing says who is selling it ("Sold by", with the city),
+  `/dealers` is the seller directory, and `/dealers/<slug>` is one dealership's storefront. A
+  dealership appears there the moment it publishes its first car and drops out when it has none
+  live, and that is an RLS policy rather than a filter in a query.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
   thumbnails, filter by status, and add a vehicle (save as draft or publish straight to the
   marketplace). Every listing can be edited, and moved through its lifecycle from the row or
