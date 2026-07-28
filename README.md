@@ -34,10 +34,11 @@ refuses to let one see another's data.
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
   photo subquery runs under the same read-only role, so a buyer never sees a draft's images.
-- **Seeded showroom**: a demo dealership (`SELECTCARS Showroom`) with 9 active listings, each
-  a full car on a transparent background (floating), owned by a demo dealer you can sign in as
-  to see the platform populated. It is the living test account, and everything a real dealer
-  adds surfaces the same way.
+- **Seeded sellers**: two dealerships publish into the same collection, `SELECTCARS Showroom`
+  (Miami, FL: Bentley, AMG, Jaguar, BMW i8) and `Bayshore Fleet Sales` (Tampa, FL: a rental
+  company remarketing its fleet). Seven active listings, every photo to one standard: a full
+  car in side profile, facing left, on a transparent background. Sign in as the demo dealer to
+  see the platform populated; everything a real dealer adds surfaces the same way.
 
 ## The two ideas worth reviewing
 
@@ -98,7 +99,7 @@ API in a container.
 pnpm install
 cp .env.example .env        # then fill it in: the file explains every variable
 pnpm --filter @selectcars/db migrate
-pnpm --filter @selectcars/db seed          # loads the demo SELECTCARS Showroom inventory
+pnpm --filter @selectcars/db seed          # two demo dealerships and their live inventory
 ```
 
 Two gotchas that will cost you an hour if you skip the comments in `.env.example`:

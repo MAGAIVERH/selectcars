@@ -64,6 +64,7 @@ The vehicles module introduced a second Postgres role: buyers read through
 | 23b | [Home preview live + static data removed + verify self-cleans](day-23b-home-live-and-cleanup.md) | Done   |
 | 24  | [Full-car photos, backgrounds removed, cars floating](day-24-floating-photos.md)                 | Done   |
 | 26  | [Dealer identity: sold by, seller directory, storefronts](day-26-dealer-identity.md)             | Done   |
+| 27  | [One photo standard + a second seller](day-27-consistent-photos-two-sellers.md)                  | Done   |
 
 Whatever a dealer publishes surfaces here automatically: same rows, read-only public role.
 Since Day 26 it also surfaces **with its seller**, so the collection is the union of what every

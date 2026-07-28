@@ -7,18 +7,22 @@ import { fetchPublicVehicles } from "@/lib/public-api";
 export const metadata: Metadata = {
   title: "Collection · SELECTCARS",
   description:
-    "A curated collection of exceptional vehicles at the Miami showroom. Filter by make, body, fuel, and price.",
+    "Every car published by every dealership on SELECTCARS. Filter by seller, make, body, fuel, and price.",
 };
 
 export default async function ColecaoPage() {
   const vehicles = await fetchPublicVehicles();
+  // The collection spans every dealership, so the label counts sellers instead of naming one.
+  const sellers = new Set(vehicles.map((v) => v.dealer?.slug).filter(Boolean)).size;
 
   return (
     <>
       <SiteHeader />
       <main className="flex-1">
         <div className="mx-auto max-w-[1280px] px-6 py-12">
-          <p className="eyebrow">Collection · Miami Showroom</p>
+          <p className="eyebrow">
+            Collection{sellers > 0 ? ` · ${sellers} ${sellers === 1 ? "seller" : "sellers"}` : ""}
+          </p>
           <h1 className="text-foreground mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
             {vehicles.length} vehicles in inventory
           </h1>
