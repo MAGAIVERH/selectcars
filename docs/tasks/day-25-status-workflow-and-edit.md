@@ -2,8 +2,7 @@
 
 - **Date:** 2026-07-28
 - **Phase:** 2 (Inventory / Vehicles), closing the last open items
-- **Status:** Built, typecheck and lint clean. **End-to-end verification is blocked:** the
-  project's Supabase instance is unreachable (see "Blocked" below).
+- **Status:** Done (verified end to end, in the browser and through the API)
 
 ## Goal
 
@@ -86,15 +85,45 @@ Two smaller decisions inside those files, both of which would bite later if take
 
 ## Verification
 
-- `pnpm typecheck`: clean across all five packages. `pnpm lint`: clean. Prettier clean.
-- `verify:vehicles` was extended with the workflow, through the real API: `active -> pending`
-  and `pending -> sold` accepted; `pending -> draft`, `sold -> draft`, and `draft -> sold`
-  refused with 409; a sold listing disappears from `/public/vehicles`; a relist brings it
-  back. **These assertions have not been executed yet** (see below).
+`pnpm typecheck` (five packages), `pnpm lint`, `next build`, and Prettier: clean.
 
-## Blocked: the Supabase instance is unreachable
+**`pnpm --filter @selectcars/db verify:vehicles`: 23/23 PASS**, against the rebuilt API
+container and the real database. The seven new checks:
 
-Discovered while starting this day's work, not caused by it:
+```
+PASS  active -> pending allowed -> 200
+PASS  pending -> draft refused -> 409 (a deal in progress is not a draft)
+PASS  pending -> sold allowed -> 200
+PASS  a sold listing leaves the public marketplace -> 404
+PASS  sold -> draft refused -> 409 (it would erase the sale from the record)
+PASS  sold -> active (relist) allowed -> 200
+PASS  draft -> sold refused -> 409 (a car nobody could see cannot have been sold)
+```
+
+**Browser (Playwright), signed in as the demo dealer**, on the Jaguar XF R-Sport:
+
+- The inventory row offers exactly `active`'s moves: Unpublish, Mark pending, Mark sold.
+- "Mark pending" flipped the pill to **Pending** and the buttons became "Back to active" and
+  "Mark sold": the buttons are read from the transition map, not hard-coded.
+- The public collection dropped to **8 vehicles in inventory** and the "Jaguar" checkbox
+  disappeared from the filter sidebar, because the filters are derived from the live data.
+  `/public/vehicles/jaguar-xf` answered 404 while the car was off the market.
+- "Mark sold" left **Relist** as the only move; relisting returned the car to `active` and
+  the "View on marketplace" link reappeared.
+- The edit form arrived prefilled with all eighteen fields. Changing the price to $46,500 and
+  the trim saved, showed in the list, and reached `/public/vehicles/jaguar-xf` (same rows,
+  read-only public role).
+- **Clearing the trim wrote `null`**, which is the `null` vs `undefined` decision above,
+  proven rather than assumed.
+- The audit trail recorded the nine updates attributed to the acting user.
+
+The showroom was returned to its seeded state: 9 vehicles, all `active`, price back to
+$47,000, trim empty.
+
+## Note: the Supabase instance was paused when this day started
+
+Not caused by this change, and resolved by restoring the project from the Supabase dashboard.
+Recorded because the symptom is misleading and will happen again after any quiet week:
 
 ```
 db.jhsvkdeuwzuqolvokmbk.supabase.co        -> Non-existent domain (NXDOMAIN)
@@ -102,18 +131,21 @@ aws-1-sa-east-1.pooler.supabase.com:5432   -> "tenant/user postgres.jhsvkdeuwzuq
 https://jhsvkdeuwzuqolvokmbk.supabase.co   -> no response
 ```
 
-Reproduced from the host and from inside the API container, so it is neither Docker nor the
-local network: the project is **paused or deleted** on Supabase. A free-tier project pauses
-after about a week of inactivity, and the last commit was twelve days before this one. When a
-project is paused, its `db.<ref>` DNS record is withdrawn and the pooler answers with exactly
-that "tenant or user not found" message, which reads like a credentials problem and is not one.
+Reproduced from the host and from inside the API container, so it was neither Docker nor the
+local network. A free-tier project pauses after about a week of inactivity, and the last
+commit was twelve days before this one. When a project is paused, its `db.<ref>` DNS record is
+withdrawn and the pooler answers "tenant or user not found", which reads like a credentials
+problem and is not one. `nslookup db.<ref>.supabase.co` settles it: `Non-existent domain`
+means paused or deleted, never a wrong password.
 
-**Fix:** restore the project from the Supabase dashboard. If it was deleted, create a new one
-and run `pnpm --filter @selectcars/db migrate` then `seed`: the schema and the showroom are
-both in the repo, so nothing is lost except the throwaway test rows.
+**Fix:** restore the project from the Supabase dashboard (done). If it had been deleted, a new
+project plus `pnpm --filter @selectcars/db migrate` and `seed` would have rebuilt it: the
+schema and the showroom are both in the repo.
 
-Until then: no browser verification, no `verify:vehicles` run. This day is code-complete and
-proof-incomplete, and it is recorded that way on purpose.
+One consequence worth remembering: the API container had to be rebuilt
+(`docker compose up -d --build api`) before verifying, because it was still running the image
+built from the previous commit. A green `/health` says the process is alive, not that it is
+running the code you just wrote.
 
 ## Still open
 

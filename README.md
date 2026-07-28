@@ -56,7 +56,7 @@ Both are proven by scripts that drive the real stack, not mocks:
 ```bash
 pnpm --filter @selectcars/db rls:verify       # isolation at the SQL level
 pnpm --filter @selectcars/db verify:api       # isolation through the API, with real tokens
-pnpm --filter @selectcars/db verify:vehicles  # dealer vs public paths, end to end
+pnpm --filter @selectcars/db verify:vehicles  # dealer vs public paths + the status workflow
 ```
 
 `verify:api` signs up two real dealerships, mints real tokens, and asserts that a forged
