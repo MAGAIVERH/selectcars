@@ -10,9 +10,12 @@ Short records of significant, hard-to-reverse decisions and their trade-offs. On
   non-bypass role that makes isolation provable.
 - [`002-service-auth-jwt-jwks.md`](002-service-auth-jwt-jwks.md) — asymmetric JWT + JWKS
   between the Next issuer and the Fastify API, vs a shared secret or session-table reads.
+- [`003-direct-to-storage-uploads.md`](003-direct-to-storage-uploads.md) — photo bytes go
+  straight to Supabase Storage under a server-signed ticket, so the service-role key never
+  reaches a browser and no photo travels through our API.
 
 ## Planned
 
-- `003-ai-vision-listings.md` — photo-to-listing vision approach and cost controls.
-- `004-semantic-search-pgvector.md` — pgvector vs external vector DB.
-- `005-microfrontends.md` — Vercel microfrontends vs single app.
+- `004-ai-vision-listings.md` — photo-to-listing vision approach and cost controls.
+- `005-semantic-search-pgvector.md` — pgvector vs external vector DB.
+- `006-microfrontends.md` — Vercel microfrontends vs single app.

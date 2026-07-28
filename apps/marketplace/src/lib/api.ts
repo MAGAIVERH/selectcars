@@ -2,9 +2,13 @@ import { headers } from "next/headers";
 import {
   apiErrorSchema,
   dealerProfileSchema,
+  photoUploadTicketSchema,
   vehicleListSchema,
   vehicleSchema,
+  type AttachPhoto,
   type DealerProfile,
+  type PhotoUploadRequest,
+  type PhotoUploadTicket,
   type UpdateDealerProfile,
   type Vehicle,
   type VehicleList,
@@ -68,7 +72,7 @@ export async function fetchInventory(
   return { ok: true, data: parsed.data };
 }
 
-export type CreateResult = { ok: true; slug: string } | { ok: false; status: number };
+export type CreateResult = { ok: true; id: string; slug: string } | { ok: false; status: number };
 
 /** Create a vehicle in the signed-in dealer's inventory (RBAC + tenant enforced by the API). */
 export async function createVehicle(input: CreateVehicle): Promise<CreateResult> {
@@ -85,7 +89,7 @@ export async function createVehicle(input: CreateVehicle): Promise<CreateResult>
 
   const parsed = vehicleSchema.safeParse(await res.json());
   if (!parsed.success) return { ok: false, status: 502 };
-  return { ok: true, slug: parsed.data.slug };
+  return { ok: true, id: parsed.data.id, slug: parsed.data.slug };
 }
 
 export type VehicleResult = { ok: true; data: Vehicle } | { ok: false; status: number };
@@ -170,6 +174,82 @@ export async function updateDealership(patch: UpdateDealerProfile): Promise<Muta
     cache: "no-store",
   });
   if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+export type UploadTicketResult =
+  { ok: true; data: PhotoUploadTicket } | { ok: false; status: number; message: string | null };
+
+/**
+ * Ask the API for permission to upload one photo.
+ *
+ * The API decides the object key and signs a short-lived ticket for it. The browser then
+ * sends the bytes straight to storage: they never pass through this app or the API.
+ */
+export async function requestPhotoUpload(
+  vehicleId: string,
+  input: PhotoUploadRequest,
+): Promise<UploadTicketResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${vehicleId}/photos/upload-url`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+  });
+  if (res.status !== 201)
+    return { ok: false, status: res.status, message: await readApiError(res) };
+
+  const parsed = photoUploadTicketSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502, message: null };
+  return { ok: true, data: parsed.data };
+}
+
+/** Record an uploaded photo against the listing, once the bytes are in storage. */
+export async function attachPhoto(vehicleId: string, input: AttachPhoto): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${vehicleId}/photos`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+  });
+  if (res.status !== 201)
+    return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+/** Remove a photo from a listing, and its object from storage. */
+export async function deletePhoto(vehicleId: string, photoId: string): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${vehicleId}/photos/${photoId}`, {
+    method: "DELETE",
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (res.status !== 204)
+    return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+/** Choose the photo buyers see first on the card and in the gallery. */
+export async function setPrimaryPhoto(vehicleId: string, photoId: string): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await fetch(`${API_URL}/vehicles/${vehicleId}/photos/${photoId}/primary`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (res.status !== 204)
+    return { ok: false, status: res.status, message: await readApiError(res) };
   return { ok: true };
 }
 

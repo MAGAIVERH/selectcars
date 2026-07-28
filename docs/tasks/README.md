@@ -43,13 +43,14 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ### Phase 2 — Inventory / Vehicles
 
-| Day   | Title                                                                          | Status                               |
-| ----- | ------------------------------------------------------------------------------ | ------------------------------------ |
-| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md)        | Done                                 |
-| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md)    | Done                                 |
-| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done                                 |
-| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                        | Done (edit + photos open)            |
-| 25    | [Status workflow + edit a listing](day-25-status-workflow-and-edit.md)         | Done (23/23 verified, browser + API) |
+| Day   | Title                                                                          | Status                                 |
+| ----- | ------------------------------------------------------------------------------ | -------------------------------------- |
+| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md)        | Done                                   |
+| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md)    | Done                                   |
+| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done                                   |
+| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                        | Done (edit + photos open)              |
+| 25    | [Status workflow + edit a listing](day-25-status-workflow-and-edit.md)         | Done (23/23 verified, browser + API)   |
+| 28    | [Photo upload (direct to storage)](day-28-photo-upload.md)                     | Built; full path needs the storage key |
 
 The vehicles module introduced a second Postgres role: buyers read through
 `selectcars_public`, which can only ever see `active` listings. See the day log.
@@ -74,15 +75,15 @@ dealership has published rather than one anonymous pile.
 
 | Day   | Title                                                    | Status |
 | ----- | -------------------------------------------------------- | ------ |
-| 27-28 | Sales / deals schema (gross front + back end)            | Open   |
-| 29-30 | Dashboard overview: inventory value, units, gross, aging | Open   |
-| 31-32 | Leads / CRM pipeline from marketplace interest           | Open   |
+| 29-30 | Sales / deals schema (gross front + back end)            | Open   |
+| 31-32 | Dashboard overview: inventory value, units, gross, aging | Open   |
+| 33-34 | Leads / CRM pipeline from marketplace interest           | Open   |
 
 ### Phase 5 — Analytics + AI insights
 
 | Day | Title                                            | Status |
 | --- | ------------------------------------------------ | ------ |
-| 33+ | Trend charts, inventory turn, async AI (pricing) | Open   |
+| 35+ | Trend charts, inventory turn, async AI (pricing) | Open   |
 
 The full intent behind Phases 3-5 lives in
 [`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).

@@ -98,6 +98,10 @@ export const apiErrorSchema = z.object({
       // it: a listing that is `sold` cannot be moved back to `draft`, for example.
       "conflict",
       "bad_request",
+      // A dependency this endpoint needs is not configured or not answering (photo storage,
+      // for instance). Distinct from `internal`, because nothing is broken: something is
+      // switched off, and the message can say which.
+      "unavailable",
       "internal",
     ]),
     message: z.string(),
@@ -232,6 +236,55 @@ export const vehiclePhotoSchema = z.object({
   isPrimary: z.boolean(),
 });
 export type VehiclePhoto = z.infer<typeof vehiclePhotoSchema>;
+
+/**
+ * Upload limits, shared so the browser, the API, and the storage bucket agree.
+ *
+ * The browser check exists to give a dealer an instant, readable answer. It is not the
+ * defence: the API re-checks, and the bucket itself refuses anything larger or of another
+ * type. Three layers, because the first two can be bypassed by anyone willing to craft a
+ * request, and the last one cannot.
+ */
+export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+export const MAX_PHOTOS_PER_VEHICLE = 12;
+export const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"] as const;
+
+export const photoContentTypeSchema = z.enum(ALLOWED_PHOTO_TYPES);
+export type PhotoContentType = z.infer<typeof photoContentTypeSchema>;
+
+/** What a dealer's browser says it is about to upload, before it is allowed to. */
+export const photoUploadRequestSchema = z.object({
+  fileName: z.string().min(1).max(180),
+  contentType: photoContentTypeSchema,
+  sizeBytes: z.number().int().positive().max(MAX_PHOTO_BYTES),
+});
+export type PhotoUploadRequest = z.infer<typeof photoUploadRequestSchema>;
+
+/**
+ * Permission to write exactly one object, for a short time.
+ *
+ * The dealer's browser sends the bytes straight to storage with this ticket, so a 5 MB photo
+ * never travels through our API. What the browser never receives is the storage credential:
+ * the ticket is signed server-side and only covers the one key the API chose.
+ */
+export const photoUploadTicketSchema = z.object({
+  uploadUrl: z.string().url(),
+  storageKey: z.string(),
+  /** Where the object will be readable once the upload finishes. */
+  publicUrl: z.string().url(),
+});
+export type PhotoUploadTicket = z.infer<typeof photoUploadTicketSchema>;
+
+/**
+ * Recorded after the bytes are safely in storage. The API re-derives the URL from the key it
+ * issued, so a caller cannot attach an arbitrary address to someone's listing.
+ */
+export const attachPhotoSchema = z.object({
+  storageKey: z.string().min(1).max(300),
+  alt: z.string().max(180).nullish(),
+  isPrimary: z.boolean().default(false),
+});
+export type AttachPhoto = z.infer<typeof attachPhotoSchema>;
 
 /**
  * A vehicle as the API returns it, with its ordered gallery (primary first). `photos` is

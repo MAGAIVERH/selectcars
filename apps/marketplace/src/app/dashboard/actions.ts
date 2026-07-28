@@ -5,10 +5,21 @@ import { redirect } from "next/navigation";
 import {
   changeVehicleStatusSchema,
   createVehicleSchema,
+  photoUploadRequestSchema,
   updateDealerProfileSchema,
   updateVehicleSchema,
+  type PhotoUploadRequest,
 } from "@selectcars/shared";
-import { createVehicle, deleteVehicle, updateDealership, updateVehicle } from "@/lib/api";
+import {
+  attachPhoto,
+  createVehicle,
+  deletePhoto,
+  deleteVehicle,
+  requestPhotoUpload,
+  setPrimaryPhoto,
+  updateDealership,
+  updateVehicle,
+} from "@/lib/api";
 
 export type VehicleFormState = {
   error?: string;
@@ -73,13 +84,19 @@ function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]): Vehi
   return { error: "Please fix the highlighted fields.", fieldErrors };
 }
 
-/** One place that decides what an HTTP failure means to a dealer looking at a form. */
+/**
+ * One place that decides what an HTTP failure means to a dealer looking at a form.
+ *
+ * For the two statuses where the API knows the reason and we do not, its own message wins:
+ * a refused status change (409) names the rule, and an unavailable dependency (503) names
+ * what is switched off. Paraphrasing either one here would eventually contradict the server.
+ */
 function describeFailure(status: number, message: string | null): string {
   if (status === 401) return "Your session expired. Please sign in again.";
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404) return "That vehicle is no longer in your inventory.";
-  // 409 is the status workflow refusing the move, and the API says exactly why.
   if (status === 409) return message ?? "That status change is not allowed.";
+  if (status === 503) return message ?? "That feature is not available on this server yet.";
   return `The change could not be saved (error ${status}).`;
 }
 
@@ -104,7 +121,9 @@ export async function createVehicleAction(
 
   // The dashboard list and (if published) the marketplace read live, so refresh them.
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  // Straight to the new listing rather than back to the list: photos can only be attached
+  // to a car that exists, so this is where the dealer's next step actually is.
+  redirect(`/dashboard/vehicles/${result.id}`);
 }
 
 /**
@@ -189,6 +208,73 @@ export async function updateDealershipAction(
   // there is no cache entry to invalidate. Asking for it anyway made the dev server
   // re-render three routes at once and fail its own `/api/auth/token` call mid-save.
   return { saved: true };
+}
+
+/**
+ * Photo actions.
+ *
+ * These take plain arguments rather than a `FormData`, because they are called from the
+ * uploader component in a sequence (ask, upload, record) rather than from a form submit.
+ * The dealer's token is minted inside the API client on the server, so the browser never
+ * holds a credential for either our API or storage.
+ */
+export type UploadTicketState =
+  { ok: true; uploadUrl: string; storageKey: string } | { ok: false; error: string };
+
+/** Step 1: permission to upload one photo for this listing. */
+export async function requestPhotoUploadAction(
+  vehicleId: string,
+  input: PhotoUploadRequest,
+): Promise<UploadTicketState> {
+  const parsed = photoUploadRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "That file cannot be uploaded." };
+  }
+
+  const result = await requestPhotoUpload(vehicleId, parsed.data);
+  if (!result.ok) {
+    // 404 here means the vehicle, not a missing route, so the shared wording still fits.
+    return { ok: false, error: describeFailure(result.status, result.message) };
+  }
+  return { ok: true, uploadUrl: result.data.uploadUrl, storageKey: result.data.storageKey };
+}
+
+/** Step 3: the bytes are in storage, so record the photo against the listing. */
+export async function attachPhotoAction(
+  vehicleId: string,
+  storageKey: string,
+  alt: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await attachPhoto(vehicleId, { storageKey, alt: alt || null, isPrimary: false });
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
+}
+
+export async function deletePhotoAction(
+  vehicleId: string,
+  photoId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await deletePhoto(vehicleId, photoId);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
+}
+
+export async function setPrimaryPhotoAction(
+  vehicleId: string,
+  photoId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await setPrimaryPhoto(vehicleId, photoId);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
 }
 
 /** Remove a listing for good. The API restricts this to owners and managers. */

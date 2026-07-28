@@ -400,6 +400,87 @@ async function main(): Promise<void> {
     quietPage.status,
   );
 
+  // --- photo uploads ------------------------------------------------------
+  // The upload is three steps and the bytes skip this API entirely: it signs a ticket for one
+  // object key, the client PUTs the file straight to storage, and only then is the row
+  // recorded. These checks follow that path for real, against the real bucket.
+  //
+  // Storage is optional, so this section asserts the honest 503 when it is not configured
+  // rather than being skipped: "switched off" is a behaviour worth proving too.
+  const ticketRes = await fetch(`${API}/vehicles/${ferrariId}/photos/upload-url`, {
+    method: "POST",
+    headers: authed(alpha.token),
+    body: JSON.stringify({ fileName: "front.png", contentType: "image/png", sizeBytes: 95 }),
+  });
+
+  if (ticketRes.status === 503) {
+    check(
+      "photo storage is not configured, and the API says so -> 503",
+      true,
+      await ticketRes.json(),
+    );
+    console.log("      (set SUPABASE_SERVICE_ROLE_KEY to exercise the full upload path)");
+  } else {
+    check("dealer gets a signed upload ticket -> 201", ticketRes.status === 201, ticketRes.status);
+    const ticket = (await ticketRes.json()) as { uploadUrl: string; storageKey: string };
+
+    check(
+      "the ticket's key is scoped to this dealership and this car",
+      ticket.storageKey?.startsWith(`tenant/${alpha.orgId}/vehicle/${ferrariId}/`),
+      ticket.storageKey,
+    );
+
+    // A real 1x1 PNG: enough to prove the bytes land and come back out again.
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const uploaded = await fetch(ticket.uploadUrl, {
+      method: "PUT",
+      headers: { "content-type": "image/png" },
+      body: png,
+    });
+    check("the browser uploads straight to storage -> 200", uploaded.ok, uploaded.status);
+
+    const attached = await fetch(`${API}/vehicles/${ferrariId}/photos`, {
+      method: "POST",
+      headers: authed(alpha.token),
+      body: JSON.stringify({ storageKey: ticket.storageKey, alt: "Ferrari 296 GTB" }),
+    });
+    check("the photo is recorded on the listing -> 201", attached.status === 201, attached.status);
+    const photo = (await attached.json()) as { id: string; url: string; isPrimary: boolean };
+    check("a listing's first photo becomes its primary", photo.isPrimary === true, photo);
+
+    // The object must be readable by an anonymous buyer: this is a public listing photo.
+    const fetched = await fetch(photo.url);
+    check("the uploaded file is publicly readable -> 200", fetched.ok, fetched.status);
+
+    // A key belonging to another dealership must not be attachable to this one's car.
+    const stolen = await fetch(`${API}/vehicles/${ferrariId}/photos`, {
+      method: "POST",
+      headers: authed(alpha.token),
+      body: JSON.stringify({ storageKey: `tenant/${bravo.orgId}/vehicle/${bravoCar.id}/x.png` }),
+    });
+    check("attaching another dealership's upload key -> 400", stolen.status === 400, stolen.status);
+
+    // Bravo must not be able to touch Alpha's photo, even knowing both ids.
+    const crossDeletePhoto = await fetch(`${API}/vehicles/${ferrariId}/photos/${photo.id}`, {
+      method: "DELETE",
+      headers: authedNoBody(bravo.token),
+    });
+    check(
+      "another dealership cannot delete this photo -> 404",
+      crossDeletePhoto.status === 404,
+      crossDeletePhoto.status,
+    );
+
+    const deleted = await fetch(`${API}/vehicles/${ferrariId}/photos/${photo.id}`, {
+      method: "DELETE",
+      headers: authedNoBody(alpha.token),
+    });
+    check("the owner deletes the photo -> 204", deleted.status === 204, deleted.status);
+  }
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];

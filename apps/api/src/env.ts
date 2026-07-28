@@ -8,6 +8,19 @@ import { z } from "zod";
 const here = dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: resolve(here, "../../../.env") });
 
+/**
+ * An optional setting, where **an empty value means "not set"**.
+ *
+ * `.optional()` alone only accepts `undefined`, and env files do not deal in undefined: a
+ * variable that is present but blank (`SUPABASE_SERVICE_ROLE_KEY=`) arrives as `""`. Without
+ * this, a placeholder line someone left in `.env` fails validation and the API refuses to
+ * boot, which is the opposite of the graceful degradation the optional settings exist for.
+ * Learned the hard way: an empty key took the whole service down.
+ */
+function optionalConfig<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess((value) => (value === "" ? undefined : value), schema.optional());
+}
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -31,6 +44,19 @@ const envSchema = z
      * `iss` check to make containers work.
      */
     AUTH_JWKS_URL: z.string().url().optional(),
+
+    /**
+     * Photo storage (Supabase Storage). Optional on purpose: without it the API still boots
+     * and everything except uploading a photo works, and the photo endpoints answer 503
+     * naming what is missing. Refusing to boot would take the marketplace down over one
+     * feature.
+     *
+     * The service-role key bypasses RLS, so it lives only here, in the API process. It is
+     * never sent to a browser: the browser receives a signed ticket for one object instead.
+     */
+    SUPABASE_URL: optionalConfig(z.string().url()),
+    SUPABASE_SERVICE_ROLE_KEY: optionalConfig(z.string().min(20)),
+    SUPABASE_STORAGE_BUCKET: z.string().default("vehicle-photos"),
   })
   .transform((cfg) => ({
     ...cfg,
