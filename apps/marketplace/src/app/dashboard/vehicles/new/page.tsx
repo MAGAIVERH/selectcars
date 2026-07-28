@@ -20,8 +20,8 @@ export default function NewVehiclePage() {
         <span className="eyebrow">New listing</span>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Add a vehicle</h1>
         <p className="text-muted mt-2 max-w-xl text-sm">
-          Save it as a draft to finish later, or publish it straight to the marketplace. You can add
-          photos after it is created.
+          Save it as a draft to finish later, or publish it straight to the marketplace. Saving
+          takes you to the listing, where you add its photos.
         </p>
       </div>
 

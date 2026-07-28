@@ -117,9 +117,11 @@ inventory list. Remaining and upcoming, in order:
    responses (dealer and public). Switch the marketplace off `cars.ts` onto
    `/public/vehicles`, with a real listing detail page. Thumbnails appear in the dashboard
    list. This makes the dashboard to marketplace reflection visible end to end.
-2. **Add / edit vehicle + photo upload (Phase 2 finish).** Create and edit are **done**
-   (Days 18-19 and 25): the form posts to the API and a dealer's car shows on the marketplace.
-   Photo upload to Supabase Storage (presigned) is what remains, and it is the next piece.
+2. **Add / edit vehicle + photo upload (Phase 2 finish).** **Done.** Create and edit shipped on
+   Days 18-19 and 25; photo upload to Supabase Storage shipped on Day 28, direct from the
+   browser under a server-signed ticket ([ADR 003](../adr/003-direct-to-storage-uploads.md)).
+   The loop is closed: a dealer signs up, adds a car, photographs it, publishes, and it is on
+   the marketplace with its images.
 3. **Status workflow.** **Done (Day 25).** Publish draft to active, mark pending, mark sold,
    relist, from the row or the edit page. The legal moves live in one map in
    `packages/shared`; the API validates against it inside the writing transaction, so the UI

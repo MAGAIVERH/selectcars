@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SITE, type VehicleStatus } from "@selectcars/shared";
@@ -7,6 +6,7 @@ import { formatPrice } from "@/lib/format";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { StatusActions } from "@/components/dashboard/status-actions";
 import { DeleteVehicle } from "@/components/dashboard/delete-vehicle";
+import { PhotoManager } from "@/components/dashboard/photo-manager";
 import { VehicleForm } from "@/components/dashboard/vehicle-form";
 
 type Params = Promise<{ id: string }>;
@@ -87,29 +87,7 @@ export default async function EditVehiclePage({ params }: { params: Params }) {
         <h2 id="photos-heading" className="eyebrow">
           Photos
         </h2>
-        {vehicle.photos.length === 0 ? (
-          <p className="text-muted mt-3 text-sm">
-            No photos on this listing yet. A listing with no photo still publishes, but it will not
-            hold a buyer.
-          </p>
-        ) : (
-          <ul className="mt-4 flex flex-wrap gap-3">
-            {vehicle.photos.map((photo) => (
-              <li
-                key={photo.id}
-                className="border-border bg-background relative h-20 w-32 overflow-hidden rounded-[10px] border"
-              >
-                <Image
-                  src={photo.url}
-                  alt={photo.alt ?? title}
-                  fill
-                  sizes="128px"
-                  className="object-contain p-1"
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <PhotoManager vehicleId={vehicle.id} photos={vehicle.photos} alt={title} />
       </section>
 
       <section aria-labelledby="details-heading" className="mt-10">

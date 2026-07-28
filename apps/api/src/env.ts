@@ -31,6 +31,19 @@ const envSchema = z
      * `iss` check to make containers work.
      */
     AUTH_JWKS_URL: z.string().url().optional(),
+
+    /**
+     * Photo storage (Supabase Storage). Optional on purpose: without it the API still boots
+     * and everything except uploading a photo works, and the photo endpoints answer 503
+     * naming what is missing. Refusing to boot would take the marketplace down over one
+     * feature.
+     *
+     * The service-role key bypasses RLS, so it lives only here, in the API process. It is
+     * never sent to a browser: the browser receives a signed ticket for one object instead.
+     */
+    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
+    SUPABASE_STORAGE_BUCKET: z.string().default("vehicle-photos"),
   })
   .transform((cfg) => ({
     ...cfg,

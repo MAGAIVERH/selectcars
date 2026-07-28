@@ -25,11 +25,14 @@ refuses to let one see another's data.
   live, and that is an RLS policy rather than a filter in a query.
 - **Dealer dashboard** (`/dashboard`): sign in, see your tenant-scoped inventory with photo
   thumbnails, filter by status, and add a vehicle (save as draft or publish straight to the
-  marketplace). Every listing can be edited, and moved through its lifecycle from the row or
-  the edit page: publish a draft, mark a deal pending, mark it sold, relist it. Which moves
-  are offered comes from one map in `packages/shared` that the API validates against, so the
-  buttons and the server can never disagree. Reads and writes the vehicles API with a token
-  minted from your session.
+  marketplace). Every listing can be edited, photographed, and moved through its lifecycle
+  from the row or the edit page: publish a draft, mark a deal pending, mark it sold, relist
+  it. Which moves are offered comes from one map in `packages/shared` that the API validates
+  against, so the buttons and the server can never disagree. Reads and writes the vehicles API
+  with a token minted from your session.
+- **Photo upload**: a dealer uploads photos straight to Supabase Storage under a ticket the
+  API signs for one object key, so a 5 MB photo never travels through our servers and the
+  storage credential never reaches a browser. → [ADR 003](docs/adr/003-direct-to-storage-uploads.md)
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the

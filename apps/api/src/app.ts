@@ -12,6 +12,7 @@ import { healthRoutes } from "./routes/health";
 import { meRoutes } from "./routes/me";
 import { vehicleRoutes } from "./routes/vehicles";
 import { dealerRoutes } from "./routes/dealers";
+import { photoRoutes } from "./routes/photos";
 
 /** Narrow an unknown thrown value to something carrying an HTTP status code. */
 function hasStatusCode(error: unknown): error is { statusCode: number } {
@@ -87,6 +88,7 @@ export function buildApp(): FastifyInstance {
   app.register(meRoutes);
   app.register(vehicleRoutes);
   app.register(dealerRoutes);
+  app.register(photoRoutes);
 
   return app;
 }

@@ -5,10 +5,21 @@ import { redirect } from "next/navigation";
 import {
   changeVehicleStatusSchema,
   createVehicleSchema,
+  photoUploadRequestSchema,
   updateDealerProfileSchema,
   updateVehicleSchema,
+  type PhotoUploadRequest,
 } from "@selectcars/shared";
-import { createVehicle, deleteVehicle, updateDealership, updateVehicle } from "@/lib/api";
+import {
+  attachPhoto,
+  createVehicle,
+  deletePhoto,
+  deleteVehicle,
+  requestPhotoUpload,
+  setPrimaryPhoto,
+  updateDealership,
+  updateVehicle,
+} from "@/lib/api";
 
 export type VehicleFormState = {
   error?: string;
@@ -104,7 +115,9 @@ export async function createVehicleAction(
 
   // The dashboard list and (if published) the marketplace read live, so refresh them.
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  // Straight to the new listing rather than back to the list: photos can only be attached
+  // to a car that exists, so this is where the dealer's next step actually is.
+  redirect(`/dashboard/vehicles/${result.id}`);
 }
 
 /**
@@ -189,6 +202,70 @@ export async function updateDealershipAction(
   // there is no cache entry to invalidate. Asking for it anyway made the dev server
   // re-render three routes at once and fail its own `/api/auth/token` call mid-save.
   return { saved: true };
+}
+
+/**
+ * Photo actions.
+ *
+ * These take plain arguments rather than a `FormData`, because they are called from the
+ * uploader component in a sequence (ask, upload, record) rather than from a form submit.
+ * The dealer's token is minted inside the API client on the server, so the browser never
+ * holds a credential for either our API or storage.
+ */
+export type UploadTicketState =
+  { ok: true; uploadUrl: string; storageKey: string } | { ok: false; error: string };
+
+/** Step 1: permission to upload one photo for this listing. */
+export async function requestPhotoUploadAction(
+  vehicleId: string,
+  input: PhotoUploadRequest,
+): Promise<UploadTicketState> {
+  const parsed = photoUploadRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "That file cannot be uploaded." };
+  }
+
+  const result = await requestPhotoUpload(vehicleId, parsed.data);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+  return { ok: true, uploadUrl: result.data.uploadUrl, storageKey: result.data.storageKey };
+}
+
+/** Step 3: the bytes are in storage, so record the photo against the listing. */
+export async function attachPhotoAction(
+  vehicleId: string,
+  storageKey: string,
+  alt: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await attachPhoto(vehicleId, { storageKey, alt: alt || null, isPrimary: false });
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
+}
+
+export async function deletePhotoAction(
+  vehicleId: string,
+  photoId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await deletePhoto(vehicleId, photoId);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
+}
+
+export async function setPrimaryPhotoAction(
+  vehicleId: string,
+  photoId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await setPrimaryPhoto(vehicleId, photoId);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/vehicles/${vehicleId}`);
+  return { ok: true };
 }
 
 /** Remove a listing for good. The API restricts this to owners and managers. */
