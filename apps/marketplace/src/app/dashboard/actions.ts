@@ -84,13 +84,19 @@ function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]): Vehi
   return { error: "Please fix the highlighted fields.", fieldErrors };
 }
 
-/** One place that decides what an HTTP failure means to a dealer looking at a form. */
+/**
+ * One place that decides what an HTTP failure means to a dealer looking at a form.
+ *
+ * For the two statuses where the API knows the reason and we do not, its own message wins:
+ * a refused status change (409) names the rule, and an unavailable dependency (503) names
+ * what is switched off. Paraphrasing either one here would eventually contradict the server.
+ */
 function describeFailure(status: number, message: string | null): string {
   if (status === 401) return "Your session expired. Please sign in again.";
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404) return "That vehicle is no longer in your inventory.";
-  // 409 is the status workflow refusing the move, and the API says exactly why.
   if (status === 409) return message ?? "That status change is not allowed.";
+  if (status === 503) return message ?? "That feature is not available on this server yet.";
   return `The change could not be saved (error ${status}).`;
 }
 
@@ -226,7 +232,10 @@ export async function requestPhotoUploadAction(
   }
 
   const result = await requestPhotoUpload(vehicleId, parsed.data);
-  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+  if (!result.ok) {
+    // 404 here means the vehicle, not a missing route, so the shared wording still fits.
+    return { ok: false, error: describeFailure(result.status, result.message) };
+  }
   return { ok: true, uploadUrl: result.data.uploadUrl, storageKey: result.data.storageKey };
 }
 

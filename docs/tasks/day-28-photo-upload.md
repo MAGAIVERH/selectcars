@@ -89,6 +89,22 @@ dead site instead of a working one with a switched-off corner.
     URL anonymously, then asserts that attaching **another dealership's key** is a 400 and
     that another dealership **cannot delete** the photo (404).
 
+- **Browser:** the edit page shows the gallery with its Primary label, Remove, and the limits
+  line ("11 slots left"). Choosing a file drives the whole chain (client, server action, API)
+  and surfaces the real reason: _"Photo storage is not configured on this server. Set
+  SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."_
+
+### Two bugs the browser pass caught
+
+1. **An empty optional variable took the API down.** `SUPABASE_SERVICE_ROLE_KEY=` (present but
+   blank, which is what a placeholder line in `.env` looks like) arrives as `""`, and
+   `z.string().optional()` accepts only `undefined`. The API refused to boot: the exact
+   opposite of the graceful degradation these optional settings exist for. Fixed with an
+   `optionalConfig()` helper that treats an empty value as unset.
+2. **The error message was useless.** The UI said "The change could not be saved (error 503)"
+   while the API was already answering with the reason. `describeFailure` now passes the
+   server's own message through for 503, as it already did for 409.
+
 **What is still unverified:** the full upload path, because it needs the service-role key.
 Paste it into `.env` as `SUPABASE_SERVICE_ROLE_KEY` (Supabase Dashboard, Project Settings,
 API, `service_role`), rebuild the API with `docker compose up -d --build api`, then run
