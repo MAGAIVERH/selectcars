@@ -113,6 +113,9 @@ type MetricsRow = {
   backEndGrossUsd: number;
   totalGrossUsd: number;
   averageDaysToSale: number | null;
+  newLeads: number;
+  leadsLast30d: number;
+  averageResponseHours: number | null;
 };
 
 /** Unsold means it is still costing the dealership money: draft, active, or pending. */
@@ -155,8 +158,17 @@ export async function metricsForTenant(client: PoolClient): Promise<DealershipMe
       select avg(d.sold_at - v.created_at::date)::float8 as "averageDaysToSale"
       from public.deals d
       join public.vehicles v on v.id = d.vehicle_id
+    ),
+    inbound as (
+      select
+        count(*) filter (where status = 'new')::int as "newLeads",
+        count(*) filter (where created_at >= now() - interval '30 days')::int as "leadsLast30d",
+        avg(
+          extract(epoch from (first_response_at - created_at)) / 3600.0
+        )::float8 as "averageResponseHours"
+      from public.leads
     )
-    select * from stock, sold, speed
+    select * from stock, sold, speed, inbound
   `);
 
   const row = result.rows[0];
@@ -182,6 +194,14 @@ export async function metricsForTenant(client: PoolClient): Promise<DealershipMe
       // anything yet. The guard is clearer here than a `nullif` buried in the query.
       grossPerUnitUsd: row.unitsSoldTotal > 0 ? row.totalGrossUsd / row.unitsSoldTotal : 0,
       averageDaysToSale: row.averageDaysToSale === null ? null : Math.round(row.averageDaysToSale),
+    },
+    leads: {
+      newLeads: row.newLeads,
+      last30d: row.leadsLast30d,
+      // Rounded to one decimal: "1.4 hours" is a number a dealer can act on, and hiding the
+      // fraction would flatter every store that answers in under an hour.
+      averageResponseHours:
+        row.averageResponseHours === null ? null : Math.round(row.averageResponseHours * 10) / 10,
     },
   };
 }

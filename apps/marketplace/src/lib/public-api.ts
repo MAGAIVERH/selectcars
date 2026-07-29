@@ -3,6 +3,7 @@ import {
   dealerProfileSchema,
   vehicleListSchema,
   vehicleSchema,
+  type CreateLead,
   type DealerListing,
   type DealerProfile,
   type Vehicle,
@@ -43,6 +44,24 @@ export async function fetchPublicDealers(): Promise<DealerListing[]> {
 
   const parsed = dealerListSchema.safeParse(await res.json());
   return parsed.success ? parsed.data.items : [];
+}
+
+export type LeadSubmission = { ok: true } | { ok: false; status: number };
+
+/**
+ * Send a buyer's enquiry to the dealership selling the car.
+ *
+ * Nothing comes back but an acknowledgement, by design: the API answers 202 and returns no
+ * record, because the buyer must not be able to read anything out of a dealership's pipeline.
+ */
+export async function submitLead(input: CreateLead): Promise<LeadSubmission> {
+  const res = await fetch(`${API_URL}/public/leads`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+  });
+  return res.status === 202 ? { ok: true } : { ok: false, status: res.status };
 }
 
 /** One dealership's public profile, or null when it has nothing published (or does not exist). */

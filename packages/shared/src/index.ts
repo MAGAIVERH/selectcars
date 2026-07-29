@@ -361,6 +361,75 @@ export const updateVehicleSchema = createVehicleSchema.partial();
 export type UpdateVehicle = z.infer<typeof updateVehicleSchema>;
 
 /**
+ * The pipeline a salesperson works. Short on purpose: a stage nobody updates is a stage that
+ * lies, and five is already more than most stores keep honest.
+ */
+export const leadStatusSchema = z.enum(["new", "contacted", "appointment", "won", "lost"]);
+export type LeadStatus = z.infer<typeof leadStatusSchema>;
+
+export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
+  new: "New",
+  contacted: "Contacted",
+  appointment: "Appointment",
+  won: "Won",
+  lost: "Lost",
+};
+
+/** A buyer's enquiry, as the dealership works it. */
+export const leadSchema = z.object({
+  id: z.string().uuid(),
+  status: leadStatusSchema,
+  vehicleId: z.string().uuid().nullable(),
+  /** The car they asked about, kept readable even after the listing is gone. */
+  vehicleLabel: z.string().nullable(),
+  vehicleSlug: z.string().nullable(),
+  buyerName: z.string(),
+  buyerEmail: z.string(),
+  buyerPhone: z.string().nullable(),
+  message: z.string().nullable(),
+  assignedToUserId: z.string().nullable(),
+  assignedToName: z.string().nullable(),
+  /** Hours between the enquiry arriving and the dealership first moving it. Null until then. */
+  responseHours: z.number().nullable(),
+  createdAt: z.coerce.date(),
+});
+export type Lead = z.infer<typeof leadSchema>;
+
+export const leadListSchema = z.object({ items: z.array(leadSchema) });
+export type LeadList = z.infer<typeof leadListSchema>;
+
+/**
+ * What a buyer sends from a listing page.
+ *
+ * The dealership is absent, and that is the point: it is derived from the vehicle server
+ * side, so an enquiry cannot be addressed to a seller who has nothing to do with the car.
+ */
+export const createLeadSchema = z.object({
+  vehicleId: z.string().uuid(),
+  buyerName: z.string().min(2, "Please tell us your name.").max(120),
+  buyerEmail: z.string().email("That email does not look right."),
+  buyerPhone: z.string().max(40).nullish(),
+  message: z.string().max(2000).nullish(),
+});
+export type CreateLead = z.infer<typeof createLeadSchema>;
+
+/** What a dealership changes about a lead: where it is, and whose it is. */
+export const updateLeadSchema = z.object({
+  status: leadStatusSchema.optional(),
+  // `null` unassigns. `undefined` leaves it alone.
+  assignedToUserId: z.string().max(120).nullish(),
+});
+export type UpdateLead = z.infer<typeof updateLeadSchema>;
+
+/** Someone in the dealership a lead can be assigned to. */
+export const teamMemberSchema = z.object({
+  userId: z.string(),
+  name: z.string(),
+  role: dealershipRoleSchema,
+});
+export type TeamMember = z.infer<typeof teamMemberSchema>;
+
+/**
  * A recorded sale.
  *
  * The gross figures are computed by the database (generated columns), never sent by a client:
@@ -441,6 +510,13 @@ export const dealershipMetricsSchema = z.object({
     grossPerUnitUsd: z.number(),
     /** Average days from listing to sale. Null until something has sold. */
     averageDaysToSale: z.number().nullable(),
+  }),
+  leads: z.object({
+    /** Enquiries nobody has touched yet: the number that should be zero by end of day. */
+    newLeads: z.number().int().nonnegative(),
+    last30d: z.number().int().nonnegative(),
+    /** Average hours to first response. Null until the dealership has answered one. */
+    averageResponseHours: z.number().nullable(),
   }),
 });
 export type DealershipMetrics = z.infer<typeof dealershipMetricsSchema>;
