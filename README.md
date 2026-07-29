@@ -6,10 +6,10 @@ Buyers browse a premium showroom. Dealerships get an operating system: inventory
 test drives, analytics. Many dealerships share one database, and **the database itself**
 refuses to let one see another's data.
 
-> Status: **Phases 2 and 3 are done except photo upload.** Multi-tenancy, auth, the vehicles
-> API, a seeded showroom, a live marketplace, and a dealer dashboard where a car is created,
-> edited, and moved through its lifecycle (draft, active, pending, sold) are all in place.
-> Next: photo upload to Supabase Storage, then the financial/analytics dashboard (Phase 4).
+> Status: **Phases 2, 3 and 4 are done, and Phase 5 has landed.** Multi-tenancy, auth, the
+> vehicles API, photo upload, a live multi-seller marketplace, a dealer dashboard with
+> financials and a leads pipeline, trends over time, and now insights computed on a queue.
+> Next: recomputing insights on a schedule, then AI vision for photo-to-listing.
 > See the [build plan](docs/plans/dealer-dashboard-and-marketplace.md) for the full vision and
 > [`docs/tasks/`](docs/tasks/) for the day-by-day log.
 
@@ -45,6 +45,13 @@ refuses to let one see another's data.
 - **Trends** (`/dashboard/analytics`): units sold, gross, and enquiries by month over 6 or 12
   months, as small multiples with a table twin. One series per chart on purpose: a dual axis
   invents a correlation the data does not contain.
+- **Insights** (`/dashboard/analytics`, "What we noticed"): where each car sits against
+  comparable listings across the whole marketplace, and how long it has been sitting against
+  this dealership's own selling pace. Computed by a **worker off the request path**: asking for
+  a run returns `202` with a job id, and the result appears on the next load. The numbers are
+  SQL and always run; a language model writes at most one sentence over them, only when a key
+  is configured. **The feature works with no API key**, which is the point.
+  → [ADR 004](docs/adr/004-async-insights.md)
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the
@@ -85,20 +92,22 @@ attributed and never leaks across tenants.
 
 ## Stack
 
-| Layer       | Choice                                                   |
-| ----------- | -------------------------------------------------------- |
-| Monorepo    | Turborepo + pnpm                                         |
-| Marketplace | Next.js 16, React 19, Tailwind v4, shadcn/ui             |
-| API         | Fastify 5, Zod type provider, pino                       |
-| Database    | Supabase Postgres, Row-Level Security, pgvector          |
-| Auth        | Better Auth (organization plugin = tenant) + JWT/JWKS    |
-| Contracts   | Zod schemas in `packages/shared`, imported by both sides |
-| Async       | BullMQ + Redis (Phase 3: AI never blocks a request)      |
+| Layer       | Choice                                                                 |
+| ----------- | ---------------------------------------------------------------------- |
+| Monorepo    | Turborepo + pnpm                                                       |
+| Marketplace | Next.js 16, React 19, Tailwind v4, shadcn/ui                           |
+| API         | Fastify 5, Zod type provider, pino                                     |
+| Database    | Supabase Postgres, Row-Level Security, pgvector                        |
+| Auth        | Better Auth (organization plugin = tenant) + JWT/JWKS                  |
+| Contracts   | Zod schemas in `packages/shared`, imported by both sides               |
+| Async       | BullMQ + Redis: insights and every model call run off the request path |
+| AI          | `@anthropic-ai/sdk` (`claude-opus-5`), flag-gated, worker-only         |
 
 ```
 apps/
   marketplace   Next.js buyer-facing app; also the identity issuer (Better Auth)
   api           Fastify service: business logic, tenant-scoped
+                two entrypoints: server.ts (HTTP) and worker.ts (the queue)
 packages/
   db            pg pool, withTenant() (RLS context), SQL migrations
   shared        Zod contracts shared by every app: one source of truth
@@ -149,12 +158,36 @@ Google sign-in expects this exact redirect URI:
 ### With Docker
 
 ```bash
-docker compose up --build      # api on :3333, redis on :6380
+docker compose up --build      # api on :3333, worker, redis on :6380
 ```
+
+Three services. The **worker** is the same image as the API started with
+`node dist/worker.js`: it holds no HTTP port, consumes the `insights` queue, and writes to
+Postgres. Without it the API still serves everything, and a queued insight run simply never
+happens.
 
 Redis is published on **6380**, not the default 6379, so it can coexist with another
 project's Redis on the same machine. Postgres is intentionally not containerized: the
 database is Supabase, and a second local Postgres would let RLS drift from production.
+
+If an endpoint answers something the container's own logs cannot explain, check who is
+actually answering: `netstat -ano | findstr :3333`. A leftover `pnpm --filter @selectcars/api dev`
+on the host binds the same port as the container and wins, and it reads a different
+environment. This has cost time twice.
+
+### Switching on the AI narrative (optional)
+
+Insights are computed without any model. To have one write the sentence over the numbers,
+set both in `.env` and restart the worker:
+
+```bash
+ENABLE_AI_INSIGHTS=true
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+The key is read only by the worker process, never by the API's request path and never by a
+browser. With it unset, `narrative` stays null and everything else is identical: that is the
+designed behaviour, not a degraded mode.
 
 ## Engineering rules
 

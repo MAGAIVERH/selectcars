@@ -57,6 +57,26 @@ const envSchema = z
     SUPABASE_URL: optionalConfig(z.string().url()),
     SUPABASE_SERVICE_ROLE_KEY: optionalConfig(z.string().min(20)),
     SUPABASE_STORAGE_BUCKET: z.string().default("vehicle-photos"),
+
+    /**
+     * The queue. Insights are computed by a worker off this Redis, never inside a request.
+     * Optional like storage: without it the API still serves everything else and the insight
+     * endpoints answer 503 naming what is missing.
+     */
+    REDIS_URL: optionalConfig(z.string().url()),
+
+    /**
+     * The language model that writes the sentence over an insight's numbers.
+     *
+     * Off by default, and the feature works without it: the arithmetic and the headline are
+     * computed either way, and `narrative` simply stays null. This is the project's rule for
+     * anything expensive or key-bound: a demo must work with it switched off.
+     */
+    ENABLE_AI_INSIGHTS: z
+      .union([z.literal("true"), z.literal("false")])
+      .default("false")
+      .transform((value) => value === "true"),
+    ANTHROPIC_API_KEY: optionalConfig(z.string().min(10)),
   })
   .transform((cfg) => ({
     ...cfg,

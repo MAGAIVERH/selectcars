@@ -13,9 +13,12 @@ Short records of significant, hard-to-reverse decisions and their trade-offs. On
 - [`003-direct-to-storage-uploads.md`](003-direct-to-storage-uploads.md) — photo bytes go
   straight to Supabase Storage under a server-signed ticket, so the service-role key never
   reaches a browser and no photo travels through our API.
+- [`004-async-insights.md`](004-async-insights.md) — insights are computed deterministically
+  on a BullMQ queue and the model writes only the sentence, so the feature works with no API
+  key and no page ever waits on a model.
 
 ## Planned
 
-- `004-ai-vision-listings.md` — photo-to-listing vision approach and cost controls.
-- `005-semantic-search-pgvector.md` — pgvector vs external vector DB.
-- `006-microfrontends.md` — Vercel microfrontends vs single app.
+- `005-ai-vision-listings.md` — photo-to-listing vision approach and cost controls.
+- `006-semantic-search-pgvector.md` — pgvector vs external vector DB.
+- `007-microfrontends.md` — Vercel microfrontends vs single app.

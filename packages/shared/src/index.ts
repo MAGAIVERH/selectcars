@@ -522,6 +522,54 @@ export const dealershipMetricsSchema = z.object({
 export type DealershipMetrics = z.infer<typeof dealershipMetricsSchema>;
 
 /**
+ * What the platform noticed about one listing.
+ *
+ * Both kinds are arithmetic, not opinion: `pricing` compares the car to comparable listings
+ * across the marketplace, `aging` compares its days on the lot to how fast this dealership
+ * usually sells. `narrative` is a sentence a language model may write over those facts, and
+ * is nullable because the numbers stand on their own.
+ */
+export const insightKindSchema = z.enum(["pricing", "aging"]);
+export type InsightKind = z.infer<typeof insightKindSchema>;
+
+export const insightSeveritySchema = z.enum(["info", "warning", "critical"]);
+export type InsightSeverity = z.infer<typeof insightSeveritySchema>;
+
+export const vehicleInsightSchema = z.object({
+  id: z.string().uuid(),
+  vehicleId: z.string().uuid(),
+  vehicleLabel: z.string(),
+  vehicleSlug: z.string(),
+  kind: insightKindSchema,
+  severity: insightSeveritySchema,
+  headline: z.string(),
+  /** The evidence: sample size, median, percentages, day counts. */
+  facts: z.record(z.union([z.string(), z.number()])),
+  narrative: z.string().nullable(),
+  computedAt: z.coerce.date(),
+});
+export type VehicleInsight = z.infer<typeof vehicleInsightSchema>;
+
+export const insightListSchema = z.object({
+  items: z.array(vehicleInsightSchema),
+  /** When the queue last finished a run for this dealership. Null before the first one. */
+  lastComputedAt: z.coerce.date().nullable(),
+});
+export type InsightList = z.infer<typeof insightListSchema>;
+
+/**
+ * The answer to "please recompute my insights".
+ *
+ * `202` and a job id, never the insights themselves: the work happens on a queue, and a
+ * request that waited for it would be exactly the thing this design exists to avoid.
+ */
+export const insightRunSchema = z.object({
+  queued: z.literal(true),
+  jobId: z.string(),
+});
+export type InsightRun = z.infer<typeof insightRunSchema>;
+
+/**
  * One month of the dealership's history.
  *
  * Every month in the requested window is present, including the empty ones. A series that
