@@ -2,8 +2,7 @@
 
 - **Date:** 2026-07-28
 - **Phase:** 2 (Inventory), closing the last gap
-- **Status:** Built and typecheck/lint clean. Verified as far as it can be until the storage
-  credential is set: see "Verification" below.
+- **Status:** Done (46/46 through the API with real uploads, plus a full loop in the browser)
 
 ## Goal
 
@@ -81,13 +80,23 @@ dead site instead of a working one with a switched-off corner.
 
 - `pnpm typecheck`, `pnpm lint`, Prettier: clean. Migration applied; the bucket exists with an
   8 MB limit and an image-only MIME list.
-- `verify:vehicles` covers **both** worlds, so the script is honest either way:
-  - **storage off:** `PASS photo storage is not configured, and the API says so -> 503`
-    (this is what ran today).
-  - **storage on:** signs a ticket, asserts the key is scoped to the right tenant and car,
-    `PUT`s a real PNG, records it, asserts the first photo becomes primary, fetches the public
-    URL anonymously, then asserts that attaching **another dealership's key** is a 400 and
-    that another dealership **cannot delete** the photo (404).
+- `verify:vehicles` covers **both** worlds, so the script is honest either way. With the
+  credential set it runs the real path, and all nine photo checks pass:
+
+```
+PASS  dealer gets a signed upload ticket -> 201
+PASS  the ticket's key is scoped to this dealership and this car
+PASS  the browser uploads straight to storage -> 200
+PASS  the photo is recorded on the listing -> 201
+PASS  a listing's first photo becomes its primary
+PASS  the uploaded file is publicly readable -> 200
+PASS  attaching another dealership's upload key -> 400
+PASS  another dealership cannot delete this photo -> 404
+PASS  the owner deletes the photo -> 204
+```
+
+Without it, the same section asserts the honest `503` instead, so a contributor with no
+credential still gets a green run and a clear reason.
 
 - **Browser:** the edit page shows the gallery with its Primary label, Remove, and the limits
   line ("11 slots left"). Choosing a file drives the whole chain (client, server action, API)
@@ -105,11 +114,29 @@ dead site instead of a working one with a switched-off corner.
    while the API was already answering with the reason. `describeFailure` now passes the
    server's own message through for 503, as it already did for 409.
 
-**What is still unverified:** the full upload path, because it needs the service-role key.
-Paste it into `.env` as `SUPABASE_SERVICE_ROLE_KEY` (Supabase Dashboard, Project Settings,
-API, `service_role`), rebuild the API with `docker compose up -d --build api`, then run
-`pnpm --filter @selectcars/db verify:vehicles`. The eight photo assertions above execute for
-real from that point on, and the dashboard uploader works end to end.
+- **Browser, full loop:** uploaded a real PNG to the Bentley from the dashboard. The gallery
+  went to two photos with the new one offering "Make primary", the listing page at
+  `/colecao/bentley-continental-gt` rendered it in the buyer's gallery, and the public API
+  returned it as a `…supabase.co/storage/v1/object/public/vehicle-photos/tenant/…` URL. Then
+  removed it from the dashboard and confirmed the listing was back to one photo.
+
+### The environment bug that hid all of this
+
+The first run after setting the credential still answered `503`, then `500`, with **nothing at
+all in the container's logs**. The cause was not the code: **two processes were listening on
+port 3333**. A stray `tsx src/server.ts` from an earlier session was competing with the
+container, and requests landed on whichever won, so a fresh container and a stale process were
+answering the same URL by turns.
+
+Worth remembering as a diagnostic habit: when a service answers in a way its own logs cannot
+explain, stop debugging the code and ask **who is actually answering**. On Windows,
+`netstat -ano | findstr :3333` showed two PIDs where there should have been one.
+
+**Setup note:** paste the key into `.env` as `SUPABASE_SERVICE_ROLE_KEY` (Supabase Dashboard,
+Project Settings, API, `service_role`) and rebuild the API with
+`docker compose up -d --build api`. In current Supabase dashboards the key list also shows a
+"publishable" key: that is the browser-safe one and this project never needs it, because the
+browser is handed a signed ticket rather than a credential.
 
 ## Still open
 

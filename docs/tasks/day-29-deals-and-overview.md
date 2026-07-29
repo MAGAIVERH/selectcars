@@ -87,7 +87,8 @@ listed 12 to 96 days ago, so the aging tile turns red on the two cars that deser
 ## Verification
 
 - `pnpm typecheck`, `pnpm lint`, Prettier: clean.
-- **`verify:vehicles`: 38/38 PASS**, including seven new checks: a sale on a still-active
+- **`verify:vehicles`: 38/38 PASS** at the time of writing (46/46 once photo storage was
+  configured on Day 28), including seven new checks: a sale on a still-active
   listing is refused (409), gross comes back computed by the database, another dealership can
   neither record a sale on the car nor see the deal, and its own metrics stay at zero.
 - **Browser, full loop:** marked the Jaguar F-Type sold, recorded the sale (96,500 sale,

@@ -43,14 +43,14 @@ and [ADR 002](../adr/002-service-auth-jwt-jwks.md).
 
 ### Phase 2 — Inventory / Vehicles
 
-| Day   | Title                                                                          | Status                                 |
-| ----- | ------------------------------------------------------------------------------ | -------------------------------------- |
-| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md)        | Done                                   |
-| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md)    | Done                                   |
-| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done                                   |
-| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                        | Done (edit + photos open)              |
-| 25    | [Status workflow + edit a listing](day-25-status-workflow-and-edit.md)         | Done (23/23 verified, browser + API)   |
-| 28    | [Photo upload (direct to storage)](day-28-photo-upload.md)                     | Built; full path needs the storage key |
+| Day   | Title                                                                          | Status                               |
+| ----- | ------------------------------------------------------------------------------ | ------------------------------------ |
+| 13-14 | [Vehicles schema, RLS, and CRUD API](day-13-vehicles-schema-and-api.md)        | Done                                 |
+| 15    | [Vehicle photos schema + showroom seed](day-15-photos-and-showroom-seed.md)    | Done                                 |
+| 16-17 | [Dashboard shell + inventory list UI](day-16-dashboard-shell-and-inventory.md) | Done                                 |
+| 18-19 | [Add vehicle form (create)](day-18-add-vehicle-form.md)                        | Done (edit + photos open)            |
+| 25    | [Status workflow + edit a listing](day-25-status-workflow-and-edit.md)         | Done (23/23 verified, browser + API) |
+| 28    | [Photo upload (direct to storage)](day-28-photo-upload.md)                     | Done (46/46 verified, real uploads)  |
 
 The vehicles module introduced a second Postgres role: buyers read through
 `selectcars_public`, which can only ever see `active` listings. See the day log.
