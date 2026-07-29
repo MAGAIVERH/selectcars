@@ -1,5 +1,11 @@
 import type { PoolClient } from "pg";
-import type { CreateDeal, Deal, DealershipMetrics } from "@selectcars/shared";
+import type {
+  CreateDeal,
+  Deal,
+  DealershipMetrics,
+  DealershipTrends,
+  TrendPoint,
+} from "@selectcars/shared";
 
 /**
  * Deals and the numbers derived from them.
@@ -97,6 +103,57 @@ export async function create(
 export async function remove(client: PoolClient, id: string): Promise<boolean> {
   const result = await client.query("delete from public.deals where id = $1", [id]);
   return (result.rowCount ?? 0) > 0;
+}
+
+/**
+ * The dealership's history, month by month.
+ *
+ * The month list is generated first and the data is joined **onto** it, rather than grouping
+ * whatever rows happen to exist. A quiet month has to appear as a zero: if the series simply
+ * skips it, the line is drawn straight across the gap and tells the dealer they sold steadily
+ * through a month when they sold nothing.
+ */
+export async function trendsForTenant(
+  client: PoolClient,
+  months: number,
+): Promise<DealershipTrends> {
+  const result = await client.query<TrendPoint>(
+    `
+    with window_months as (
+      select date_trunc('month', current_date) - (n || ' months')::interval as month_start
+      from generate_series($1::int - 1, 0, -1) as n
+    ),
+    sold as (
+      select
+        date_trunc('month', d.sold_at) as month_start,
+        count(*)::int as units,
+        sum(d.total_gross_usd)::float8 as gross,
+        avg(d.sold_at - v.created_at::date)::float8 as days_to_sale
+      from public.deals d
+      join public.vehicles v on v.id = d.vehicle_id
+      group by 1
+    ),
+    inbound as (
+      select date_trunc('month', created_at) as month_start, count(*)::int as leads
+      from public.leads
+      group by 1
+    )
+    select
+      to_char(w.month_start, 'YYYY-MM') as month,
+      to_char(w.month_start, 'Mon') as label,
+      coalesce(s.units, 0) as "unitsSold",
+      coalesce(s.gross, 0)::float8 as "totalGrossUsd",
+      coalesce(i.leads, 0) as leads,
+      case when s.units is null then null else round(s.days_to_sale)::int end as "averageDaysToSale"
+    from window_months w
+    left join sold s on s.month_start = w.month_start
+    left join inbound i on i.month_start = w.month_start
+    order by w.month_start
+  `,
+    [months],
+  );
+
+  return { months, points: result.rows };
 }
 
 type MetricsRow = {

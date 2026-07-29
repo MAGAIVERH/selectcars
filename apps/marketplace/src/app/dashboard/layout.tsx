@@ -64,6 +64,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
               Leads
             </Link>
             <Link
+              href="/dashboard/analytics"
+              className="text-muted hover:text-foreground text-sm transition-colors"
+            >
+              Analytics
+            </Link>
+            <Link
               href="/dashboard/dealership"
               className="text-muted hover:text-foreground text-sm transition-colors"
             >

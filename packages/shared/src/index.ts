@@ -521,6 +521,36 @@ export const dealershipMetricsSchema = z.object({
 });
 export type DealershipMetrics = z.infer<typeof dealershipMetricsSchema>;
 
+/**
+ * One month of the dealership's history.
+ *
+ * Every month in the requested window is present, including the empty ones. A series that
+ * silently skips a quiet month draws a straight line across it and tells the dealer they sold
+ * steadily through a period when they sold nothing.
+ */
+export const trendPointSchema = z.object({
+  /** `2026-02`, so the client never has to parse a label back into a date. */
+  month: z.string(),
+  label: z.string(),
+  unitsSold: z.number().int().nonnegative(),
+  totalGrossUsd: z.number(),
+  leads: z.number().int().nonnegative(),
+  /** Null in a month with no sales: an average of nothing is not zero. */
+  averageDaysToSale: z.number().nullable(),
+});
+export type TrendPoint = z.infer<typeof trendPointSchema>;
+
+export const dealershipTrendsSchema = z.object({
+  months: z.number().int(),
+  points: z.array(trendPointSchema),
+});
+export type DealershipTrends = z.infer<typeof dealershipTrendsSchema>;
+
+export const trendsQuerySchema = z.object({
+  months: z.coerce.number().int().min(3).max(24).default(6),
+});
+export type TrendsQuery = z.infer<typeof trendsQuerySchema>;
+
 /** Filters a dealer can apply to their own inventory. */
 export const listVehiclesQuerySchema = z.object({
   status: vehicleStatusSchema.optional(),

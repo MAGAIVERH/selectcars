@@ -103,6 +103,58 @@ type SeedDealership = {
 
 const p = (file: string, alt: string): SeedPhoto => ({ file, alt, primary: true });
 
+/**
+ * A unit that was sold months ago: enough to draw a trend, and nothing more.
+ *
+ * These exist so the analytics screen has real history behind it. They carry no photos (a
+ * sold car is invisible to buyers) and the specs are deliberately thin, because their whole
+ * job is to be a dot on a line. Spelling each one out in full would triple the file for no
+ * extra truth.
+ */
+function soldUnit(input: {
+  slug: string;
+  make: string;
+  model: string;
+  year: number;
+  bodyStyle: SeedVehicle["bodyStyle"];
+  mileage: number;
+  listedDaysAgo: number;
+  soldDaysAgo: number;
+  salePriceUsd: number;
+  vehicleCostUsd: number;
+  reconCostUsd: number;
+  backEndGrossUsd: number;
+  buyerName: string;
+}): SeedVehicle {
+  return {
+    slug: input.slug,
+    make: input.make,
+    model: input.model,
+    year: input.year,
+    trim: null,
+    mileage: input.mileage,
+    priceUsd: input.salePriceUsd,
+    condition: "Used",
+    bodyStyle: input.bodyStyle,
+    fuelType: "Gas",
+    transmission: "Automatic",
+    drivetrain: "AWD",
+    exteriorColor: "Black",
+    interiorColor: "Black",
+    description: "Sold unit, retained for the sales record.",
+    photos: [],
+    listedDaysAgo: input.listedDaysAgo,
+    sale: {
+      soldDaysAgo: input.soldDaysAgo,
+      salePriceUsd: input.salePriceUsd,
+      vehicleCostUsd: input.vehicleCostUsd,
+      reconCostUsd: input.reconCostUsd,
+      backEndGrossUsd: input.backEndGrossUsd,
+      buyerName: input.buyerName,
+    },
+  };
+}
+
 const DEALERSHIPS: SeedDealership[] = [
   {
     id: "org_selectcars_showroom",
@@ -253,6 +305,53 @@ const DEALERSHIPS: SeedDealership[] = [
           buyerName: "M. Okafor",
         },
       },
+
+      // Older history, so the trend line has months to cross.
+      soldUnit({
+        slug: "maserati-granturismo",
+        make: "Maserati",
+        model: "GranTurismo",
+        year: 2020,
+        bodyStyle: "Coupe",
+        mileage: 18900,
+        listedDaysAgo: 128,
+        soldDaysAgo: 78,
+        salePriceUsd: 96000,
+        vehicleCostUsd: 82000,
+        reconCostUsd: 4100,
+        backEndGrossUsd: 3400,
+        buyerName: "J. Almeida",
+      }),
+      soldUnit({
+        slug: "porsche-macan-gts",
+        make: "Porsche",
+        model: "Macan GTS",
+        year: 2022,
+        bodyStyle: "SUV",
+        mileage: 22400,
+        listedDaysAgo: 160,
+        soldDaysAgo: 112,
+        salePriceUsd: 78500,
+        vehicleCostUsd: 66000,
+        reconCostUsd: 2800,
+        backEndGrossUsd: 5100,
+        buyerName: "K. Osei",
+      }),
+      soldUnit({
+        slug: "range-rover-sport-hse",
+        make: "Range Rover",
+        model: "Sport HSE",
+        year: 2021,
+        bodyStyle: "SUV",
+        mileage: 31200,
+        listedDaysAgo: 196,
+        soldDaysAgo: 149,
+        salePriceUsd: 71000,
+        vehicleCostUsd: 61500,
+        reconCostUsd: 3900,
+        backEndGrossUsd: 2200,
+        buyerName: "L. Petrov",
+      }),
     ],
     leads: [
       {
@@ -440,6 +539,68 @@ const DEALERSHIPS: SeedDealership[] = [
           buyerName: "S. Brennan",
         },
       },
+
+      // A volume seller's history: more units, thinner gross on each.
+      soldUnit({
+        slug: "toyota-camry-le",
+        make: "Toyota",
+        model: "Camry LE",
+        year: 2022,
+        bodyStyle: "Sedan",
+        mileage: 52300,
+        listedDaysAgo: 92,
+        soldDaysAgo: 66,
+        salePriceUsd: 20800,
+        vehicleCostUsd: 17600,
+        reconCostUsd: 850,
+        backEndGrossUsd: 1400,
+        buyerName: "A. Whitmore",
+      }),
+      soldUnit({
+        slug: "ford-escape-se",
+        make: "Ford",
+        model: "Escape SE",
+        year: 2021,
+        bodyStyle: "SUV",
+        mileage: 61700,
+        listedDaysAgo: 124,
+        soldDaysAgo: 95,
+        salePriceUsd: 18900,
+        vehicleCostUsd: 15800,
+        reconCostUsd: 1100,
+        backEndGrossUsd: 900,
+        buyerName: "R. Duarte",
+      }),
+      soldUnit({
+        slug: "nissan-rogue-sv",
+        make: "Nissan",
+        model: "Rogue SV",
+        year: 2022,
+        bodyStyle: "SUV",
+        mileage: 44900,
+        listedDaysAgo: 158,
+        soldDaysAgo: 133,
+        salePriceUsd: 22600,
+        vehicleCostUsd: 19200,
+        reconCostUsd: 950,
+        backEndGrossUsd: 1750,
+        buyerName: "P. Sandoval",
+      }),
+      soldUnit({
+        slug: "chevrolet-equinox-lt",
+        make: "Chevrolet",
+        model: "Equinox LT",
+        year: 2021,
+        bodyStyle: "SUV",
+        mileage: 58400,
+        listedDaysAgo: 188,
+        soldDaysAgo: 160,
+        salePriceUsd: 19400,
+        vehicleCostUsd: 16600,
+        reconCostUsd: 780,
+        backEndGrossUsd: 1050,
+        buyerName: "M. Ferreira",
+      }),
     ],
     leads: [
       {
