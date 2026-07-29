@@ -19,6 +19,7 @@ import {
   createVehicle,
   deletePhoto,
   deleteVehicle,
+  refreshInsights,
   requestPhotoUpload,
   setPrimaryPhoto,
   updateDealership,
@@ -341,6 +342,22 @@ export async function updateLeadAction(
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/leads");
+  return { ok: true };
+}
+
+/**
+ * Ask the queue for a fresh look at the inventory.
+ *
+ * This returns when the job is **queued**, not when it is done, and the wording the button
+ * shows says so. Polling for the result would put us back where we started: a screen waiting
+ * on a market scan and possibly a model call. The dealer reloads, or comes back later, and
+ * the numbers are there.
+ */
+export async function refreshInsightsAction(): Promise<
+  { ok: true } | { ok: false; error: string }
+> {
+  const result = await refreshInsights();
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
   return { ok: true };
 }
 

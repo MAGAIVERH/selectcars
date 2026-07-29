@@ -86,10 +86,15 @@ people, and the money stays with owners and managers.
 
 ### Phase 5 — Analytics + AI insights
 
-| Day | Title                                          | Status                               |
-| --- | ---------------------------------------------- | ------------------------------------ |
-| 31  | [Trends over time](day-31-analytics-trends.md) | Done (59/59 verified, browser + API) |
-| 32+ | Async AI insights on BullMQ (pricing, aging)   | Open                                 |
+| Day | Title                                                  | Status                               |
+| --- | ------------------------------------------------------ | ------------------------------------ |
+| 31  | [Trends over time](day-31-analytics-trends.md)         | Done (59/59 verified, browser + API) |
+| 32  | [Async insights on BullMQ](day-32-async-insights.md)   | Done (71/71 verified, browser + API) |
+| 33+ | Scheduled recomputation, inventory turn, period deltas | Open                                 |
+
+Day 32 is where the AI half of the phase lands, and the shape of it matters more than the
+feature: the arithmetic is SQL and always runs, the model writes at most one sentence over
+it, and neither happens inside a request. The whole thing demonstrates with **no API key**.
 
 The full intent behind Phases 3-5 lives in
 [`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).

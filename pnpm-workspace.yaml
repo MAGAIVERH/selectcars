@@ -5,5 +5,10 @@ allowBuilds:
   "@prisma/client": false
   better-sqlite3: false
   esbuild: true
+  # Optional native accelerator behind BullMQ's serializer. msgpackr falls back to its
+  # JavaScript path without it, so we decline the native build: a C++ toolchain in the
+  # Docker build (and on every contributor's machine) is a poor trade for a job queue that
+  # moves a few small objects per minute.
+  msgpackr-extract: false
   sharp: true
   unrs-resolver: true

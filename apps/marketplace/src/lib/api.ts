@@ -5,6 +5,8 @@ import {
   dealerProfileSchema,
   dealershipMetricsSchema,
   dealershipTrendsSchema,
+  insightListSchema,
+  insightRunSchema,
   leadListSchema,
   photoUploadTicketSchema,
   vehicleListSchema,
@@ -15,6 +17,7 @@ import {
   type DealerProfile,
   type DealershipMetrics,
   type DealershipTrends,
+  type InsightList,
   type Lead,
   type UpdateLead,
   type PhotoUploadRequest,
@@ -264,6 +267,57 @@ export async function updateLead(id: string, patch: UpdateLead): Promise<Mutatio
   });
   if (!res) return { ok: false, status: UNREACHABLE, message: null };
   if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
+  return { ok: true };
+}
+
+export type InsightsResult = { ok: true; data: InsightList } | { ok: false; status: number };
+
+/**
+ * What the last run noticed about this dealership's stock.
+ *
+ * A plain read of a table: whatever the worker last wrote. It never triggers a computation,
+ * which is why a dashboard page carrying this loads at the same speed as one that does not.
+ */
+export async function fetchInsights(): Promise<InsightsResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await request(`${API_URL}/insights`, {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res) return { ok: false, status: UNREACHABLE };
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = insightListSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data };
+}
+
+/**
+ * Ask for a new run.
+ *
+ * Returns as soon as the job is queued, not when it is done: the API answers 202 with a job
+ * id. The screen says the run started, and the numbers appear on the next load. Waiting here
+ * would put the whole computation back inside a request, which is the thing we designed out.
+ */
+export async function refreshInsights(): Promise<MutationResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401, message: null };
+
+  const res = await request(`${API_URL}/insights/refresh`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res) return { ok: false, status: UNREACHABLE, message: null };
+  if (res.status !== 202)
+    return { ok: false, status: res.status, message: await readApiError(res) };
+
+  // Parsed rather than ignored: if the API ever stops answering with a job id, that is a
+  // contract change we want to see here, not a silently successful no-op.
+  const parsed = insightRunSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502, message: null };
   return { ok: true };
 }
 

@@ -135,10 +135,25 @@ inventory list. Remaining and upcoming, in order:
    API on the first move. A buyer may create one and can never read one: `selectcars_public`
    holds an insert grant and no select policy at all. This is where the **salesperson** role
    finally does product work, while the listing stays owned by the dealership.
-6. **Analytics + AI insights (Phase 5).** Trends shipped on Day 31: units sold, gross, and
-   enquiries by month, at `/dashboard/analytics`, as small multiples with a table twin. The
-   async AI half (pricing position, aging alerts, lead scoring) is next, and stays on BullMQ:
-   never on the request path.
+6. **Analytics + AI insights (Phase 5).** **Done (Days 31-32).** Trends shipped on Day 31:
+   units sold, gross, and enquiries by month, at `/dashboard/analytics`, as small multiples
+   with a table twin. Insights shipped on Day 32 in the same screen: pricing position against
+   comparable listings across the whole marketplace, and aging against the dealership's own
+   selling pace.
+
+   The shape of that second half is the part worth carrying forward. **The arithmetic is SQL
+   and always runs; a model writes at most one sentence over it, behind a flag, from a
+   worker.** The model is never asked for a number the database can compute exactly, so the
+   feature demonstrates end to end with no API key and nobody is shown an invented
+   percentage. `POST /insights/refresh` answers `202` with a job id and the worker writes the
+   table: nothing expensive is ever on the request path, which is the rule this phase existed
+   to establish before vision and semantic search arrive.
+   → [ADR 004](../adr/004-async-insights.md), [Day 32](../tasks/day-32-async-insights.md)
+
+7. **Next, in order.** Recompute insights on a schedule (a cron pushing onto the same queue,
+   so a dealer is not the only trigger); inventory turn and period-over-period deltas on the
+   analytics screen; then AI vision for photo-to-listing, which is the first feature where a
+   model produces something the database cannot.
 
 Delivered alongside the above, out of sequence because the marketplace needed it to be a real
 platform:

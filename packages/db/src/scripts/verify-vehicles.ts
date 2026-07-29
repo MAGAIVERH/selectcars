@@ -694,6 +694,132 @@ async function main(): Promise<void> {
     crossLead.status,
   );
 
+  // --- insights: work that happens off the request path ---------------------
+  // The property under test is the shape of the thing, not the arithmetic: asking for a run
+  // returns immediately with a job id, and the result arrives later, written by a different
+  // process. If this ever starts passing without the worker running, the work has crept back
+  // into the request and the whole design has been undone.
+  type Insights = {
+    items: { vehicleId: string; kind: string; headline: string; facts: Record<string, unknown> }[];
+    lastComputedAt: string | null;
+  };
+  const readInsights = async (token: string): Promise<Insights> =>
+    (await (await fetch(`${API}/insights`, { headers: authed(token) })).json()) as Insights;
+
+  const anonymousInsights = await fetch(`${API}/insights`);
+  check(
+    "reading insights without a token -> 401",
+    anonymousInsights.status === 401,
+    anonymousInsights.status,
+  );
+
+  const beforeRun = await readInsights(alpha.token);
+  check(
+    "a dealership that has never run one has nothing and says so",
+    beforeRun.items.length === 0 && beforeRun.lastComputedAt === null,
+    beforeRun,
+  );
+
+  const queued = await fetch(`${API}/insights/refresh`, {
+    method: "POST",
+    headers: authedNoBody(alpha.token),
+  });
+  check("asking for a run -> 202 Accepted, not 200", queued.status === 202, queued.status);
+  const run = (await queued.json()) as { queued: boolean; jobId: string };
+  check("the answer is a job id, not the insights", run.queued === true && !!run.jobId, run);
+
+  // Poll rather than sleep: the run takes as long as it takes, and a fixed wait is either
+  // flaky or slow. Ten seconds is generous for a handful of cars.
+  let afterRun: Insights = { items: [], lastComputedAt: null };
+  for (let attempt = 0; attempt < 20; attempt++) {
+    afterRun = await readInsights(alpha.token);
+    if (afterRun.items.length > 0) break;
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
+  check(
+    "the worker writes the result, and a later read finds it",
+    afterRun.items.length > 0 && afterRun.lastComputedAt !== null,
+    { items: afterRun.items.length, lastComputedAt: afterRun.lastComputedAt },
+  );
+  check(
+    "every unsold car gets an aging reading, including the draft",
+    afterRun.items.filter((i) => i.kind === "aging").length >= 2,
+    afterRun.items.map((i) => `${i.kind}:${i.vehicleId.slice(0, 8)}`),
+  );
+  check(
+    "the numbers stand on their own: every insight carries a headline and its evidence",
+    afterRun.items.every((i) => i.headline.length > 0 && Object.keys(i.facts).length > 0),
+    afterRun.items,
+  );
+
+  const bravoInsights = await readInsights(bravo.token);
+  const alphaVehicleIds = new Set(afterRun.items.map((i) => i.vehicleId));
+  check(
+    "another dealership cannot read what we noticed about these cars",
+    bravoInsights.items.every((i) => !alphaVehicleIds.has(i.vehicleId)),
+    bravoInsights.items.map((i) => i.vehicleId),
+  );
+
+  // --- pricing against the market -------------------------------------------
+  // The aging half fires for every car, so the checks above cover it by accident. The
+  // pricing half is deliberately silent until there are enough comparable listings to have
+  // a median worth quoting, which means the showroom's one-of-a-kind exotics never trigger
+  // it. So build a market on purpose: four near-identical sedans, one of them overpriced.
+  const comparable = (priceUsd: number) => ({
+    make: "Toyota",
+    model: "Camry",
+    year: 2021,
+    mileage: 30000,
+    priceUsd,
+    condition: "Used",
+    bodyStyle: "Sedan",
+    fuelType: "Gas",
+    status: "active",
+  });
+
+  for (const price of [20000, 21000, 22000]) {
+    const peer = await addVehicle(bravo.token, comparable(price));
+    if (peer.status !== 201) throw new Error(`comparable listing failed: ${peer.status}`);
+  }
+  const overpriced = await addVehicle(alpha.token, comparable(31000));
+  check("a fourth comparable listing is created -> 201", overpriced.status === 201, overpriced);
+
+  const secondRun = await fetch(`${API}/insights/refresh`, {
+    method: "POST",
+    headers: authedNoBody(alpha.token),
+  });
+  check(
+    "a completed run does not block the next one -> 202",
+    secondRun.status === 202,
+    secondRun.status,
+  );
+
+  let priced: Insights["items"][number] | undefined;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const current = await readInsights(alpha.token);
+    priced = current.items.find((i) => i.kind === "pricing" && i.vehicleId === overpriced.id);
+    if (priced) break;
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
+  check(
+    "a car well above the market median is flagged, with the comparison it used",
+    !!priced &&
+      priced.facts.comparableListings === 3 &&
+      priced.facts.marketMedianUsd === 21000 &&
+      priced.facts.percentFromMedian === 48,
+    priced,
+  );
+  // The comparison ran under the public role, so the median came from listings owned by a
+  // dealership this token cannot read a single row of. That is the point of computing it
+  // there rather than under the tenant.
+  check(
+    "the median is drawn from the whole marketplace, not just this dealership's own cars",
+    !!priced && priced.headline.includes("above comparable listings"),
+    priced?.headline,
+  );
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];

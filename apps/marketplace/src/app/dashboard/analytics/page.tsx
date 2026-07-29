@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { SITE, trendsQuerySchema, type TrendPoint } from "@selectcars/shared";
-import { fetchTrends } from "@/lib/api";
+import { fetchInsights, fetchTrends } from "@/lib/api";
 import { TrendChart, type ChartPoint } from "@/components/dashboard/trend-chart";
+import { InsightCard } from "@/components/dashboard/insight-card";
+import { RefreshInsights } from "@/components/dashboard/refresh-insights";
 
 export const metadata = {
   title: `Analytics · ${SITE.name}`,
@@ -15,6 +17,14 @@ const usd0 = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
   maximumFractionDigits: 0,
+});
+
+/** When the last insight run finished. Short, because it is a footnote, not a headline. */
+const runFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
 });
 
 const money = (n: number) => usd0.format(n);
@@ -54,7 +64,10 @@ function series(
 export default async function AnalyticsPage({ searchParams }: { searchParams: SearchParams }) {
   const raw = (await searchParams).months;
   const months = trendsQuerySchema.parse({ months: typeof raw === "string" ? raw : 6 }).months;
-  const result = await fetchTrends(months);
+
+  // Two independent reads, so they go together rather than one after the other. Both are
+  // plain table reads: neither computes anything, which is why this page is not slow.
+  const [result, insights] = await Promise.all([fetchTrends(months), fetchInsights()]);
 
   if (!result.ok) {
     return (
@@ -112,6 +125,49 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Se
         <TrendChart title="Total gross" points={series(points, (p) => p.totalGrossUsd, money)} />
         <TrendChart title="Enquiries" points={series(points, (p) => p.leads, plain)} />
       </div>
+
+      {/*
+        What the platform noticed, computed off the request path.
+
+        Everything above is this dealership's own history. This section is the one place the
+        dashboard compares them to the rest of the marketplace, which is why it cannot be
+        computed while the page loads: it reads every active listing on the platform, and
+        when a model is configured it also waits on one. A worker does it on a queue and the
+        page reads the result, so this section costs the same as a table read.
+      */}
+      <section aria-labelledby="insights-heading" className="mt-12">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 id="insights-heading" className="eyebrow">
+              What we noticed
+            </h2>
+            <p className="text-muted mt-2 max-w-lg text-sm">
+              {insights.ok && insights.data.lastComputedAt
+                ? `Last run ${runFmt.format(insights.data.lastComputedAt)}.`
+                : "Pricing against comparable listings across the marketplace, and how long each car has been sitting against your own pace."}
+            </p>
+          </div>
+          <RefreshInsights />
+        </div>
+
+        {!insights.ok ? (
+          <p className="text-muted border-border mt-4 rounded-[var(--radius-card)] border border-dashed p-8 text-center text-sm">
+            {insights.status === 403
+              ? "Insights are limited to owners and managers."
+              : `We could not load the insights (error ${insights.status}).`}
+          </p>
+        ) : insights.data.items.length === 0 ? (
+          <p className="text-muted border-border mt-4 rounded-[var(--radius-card)] border border-dashed p-8 text-center text-sm">
+            Nothing yet. Run it once and the readings appear here.
+          </p>
+        ) : (
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            {insights.data.items.map((insight) => (
+              <InsightCard key={insight.id} insight={insight} />
+            ))}
+          </div>
+        )}
+      </section>
 
       {/*
         The table is not a fallback, it is the twin: every value in the charts is readable

@@ -38,7 +38,11 @@
 
 ## Open decisions
 
-- [ ] Single `apps/api` with worker entry vs separate `apps/worker`.
+- [x] ~~Single `apps/api` with worker entry vs separate `apps/worker`.~~ **Resolved Day 32:
+      one package, two entrypoints** (`src/server.ts`, `src/worker.ts`), bundled in the same
+      tsup pass and shipped as the same image with a different command. A separate package
+      would duplicate the db layer, the env schema, the repositories, and the Zod contracts,
+      and the copies would drift. Revisit when the worker's dependencies genuinely diverge.
 - [ ] **Auth verification:** validate the Better Auth session in Fastify (shared secret /
       session lookup) vs proxying through Next. Auth is no longer Supabase, so there is no
       Supabase JWT to verify. This is the blocker for the tenant-context plugin.
@@ -46,9 +50,10 @@
 
 ## Changelog
 
-| Date       | Change                                                                                | Reason                                                                                                                                                                                                     |
-| ---------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-12 | Created sheet                                                                         | Initial decision: Fastify + BullMQ service                                                                                                                                                                 |
-| 2026-07-12 | Scaffolded `apps/api` (Fastify 5)                                                     | Day 10: cors, helmet, pino, Zod, /health, /ready                                                                                                                                                           |
-| 2026-07-28 | `409 conflict` added to the shared error contract                                     | Day 25: a refused status transition is a state conflict, not a bad request. `PATCH /vehicles/:id` now validates the move against the row's locked status inside the writing transaction.                   |
-| 2026-07-28 | Dealer surface: `/public/dealers`, `/public/dealers/:slug`, `GET`+`PATCH /dealership` | Day 26: the marketplace became multi-seller. Visibility of a seller is decided by an RLS policy that composes with the one on `vehicles`, so the API needs no "only dealers with active inventory" filter. |
+| Date       | Change                                                                                                  | Reason                                                                                                                                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-12 | Created sheet                                                                                           | Initial decision: Fastify + BullMQ service                                                                                                                                                                                                                           |
+| 2026-07-12 | Scaffolded `apps/api` (Fastify 5)                                                                       | Day 10: cors, helmet, pino, Zod, /health, /ready                                                                                                                                                                                                                     |
+| 2026-07-28 | `409 conflict` added to the shared error contract                                                       | Day 25: a refused status transition is a state conflict, not a bad request. `PATCH /vehicles/:id` now validates the move against the row's locked status inside the writing transaction.                                                                             |
+| 2026-07-28 | Dealer surface: `/public/dealers`, `/public/dealers/:slug`, `GET`+`PATCH /dealership`                   | Day 26: the marketplace became multi-seller. Visibility of a seller is decided by an RLS policy that composes with the one on `vehicles`, so the API needs no "only dealers with active inventory" filter.                                                           |
+| 2026-07-29 | BullMQ 5.81 in use; second entrypoint `src/worker.ts`; `GET /insights` + `POST /insights/refresh` (202) | Day 32: insights read the whole marketplace and may call a model, so they run on a queue and never inside a request. `REDIS_URL` is optional at boot like storage: without it the API serves everything else and only the insight endpoints answer 503. See ADR 004. |
