@@ -8,8 +8,10 @@ import {
   createVehicleSchema,
   photoUploadRequestSchema,
   updateDealerProfileSchema,
+  updateLeadSchema,
   updateVehicleSchema,
   type PhotoUploadRequest,
+  type UpdateLead,
 } from "@selectcars/shared";
 import {
   attachPhoto,
@@ -20,6 +22,7 @@ import {
   requestPhotoUpload,
   setPrimaryPhoto,
   updateDealership,
+  updateLead,
   updateVehicle,
 } from "@/lib/api";
 
@@ -98,7 +101,9 @@ function describeFailure(status: number, message: string | null): string {
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404) return "That vehicle is no longer in your inventory.";
   if (status === 409) return message ?? "That status change is not allowed.";
-  if (status === 503) return message ?? "That feature is not available on this server yet.";
+  // 503 is either a switched-off dependency (the API says which) or the API itself being
+  // unreachable, which the client reports with the same status and no message.
+  if (status === 503) return message ?? "The API is not responding. Try again in a moment.";
   return `The change could not be saved (error ${status}).`;
 }
 
@@ -315,6 +320,28 @@ export async function recordSaleAction(
   revalidatePath("/dashboard/inventory");
   revalidatePath(`/dashboard/vehicles/${parsed.data.vehicleId}`);
   return {};
+}
+
+/**
+ * Move a lead along the pipeline, or hand it to a salesperson.
+ *
+ * The first time a lead leaves `new`, the API stamps the response time. That is not done
+ * here on purpose: whichever screen or script moves a lead next would have to remember to do
+ * it, and one that forgets makes the response-time figure quietly wrong.
+ */
+export async function updateLeadAction(
+  leadId: string,
+  patch: UpdateLead,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = updateLeadSchema.safeParse(patch);
+  if (!parsed.success) return { ok: false, error: "That change is not valid." };
+
+  const result = await updateLead(leadId, parsed.data);
+  if (!result.ok) return { ok: false, error: describeFailure(result.status, result.message) };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/leads");
+  return { ok: true };
 }
 
 /** Remove a listing for good. The API restricts this to owners and managers. */

@@ -38,6 +38,10 @@ refuses to let one see another's data.
   days to sale. Gross is computed by Postgres as a generated column, so no screen gets to
   define it. Owners and managers only: a salesperson sells cars without seeing what the store
   paid for them.
+- **Leads** (`/dashboard/leads`): a buyer asks about a car from its listing and it lands in
+  that dealership's pipeline, assigned to a salesperson, with response time stamped on the
+  first reply. The buyer can create a lead and can never read one: the public database role
+  holds an insert grant and no select policy at all.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the

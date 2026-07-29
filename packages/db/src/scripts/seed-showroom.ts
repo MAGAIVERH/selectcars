@@ -71,6 +71,23 @@ type SeedVehicle = {
   sale?: SeedSale;
 };
 
+/**
+ * A buyer's enquiry about one of the dealership's cars, so the pipeline opens with something
+ * to work rather than an empty state nobody can judge.
+ */
+type SeedLead = {
+  /** Slug of the car they asked about: leads always belong to a listing. */
+  vehicleSlug: string;
+  hoursAgo: number;
+  status: "new" | "contacted" | "appointment" | "won" | "lost";
+  /** Hours after arriving that the dealership first replied. Omitted while still `new`. */
+  respondedAfterHours?: number;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string | null;
+  message: string;
+};
+
 /** A dealership account, exactly as a real one looks after signing up and filling its profile. */
 type SeedDealership = {
   id: string;
@@ -81,6 +98,7 @@ type SeedDealership = {
   phone: string;
   about: string;
   vehicles: SeedVehicle[];
+  leads: SeedLead[];
 };
 
 const p = (file: string, alt: string): SeedPhoto => ({ file, alt, primary: true });
@@ -234,6 +252,38 @@ const DEALERSHIPS: SeedDealership[] = [
           backEndGrossUsd: 2900,
           buyerName: "M. Okafor",
         },
+      },
+    ],
+    leads: [
+      {
+        vehicleSlug: "bentley-continental-gt",
+        hoursAgo: 3,
+        status: "new",
+        buyerName: "Adrian Foss",
+        buyerEmail: "adrian.foss@example.com",
+        buyerPhone: "+1 (305) 555-0142",
+        message:
+          "Is the Mulliner spec documented, and would you consider a trade against a 2021 Aston DB11?",
+      },
+      {
+        vehicleSlug: "mercedes-amg-c63-coupe",
+        hoursAgo: 26,
+        status: "contacted",
+        respondedAfterHours: 2,
+        buyerName: "Priya Raman",
+        buyerEmail: "priya.raman@example.com",
+        buyerPhone: null,
+        message: "Who did the widebody work, and is there any paint correction history?",
+      },
+      {
+        vehicleSlug: "bmw-i8",
+        hoursAgo: 96,
+        status: "appointment",
+        respondedAfterHours: 5,
+        buyerName: "Tom Van Der Berg",
+        buyerEmail: "tom.vdb@example.com",
+        buyerPhone: "+1 (786) 555-0119",
+        message: "Battery health report available? I can come by Saturday morning.",
       },
     ],
   },
@@ -391,6 +441,37 @@ const DEALERSHIPS: SeedDealership[] = [
         },
       },
     ],
+    leads: [
+      {
+        vehicleSlug: "hyundai-kona",
+        hoursAgo: 7,
+        status: "new",
+        buyerName: "Marisol Vega",
+        buyerEmail: "marisol.vega@example.com",
+        buyerPhone: "+1 (813) 555-0177",
+        message: "Was this a rental? Happy with that, I just want the service record first.",
+      },
+      {
+        vehicleSlug: "hyundai-elantra",
+        hoursAgo: 52,
+        status: "won",
+        respondedAfterHours: 1,
+        buyerName: "Devon Clarke",
+        buyerEmail: "devon.clarke@example.com",
+        buyerPhone: null,
+        message: "Can you hold it until Friday? I have financing approved already.",
+      },
+      {
+        vehicleSlug: "genesis-g90",
+        hoursAgo: 120,
+        status: "lost",
+        respondedAfterHours: 19,
+        buyerName: "Helena Braga",
+        buyerEmail: "helena.braga@example.com",
+        buyerPhone: null,
+        message: "Still available? Comparing against a G80 at another dealer.",
+      },
+    ],
   },
 ];
 
@@ -427,15 +508,17 @@ async function upsertDealership(client: PoolClient, dealership: SeedDealership):
 
 async function seedInventory(
   dealership: SeedDealership,
-): Promise<{ photos: number; deals: number }> {
+): Promise<{ photos: number; deals: number; leads: number }> {
   return withTenant(dealership.id, async (client) => {
-    // Rebuild this dealership's inventory from scratch. RLS scopes both deletes to this
-    // tenant. Deals go first: the vehicle FK is `on delete restrict` precisely so a sale
-    // cannot be erased as a side effect of deleting a car, which means the seed has to say
-    // out loud that it is throwing the history away too.
+    // Rebuild this dealership's inventory from scratch. RLS scopes every delete to this
+    // tenant. Deals and leads go first: the vehicle FK on `deals` is `on delete restrict`
+    // precisely so a sale cannot be erased as a side effect of deleting a car, which means
+    // the seed has to say out loud that it is throwing the history away too.
+    await client.query("delete from public.leads where tenant_id = $1", [dealership.id]);
     await client.query("delete from public.deals where tenant_id = $1", [dealership.id]);
     await client.query("delete from public.vehicles where tenant_id = $1", [dealership.id]);
 
+    const vehicleIdBySlug = new Map<string, string>();
     let photoCount = 0;
     let dealCount = 0;
     for (const v of dealership.vehicles) {
@@ -471,6 +554,7 @@ async function seedInventory(
         ],
       );
       const vehicleId = inserted.rows[0].id;
+      vehicleIdBySlug.set(v.slug, vehicleId);
 
       for (let i = 0; i < v.photos.length; i++) {
         const photo = v.photos[i];
@@ -507,7 +591,38 @@ async function seedInventory(
       }
     }
 
-    return { photos: photoCount, deals: dealCount };
+    // Leads last: they point at a listing, so the cars have to exist first.
+    let leadCount = 0;
+    for (const lead of dealership.leads) {
+      const vehicleId = vehicleIdBySlug.get(lead.vehicleSlug);
+      if (!vehicleId) throw new Error(`Lead references an unknown listing: ${lead.vehicleSlug}`);
+
+      await client.query(
+        `insert into public.leads (
+           tenant_id, vehicle_id, status, buyer_name, buyer_email, buyer_phone, message,
+           created_at, first_response_at
+         ) values (
+           $1, $2, $3, $4, $5, $6, $7,
+           now() - ($8 || ' hours')::interval,
+           case when $9::text is null then null
+                else now() - (($8::numeric - $9::numeric) || ' hours')::interval end
+         )`,
+        [
+          dealership.id,
+          vehicleId,
+          lead.status,
+          lead.buyerName,
+          lead.buyerEmail,
+          lead.buyerPhone,
+          lead.message,
+          String(lead.hoursAgo),
+          lead.respondedAfterHours === undefined ? null : String(lead.respondedAfterHours),
+        ],
+      );
+      leadCount++;
+    }
+
+    return { photos: photoCount, deals: dealCount, leads: leadCount };
   });
 }
 
@@ -533,21 +648,23 @@ async function main(): Promise<void> {
   let vehicles = 0;
   let photos = 0;
   let deals = 0;
+  let leads = 0;
   for (const dealership of DEALERSHIPS) {
     const count = await seedInventory(dealership);
     const live = dealership.vehicles.filter((v) => !v.sale).length;
     vehicles += dealership.vehicles.length;
     photos += count.photos;
     deals += count.deals;
+    leads += count.leads;
     console.log(
       `${dealership.name} (${dealership.city}, ${dealership.state}): ` +
-        `${live} live, ${count.deals} sold, ${count.photos} photos`,
+        `${live} live, ${count.deals} sold, ${count.photos} photos, ${count.leads} leads`,
     );
   }
 
   console.log(
     `\nseeded: ${DEALERSHIPS.length} dealerships, ${vehicles} vehicles ` +
-      `(${vehicles - deals} live, ${deals} sold), ${photos} photos, ${deals} deals`,
+      `(${vehicles - deals} live, ${deals} sold), ${photos} photos, ${deals} deals, ${leads} leads`,
   );
   console.log("live listings are status=active; sold units carry a recorded deal instead");
 

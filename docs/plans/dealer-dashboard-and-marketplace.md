@@ -130,10 +130,11 @@ inventory list. Remaining and upcoming, in order:
    the overview; the inventory list moved to `/dashboard/inventory`. The `deals` table holds
    sale price, cost, recon and back-end gross, with front-end and total gross as generated
    columns so no screen can define them differently. Owners and managers only.
-5. **Leads / CRM (Phase 4).** Capture buyer interest from the marketplace into a per-tenant
-   pipeline, surfaced in the dashboard. This is where the **salesperson** role finally shows
-   up in the product: a lead is assigned to a person inside the dealership, while the listing
-   stays owned by the dealership.
+5. **Leads / CRM (Phase 4).** **Done (Day 30).** An enquiry from a listing becomes a lead in
+   the selling dealership's pipeline, assigned to a person, with response time stamped by the
+   API on the first move. A buyer may create one and can never read one: `selectcars_public`
+   holds an insert grant and no select policy at all. This is where the **salesperson** role
+   finally does product work, while the listing stays owned by the dealership.
 6. **Analytics + AI insights (Phase 5).** Charts and async AI (pricing, aging, lead scoring).
 
 Delivered alongside the above, out of sequence because the marketplace needed it to be a real

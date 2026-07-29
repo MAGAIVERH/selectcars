@@ -76,8 +76,13 @@ dealership has published rather than one anonymous pile.
 | Day   | Title                                                      | Status                               |
 | ----- | ---------------------------------------------------------- | ------------------------------------ |
 | 29    | [Deals + dashboard overview](day-29-deals-and-overview.md) | Done (38/38 verified, browser + API) |
-| 31-32 | Leads / CRM pipeline from marketplace interest             | Open                                 |
+| 30    | [Leads / CRM pipeline](day-30-leads-crm.md)                | Done (55/55 verified, browser + API) |
 | 33-34 | Trends over time and inventory turn charts                 | Open                                 |
+
+**Phase 4 is functionally complete.** A dealership can see what it owns, what it is worth,
+what it sold and made, and who is asking about it, all tenant-scoped and all proven by
+`verify:vehicles` (55/55). The salesperson role now does product work: leads are assigned to
+people, and the money stays with owners and managers.
 
 ### Phase 5 — Analytics + AI insights
 

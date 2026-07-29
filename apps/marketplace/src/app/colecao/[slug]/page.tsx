@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingGallery } from "@/components/listing-gallery";
+import { EnquiryForm } from "@/components/enquiry-form";
 import { fetchPublicVehicleBySlug } from "@/lib/public-api";
 import { formatPrice, formatMileage } from "@/lib/format";
 
@@ -74,13 +75,10 @@ export default async function ListingPage({ params }: { params: Params }) {
                 <p className="text-muted mt-6 text-sm leading-6">{vehicle.description}</p>
               )}
 
-              <Link
-                href="/#agendar"
-                className="bg-foreground text-background mt-8 inline-flex items-center gap-1.5 rounded-full px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
-              >
-                Book a private viewing
-                <span aria-hidden="true">→</span>
-              </Link>
+              <EnquiryForm
+                vehicleId={vehicle.id}
+                dealerName={vehicle.dealer?.name ?? "the seller"}
+              />
 
               {/* Who is selling, and where the car physically is. Buyers rank a hidden
                   location among their top complaints about listing sites, so it is stated

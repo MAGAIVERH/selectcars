@@ -569,6 +569,100 @@ async function main(): Promise<void> {
   });
   await setStatus(ferrariId, "active");
 
+  // --- leads: the one thing a stranger may write ----------------------------
+  // A buyer creates a row inside a dealership's data with no account and no token, which
+  // makes this the narrowest surface in the API. Two properties have to hold: the enquiry
+  // can only be about a car the buyer can actually see, and nothing about a pipeline ever
+  // comes back out.
+  const enquire = (body: Record<string, unknown>) =>
+    fetch(`${API}/public/leads`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  const enquiry = await enquire({
+    vehicleId: bravoCar.id,
+    buyerName: "Verification Buyer",
+    buyerEmail: "buyer@example.com",
+    message: "Is it still available?",
+  });
+  check("a buyer with no account can enquire -> 202", enquiry.status === 202, enquiry.status);
+  check(
+    "the acknowledgement carries no record back",
+    JSON.stringify(await enquiry.json()) === JSON.stringify({ received: true }),
+  );
+
+  // `draft.id` is Alpha's Porsche, which was published during the workflow section and is
+  // active again; use the fresh draft created there instead, which never left `draft`.
+  const draftEnquiry = await enquire({
+    vehicleId: freshDraft.id,
+    buyerName: "Verification Buyer",
+    buyerEmail: "buyer@example.com",
+  });
+  check(
+    "enquiring about a draft -> 404 (the listing is not visible, so it does not exist)",
+    draftEnquiry.status === 404,
+    draftEnquiry.status,
+  );
+
+  const bravoLeads = (await (
+    await fetch(`${API}/leads`, { headers: authed(bravo.token) })
+  ).json()) as { items: { buyerEmail: string; status: string; vehicleLabel: string | null }[] };
+  check(
+    "the enquiry lands in the right dealership's pipeline, unanswered",
+    bravoLeads.items.some((l) => l.buyerEmail === "buyer@example.com" && l.status === "new"),
+    bravoLeads.items,
+  );
+
+  const alphaLeads = (await (
+    await fetch(`${API}/leads`, { headers: authed(alpha.token) })
+  ).json()) as { items: { buyerEmail: string }[] };
+  check(
+    "another dealership cannot see that buyer at all",
+    !alphaLeads.items.some((l) => l.buyerEmail === "buyer@example.com"),
+    alphaLeads.items.map((l) => l.buyerEmail),
+  );
+
+  const anonymousRead = await fetch(`${API}/leads`);
+  check(
+    "reading the pipeline without a token -> 401",
+    anonymousRead.status === 401,
+    anonymousRead.status,
+  );
+
+  // Moving a lead off `new` is what stamps the response time, and the API does it rather
+  // than the caller, so no screen can forget to.
+  const leadId = (
+    (await (await fetch(`${API}/leads`, { headers: authed(bravo.token) })).json()) as {
+      items: { id: string; buyerEmail: string }[];
+    }
+  ).items.find((l) => l.buyerEmail === "buyer@example.com")!.id;
+
+  const answered = await fetch(`${API}/leads/${leadId}`, {
+    method: "PATCH",
+    headers: authed(bravo.token),
+    body: JSON.stringify({ status: "contacted" }),
+  });
+  check("the seller moves the lead along -> 200", answered.status === 200, answered.status);
+  const movedLead = (await answered.json()) as { responseHours: number | null };
+  check(
+    "response time is stamped by the API on the first move",
+    movedLead.responseHours !== null,
+    movedLead,
+  );
+
+  const crossLead = await fetch(`${API}/leads/${leadId}`, {
+    method: "PATCH",
+    headers: authed(alpha.token),
+    body: JSON.stringify({ status: "won" }),
+  });
+  check(
+    "another dealership cannot touch that lead -> 404",
+    crossLead.status === 404,
+    crossLead.status,
+  );
+
   // --- filters ------------------------------------------------------------
   const filtered = (await (await fetch(`${API}/public/vehicles?make=Ferrari`)).json()) as {
     items: { make: string }[];

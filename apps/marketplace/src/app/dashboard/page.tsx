@@ -53,7 +53,7 @@ export default async function OverviewPage() {
     );
   }
 
-  const { inventory, sales } = metrics.data;
+  const { inventory, sales, leads } = metrics.data;
 
   return (
     <div>
@@ -123,6 +123,38 @@ export default async function OverviewPage() {
             label="Average days to sale"
             value={sales.averageDaysToSale === null ? "—" : String(sales.averageDaysToSale)}
             note="From listed to closed"
+          />
+        </div>
+      </section>
+
+      <section aria-labelledby="leads-heading" className="mt-12">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="leads-heading" className="eyebrow">
+            Buyers
+          </h2>
+          <Link
+            href="/dashboard/leads"
+            className="text-muted hover:text-foreground text-sm transition-colors"
+          >
+            Open the pipeline <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Tile
+            label="Unanswered leads"
+            value={String(leads.newLeads)}
+            note={leads.newLeads > 0 ? "Waiting on you right now" : "Nobody is waiting"}
+            alert={leads.newLeads > 0}
+          />
+          <Tile
+            label="Enquiries (30 days)"
+            value={String(leads.last30d)}
+            note="Messages from your listings"
+          />
+          <Tile
+            label="Average response"
+            value={leads.averageResponseHours === null ? "—" : `${leads.averageResponseHours}h`}
+            note="Most buyers ask several sellers"
           />
         </div>
       </section>
