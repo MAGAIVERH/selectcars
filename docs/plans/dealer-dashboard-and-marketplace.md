@@ -135,7 +135,10 @@ inventory list. Remaining and upcoming, in order:
    API on the first move. A buyer may create one and can never read one: `selectcars_public`
    holds an insert grant and no select policy at all. This is where the **salesperson** role
    finally does product work, while the listing stays owned by the dealership.
-6. **Analytics + AI insights (Phase 5).** Charts and async AI (pricing, aging, lead scoring).
+6. **Analytics + AI insights (Phase 5).** Trends shipped on Day 31: units sold, gross, and
+   enquiries by month, at `/dashboard/analytics`, as small multiples with a table twin. The
+   async AI half (pricing position, aging alerts, lead scoring) is next, and stays on BullMQ:
+   never on the request path.
 
 Delivered alongside the above, out of sequence because the marketplace needed it to be a real
 platform:

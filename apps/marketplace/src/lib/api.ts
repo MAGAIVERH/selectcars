@@ -4,6 +4,7 @@ import {
   dealListSchema,
   dealerProfileSchema,
   dealershipMetricsSchema,
+  dealershipTrendsSchema,
   leadListSchema,
   photoUploadTicketSchema,
   vehicleListSchema,
@@ -13,6 +14,7 @@ import {
   type Deal,
   type DealerProfile,
   type DealershipMetrics,
+  type DealershipTrends,
   type Lead,
   type UpdateLead,
   type PhotoUploadRequest,
@@ -210,6 +212,24 @@ export async function updateDealership(patch: UpdateDealerProfile): Promise<Muta
   if (!res) return { ok: false, status: UNREACHABLE, message: null };
   if (!res.ok) return { ok: false, status: res.status, message: await readApiError(res) };
   return { ok: true };
+}
+
+export type TrendsResult = { ok: true; data: DealershipTrends } | { ok: false; status: number };
+
+/** The dealership's history, month by month. Owners and managers, like every money screen. */
+export async function fetchTrends(months = 6): Promise<TrendsResult> {
+  const token = await getDealerToken();
+  if (!token) return { ok: false, status: 401 };
+
+  const res = await request(`${API_URL}/metrics/trends?months=${months}`, {
+    headers: { authorization: `Bearer ${token}` },
+  });
+  if (!res) return { ok: false, status: UNREACHABLE };
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const parsed = dealershipTrendsSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, status: 502 };
+  return { ok: true, data: parsed.data };
 }
 
 export type LeadsResult = { ok: true; data: Lead[] } | { ok: false; status: number };

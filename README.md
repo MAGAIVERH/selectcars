@@ -42,6 +42,9 @@ refuses to let one see another's data.
   that dealership's pipeline, assigned to a salesperson, with response time stamped on the
   first reply. The buyer can create a lead and can never read one: the public database role
   holds an insert grant and no select policy at all.
+- **Trends** (`/dashboard/analytics`): units sold, gross, and enquiries by month over 6 or 12
+  months, as small multiples with a table twin. One series per chart on purpose: a dual axis
+  invents a correlation the data does not contain.
 - **Vehicles API**: dealer CRUD (`/vehicles`, RBAC) and a separate public read path
   (`/public/vehicles`) that can only ever return `active` listings, enforced by a distinct
   Postgres role. Every vehicle carries its ordered `photos` gallery; on the public path the

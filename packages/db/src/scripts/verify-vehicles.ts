@@ -560,6 +560,37 @@ async function main(): Promise<void> {
     bravoMetrics.sales,
   );
 
+  // --- trends over time ----------------------------------------------------
+  type Trends = { months: number; points: { month: string; unitsSold: number; leads: number }[] };
+
+  const trends = (await (
+    await fetch(`${API}/metrics/trends?months=6`, { headers: authed(alpha.token) })
+  ).json()) as Trends;
+  check(
+    "trends return every month in the window, including the empty ones",
+    trends.points.length === 6,
+    trends.points.length,
+  );
+  check(
+    "a quiet month is a zero, not a missing point",
+    trends.points.every((p) => typeof p.unitsSold === "number"),
+    trends.points,
+  );
+  check(
+    "this month's sale shows up in the series",
+    trends.points[trends.points.length - 1]?.unitsSold === 1,
+    trends.points[trends.points.length - 1],
+  );
+
+  const bravoTrends = (await (
+    await fetch(`${API}/metrics/trends?months=6`, { headers: authed(bravo.token) })
+  ).json()) as Trends;
+  check(
+    "another dealership's series is its own",
+    bravoTrends.points.every((p) => p.unitsSold === 0),
+    bravoTrends.points.map((p) => p.unitsSold),
+  );
+
   // Put the Ferrari back on the market, so the filter check below still has one to find.
   // The deal has to go first: the vehicle FK is `on delete restrict` precisely so a sale
   // cannot quietly disappear with the car.

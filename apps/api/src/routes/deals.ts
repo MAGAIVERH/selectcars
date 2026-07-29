@@ -7,6 +7,8 @@ import {
   dealListSchema,
   dealSchema,
   dealershipMetricsSchema,
+  dealershipTrendsSchema,
+  trendsQuerySchema,
 } from "@selectcars/shared";
 import { withTenant } from "@selectcars/db";
 import { requireTenantContext } from "../lib/request-context";
@@ -38,6 +40,21 @@ export async function dealRoutes(app: FastifyInstance): Promise<void> {
     async (request) => {
       const { tenantId } = requireTenantContext(request);
       return withTenant(tenantId, (client) => deals.metricsForTenant(client));
+    },
+  );
+
+  r.get(
+    "/metrics/trends",
+    {
+      onRequest: app.requireTenant(CAN_SEE_MONEY),
+      schema: {
+        querystring: trendsQuerySchema,
+        response: { 200: dealershipTrendsSchema, 401: apiErrorSchema, 403: apiErrorSchema },
+      },
+    },
+    async (request) => {
+      const { tenantId } = requireTenantContext(request);
+      return withTenant(tenantId, (client) => deals.trendsForTenant(client, request.query.months));
     },
   );
 

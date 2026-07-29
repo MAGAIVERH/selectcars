@@ -77,7 +77,7 @@ dealership has published rather than one anonymous pile.
 | ----- | ---------------------------------------------------------- | ------------------------------------ |
 | 29    | [Deals + dashboard overview](day-29-deals-and-overview.md) | Done (38/38 verified, browser + API) |
 | 30    | [Leads / CRM pipeline](day-30-leads-crm.md)                | Done (55/55 verified, browser + API) |
-| 33-34 | Trends over time and inventory turn charts                 | Open                                 |
+| 33-34 | Inventory turn and period-over-period deltas               | Open                                 |
 
 **Phase 4 is functionally complete.** A dealership can see what it owns, what it is worth,
 what it sold and made, and who is asking about it, all tenant-scoped and all proven by
@@ -86,9 +86,10 @@ people, and the money stays with owners and managers.
 
 ### Phase 5 — Analytics + AI insights
 
-| Day | Title                                            | Status |
-| --- | ------------------------------------------------ | ------ |
-| 35+ | Trend charts, inventory turn, async AI (pricing) | Open   |
+| Day | Title                                          | Status                               |
+| --- | ---------------------------------------------- | ------------------------------------ |
+| 31  | [Trends over time](day-31-analytics-trends.md) | Done (59/59 verified, browser + API) |
+| 32+ | Async AI insights on BullMQ (pricing, aging)   | Open                                 |
 
 The full intent behind Phases 3-5 lives in
 [`docs/plans/dealer-dashboard-and-marketplace.md`](../plans/dealer-dashboard-and-marketplace.md).
